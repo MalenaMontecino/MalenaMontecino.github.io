@@ -1,0 +1,48 @@
+
+/*HEADER*/
+
+header {
+    display: flex; 
+    background-color: #96f7f779;
+    padding: 0.01px;
+}
+  
+
+  
+/*navegador*/
+.menu {
+display: inline-block;
+margin: 0;
+padding: 0;
+}
+
+.menu li {
+display: inline-block;
+margin: 0 10px;
+}
+
+.menu li a {
+text-decoration: none;
+color: #333;
+font-weight: bold;
+display: block;
+padding: 15px 20px;
+color:rgb(104, 120, 128); 
+font-size: 20px;
+}
+
+.menu li a:hover{ /*para cuando aprietes en el menú*/
+color:rgb(0, 0, 0);
+}
+
+.navegacion{
+width: 800px;
+margin: 20px auto;
+background-color: rgb(243, 240, 240);
+box-shadow: 7px 13px 37px rgb(162, 164, 165);
+text-align: center;
+}
+
+.navegacion ul{ /*para que no sea en formato lista*/
+list-style: none; 
+}
