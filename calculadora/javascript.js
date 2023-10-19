@@ -3,18 +3,18 @@ function calcularPropina() {
     var costeTotal =  document.getElementById('coste');
     var calificacionServicio = document.getElementById('calificacionServicio');
    
-/*        var propinaDefault = "0,50 €" */
+
     var porcentaje;
     var propinaFinal;
     
     if(numPersonas.value === ""){
         numPersonas.value = 1;
-      return false; //porque false
+     // return false; //porque false
     }
     
     if (costeTotal.value === ""){
      window.alert("Por favor, ingresa el coste total.");
-      return false;
+     // return false;
     }
     
      switch (calificacionServicio.value) {
