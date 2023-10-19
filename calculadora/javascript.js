@@ -9,12 +9,10 @@ function calcularPropina() {
     
     if(numPersonas.value === ""){
         numPersonas.value = 1;
-     // return false; //porque false
     }
     
     if (costeTotal.value === ""){
      window.alert("Por favor, ingresa el coste total.");
-     // return false;
     }
     
      switch (calificacionServicio.value) {
@@ -31,7 +29,6 @@ function calcularPropina() {
        porcentaje =0;
        break;
      }
-     
      
      var propinaFinal = (costeTotal.value / numPersonas.value) * porcentaje;
     
