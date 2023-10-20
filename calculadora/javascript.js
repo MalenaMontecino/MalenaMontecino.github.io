@@ -1,7 +1,8 @@
 function calcularPropina() {
-    let numPersonas= document.getElementById('numPersonas');
-    let costeTotal =  document.getElementById('coste');
-    let calificacionServicio = document.getElementById('calificacionServicio');
+    const formulario = document.getElementById('miFormulario').value;
+    const numPersonas= formulario.numPersonas.value;
+    const costeTotal =  document.getElementById('coste');
+    const calificacionServicio = document.getElementById('calificacionServicio');
    
 
     let porcentaje;
