@@ -1,6 +1,5 @@
 function calcularPropina() {
-    const formulario = document.getElementById('miFormulario').value;
-    const numPersonas= formulario.numPersonas.value;
+    const numPersonas= document.getElementById('numPersonas');
     const costeTotal =  document.getElementById('coste');
     const calificacionServicio = document.getElementById('calificacionServicio');
    
@@ -44,8 +43,6 @@ function calcularPropina() {
 document.getElementById('miFormulario').reset();
 }  
 
-    
-    
     
     
   
