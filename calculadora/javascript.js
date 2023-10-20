@@ -1,11 +1,11 @@
 function calcularPropina() {
-    var numPersonas= document.getElementById('numPersonas');
-    var costeTotal =  document.getElementById('coste');
-    var calificacionServicio = document.getElementById('calificacionServicio');
+    let numPersonas= document.getElementById('numPersonas');
+    let costeTotal =  document.getElementById('coste');
+    let calificacionServicio = document.getElementById('calificacionServicio');
    
 
-    var porcentaje;
-    var propinaFinal;
+    let porcentaje;
+    let propinaFinal;
     
     if(numPersonas.value === ""){
         numPersonas.value = 1;
@@ -30,7 +30,7 @@ function calcularPropina() {
        break;
      }
      
-     var propinaFinal = (costeTotal.value / numPersonas.value) * porcentaje;
+     let propinaFinal = (costeTotal.value / numPersonas.value) * porcentaje;
     
   if(propinaFinal === 0){
   propinaFinal = 0.5;
