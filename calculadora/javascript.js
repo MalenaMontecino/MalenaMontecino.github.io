@@ -36,7 +36,7 @@ function calcularPropina() {
   propinaFinal = 0.5;
   }
     
-    document.getElementById("propina").innerHTML = propinaFinal + " €";
+    document.getElementById("propina").innerHTML = propinaFinal.toFixed(2) + " €";
     
    
 // QUE SE BORREN LOS DATOS AL FINAL   
