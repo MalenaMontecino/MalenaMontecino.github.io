@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adopta un perrito</title>
+    <link rel="stylesheet" href="CSS/principal.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="imagen/logo.png" alt="logo de la protectora">
+            
+        </div>
+        <nav class="navegacion"> 
+            <ul class="menu">
+                <li><a href="index.html">Principal</a></li>
+                <li><a href="noticias.html">Noticias/Artículos</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="registros.html">Registros</a></li>
+            </ul>
+        </nav>
+    </header>
+   <div class="container-registro">
+        <form class = "formulario-registro">
+            <h1>Registrate aquí </h1>
+
+            <input class="campos" type="text" name="nombre-usuario" id="nombre-usuario" placeholder="Nombre de usuario"
+            required minlength="1" maxlength="80" required>
+            <input class="campos" type="email" name="correo" id="correo" placeholder="Correo electrónico" required>
+            
+            
+            <p> Elige categorías de interés </p>
+            <table>
+                 <tr>
+                     <td>
+                         <input type="checkbox" id="categoria1" name="categorias" value="Rescates">
+                         <label class="categorias" for="categoria1">Rescates</label><br>
+                     </td>
+                     <td>
+                         <input type="checkbox" id="categoria2" name="categorias" value="Rescuperacion">
+                         <label class="categorias" for="categoria2">Recuperación</label><br>
+                     </td>
+                     <td>
+                         <input type="checkbox" id="categoria3" name="categorias" value="Adopcion">
+                         <label class="categorias" for="categoria3">Adopción</label>
+                         
+                     </td>
+                    
+                 </tr>
+            </table>
+
+            <p> Suscripción al Newsletter?</p> <!---ponerlo como la política de recogida de datos-->
+            <div class="eleccion-newsletter">
+                <input type="checkbox" id="aceptarSuscripcion" name="suscripcion" value="Si">
+                <label for="aceptarSuscripcion">Sí</label> <br>
+
+                <input type="checkbox" id="negarSuscripcion" name="suscripcion" value="No">
+                <label for="negarSuscripcion">No</label>
+
+            </div> 
+            <input class = "buttons" type="submit" value="Enviar">    
+
+            <input  type="checkbox" id="aceptaPolitica" name="aceptaPolitica" value="Acepto la política" required> 
+            <label class ="politica" for="aceptaPolitica">  Acepto la Política de recogida de datos</label><br>   
+        </form>
+
+
+        <div class="imagenes">
+          
+            <img src="/imagen/protectora.jpg" alt="" width="380" height="240">
+            <img src="/imagen/granja2.jpg" alt="" width="380" height="240">
+        </div>
+   </div>
+    <footer>
+        <div class="footer-container">
+            <div class="footer-copyright">
+                <p>Copyright © 2023 Protectora de perros ® Todos los derechos reservados</p>
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li><a href="#">Aviso legal</a></li>
+                    <li><a href="#">Politica de privacidad</a></li>
+                    <li><a href="#">Politica de cookies</a></li>
+                
+                </ul>
+            </div>
+        </div>
+    </footer>   
+</body>
+</html>
