@@ -81,13 +81,22 @@ p {
   color: #ffffff;
   font-size: 1.5rem;
 }
-
+.form-control::placeholder{
+ 
+  color: #000000;
+}
+.form-control::content{
+   background-color: #60e8d19a;
+}
 /* #helloWorld p {
     color: #E9E9E9;
     font-size: 220px;
 } */
-
-
+/* TOOLTIP */
+.custom-tooltip {
+  --bs-tooltip-bg: #83ddce;
+  --bs-tooltip-color: black;
+}
 /*SKILLS*/
 .skill-card {
   display: flex;
