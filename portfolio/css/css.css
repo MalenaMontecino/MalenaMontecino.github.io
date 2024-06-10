@@ -262,7 +262,7 @@ p {
 }
 
 .contact-form label {
-  color: white;
+  color: rgb(255, 255, 255);
   display: block;
   margin-bottom: 5px;
 }
@@ -275,11 +275,8 @@ p {
   border: none;
   border-radius: 4px;
 }
-@media (max-width: 768px) {
-  #navbar-container {
-      /* justify-content: flex-start; */
-      display: none;
-  }
+::placeholder{
+  text-decoration-color: #60e8d1;
 }
 
 .contact-form button {
@@ -326,7 +323,7 @@ p {
 }
 /* video interactivo OUT */
 .form-control{
-  background-color: #ffffff45;
+  background-color: #ffffff;
 }
 #feedback {
   position: relative;
