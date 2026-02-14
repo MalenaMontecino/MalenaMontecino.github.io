@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regalo de San Valentín</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f9f9ff, #d8b6ffa6, #c5a3ff08, #ffffff);
+    background-size: 400% 400%;
+    animation: gradientAnim 20s ease infinite;
+    font-family: Arial, sans-serif;
+  }
+
+  @keyframes gradientAnim {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    z-index: 0;
+  }
+
+  #gift {
+    width: 150px;
+    height: 150px;
+    background-image: url('regalo.png'); 
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.3s;
+    z-index: 2;
+  }
+
+  #popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff0ff;
+    border: 2px solid #d1a3ff;
+    padding: 30px;
+    border-radius: 15px;
+    display: none;
+    z-index: 10;
+    text-align: center;
+  }
+
+  #popup button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  #popup button#yes {
+    background-color: #a973ff;
+    color: white;
+  }
+
+  #popup button#no {
+    background-color: #e0c6ff;
+    color: #550099;
+  }
+</style>
+</head>
+<body>
+
+<audio id="music" src="mothtoaflame.mp3" autoplay loop></audio>
+
+<canvas id="bgCanvas"></canvas>
+<div id="gift"></div>
+
+<div id="popup">
+  <p id="popupText">¿Realmente quieres el regalo?</p>
+  <button id="yes">Sí</button>
+  <button id="no">No</button>
+</div>
+
+<script>
+  const gift = document.getElementById('gift');
+  const popup = document.getElementById('popup');
+  const yesBtn = document.getElementById('yes');
+  const noBtn = document.getElementById('no');
+  let firstAttemptTime = null;
+  let timer = null;
+  let noDisabled = false;
+
+  // POSICIÓN DEL REGALO
+  function randomPosition() {
+    const x = Math.random() * (window.innerWidth - gift.offsetWidth);
+    const y = Math.random() * (window.innerHeight - gift.offsetHeight);
+    gift.style.left = x + 'px';
+    gift.style.top = y + 'px';
+  }
+  randomPosition();
+
+  gift.addEventListener('mouseenter', () => {
+    if (!firstAttemptTime) {
+      firstAttemptTime = Date.now();
+     timer = setTimeout(showPopupNormal, 6000);
+
+    }
+    moveGift();
+  });
+
+  function moveGift() {
+    const x = Math.random() * (window.innerWidth - gift.offsetWidth);
+    const y = Math.random() * (window.innerHeight - gift.offsetHeight);
+    gift.style.left = x + 'px';
+    gift.style.top = y + 'px';
+  }
+
+// Mostrar el popup normal
+function showPopupNormal() {
+    popup.style.display = 'block';
+    gift.style.pointerEvents = 'none'; // bloquea interacción con el regalo
+
+    document.getElementById('popupText').textContent = '¿Realmente quieres el regalo?';
+    yesBtn.textContent = 'Sí';
+    noBtn.textContent = 'No';
+    noBtn.style.display = 'inline-block';
+    noBtn.disabled = noDisabled;
+    noBtn.style.opacity = noDisabled ? '0.5' : '1';
+
+    yesBtn.onclick = () => {
+        // window.open('Vicente.pdf', '_blank'); // solo aquí se abre el PDF
+         document.getElementById('popupText').style.display = 'none';
+        noBtn.style.display = 'none';
+
+        // Crear iframe para PDF
+        const pdfFrame = document.createElement('iframe');
+        pdfFrame.src = 'Vicente.pdf'; // Pon aquí tu PDF
+        pdfFrame.style.width = '70vw'; // más estrecho
+        pdfFrame.style.height = '60vh';
+        pdfFrame.style.border = 'none';
+        pdfFrame.id = 'pdfFrame';
+        pdfFrame.style.borderRadius = '12px';
+        pdfFrame.style.boxShadow = '0 0 20px rgba(0,0,0,0.3)';
+        // Ocultar los botones originales del popup
+        yesBtn.style.display = 'none';
+        noBtn.style.display = 'none';
+
+        popup.appendChild(pdfFrame);
+
+        // Contenedor de botones
+        const btnContainer = document.createElement('div');
+        btnContainer.style.marginTop = '10px';
+        btnContainer.style.display = 'flex';
+        btnContainer.style.justifyContent = 'center';
+        btnContainer.style.gap = '15px';
+
+       // Botón Cerrar (ahora <a> para que sea igual que Descargar)
+const closeBtn = document.createElement('a');
+closeBtn.href = '#';
+closeBtn.textContent = 'Cerrar';
+closeBtn.style.padding = '10px 20px';
+closeBtn.style.border = 'none';
+closeBtn.style.borderRadius = '8px';
+closeBtn.style.cursor = 'pointer';
+closeBtn.style.backgroundColor = '#a973ff';
+closeBtn.style.color = 'white';
+closeBtn.style.textDecoration = 'none';
+closeBtn.style.display = 'inline-block';
+closeBtn.style.textAlign = 'center';
+closeBtn.style.minWidth = '120px';
+closeBtn.addEventListener('click', (event) => {
+    event.preventDefault(); // evita que el enlace navegue
+    pdfFrame.remove();
+    btnContainer.remove();
+    document.getElementById('popupText').style.display = 'block';
+    document.getElementById('popupText').textContent = '¿Realmente quieres el regalo?';
+    
+    yesBtn.style.display = 'inline-block';
+    noBtn.style.display = 'inline-block';
+    popup.style.display = 'none';
+
+    // Reinicia timer y desbloquea regalo
+    gift.style.pointerEvents = 'auto';
+    firstAttemptTime = null;
+});
+
+        // Botón Descargar
+        const downloadBtn = document.createElement('a');
+        downloadBtn.href = 'Vicente.pdf'; // mismo PDF
+        downloadBtn.download = 'Acuerdo_de_Noviazgo.pdf';
+        downloadBtn.textContent = 'Descargar';
+        downloadBtn.style.padding = '10px 20px';
+downloadBtn.style.border = 'none';
+downloadBtn.style.borderRadius = '8px';
+downloadBtn.style.cursor = 'pointer';
+downloadBtn.style.backgroundColor = '#e0c6ff';
+downloadBtn.style.color = '#550099';
+downloadBtn.style.textDecoration = 'none';
+downloadBtn.style.display = 'inline-block';
+downloadBtn.style.textAlign = 'center';
+downloadBtn.style.minWidth = '120px'; // mismo ancho que Cerrar
+
+        btnContainer.appendChild(closeBtn);
+        btnContainer.appendChild(downloadBtn);
+
+        popup.appendChild(btnContainer);
+    };
+
+    noBtn.onclick = () => {
+        showPopupRetry(); // llama al popup de retry
+    };
+}
+
+// Mostrar popup de retry después de pulsar "No"
+function showPopupRetry() {
+    popup.style.display = 'block';
+    gift.style.pointerEvents = 'none'; // bloquea interacción con el regalo mientras el popup está visible
+
+    document.getElementById('popupText').textContent = 'Sé que eres tontito pero no juegues con mis sentimientos, vuelve a intentarlo';
+    yesBtn.textContent = 'Entendido';
+    noBtn.style.display = 'none'; // ocultamos el botón No en este popup
+
+    yesBtn.onclick = () => {
+        popup.style.display = 'none'; // cierra el popup
+        gift.style.pointerEvents = 'auto'; // desbloquea el regalo para volver a intentar
+        firstAttemptTime = null; // resetea tiempo de primer intento
+        noDisabled = true; // ahora el botón No se deshabilita en la próxima vez
+    };
+}
+
+
+
+//   yesBtn.addEventListener('click', () => {
+//     window.open('vicente.pdf', '_blank'); 
+//   });
+
+ noBtn.addEventListener('click', () => {
+    popup.style.display = 'block';
+    document.getElementById('popupText').textContent = 'Sé que eres tontito pero no juegues con mis sentimientos, vuelve a intentarlo';
+    yesBtn.textContent = 'Entendido'; // puedes dejar solo un botón
+    noBtn.style.display = 'none'; // oculta el botón No en este popup
+    gift.style.pointerEvents = 'auto'; // desbloquea interacción con el regalo para reintento
+    firstAttemptTime = null;
+    noDisabled = true;
+});
+
+
+  window.addEventListener('resize', randomPosition);
+
+  // --- FONDO CON BURBUJAS ---
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+
+  class Bubble {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.radius = Math.random() * 6 + 2;
+      this.speed = Math.random() * 1 + 0.2;
+      const colors = ['#d8b6ff', '#c5a3ff', '#a973ff', '#ffffff', '#f9f9ff'];
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.opacity = Math.random() * 0.5 + 0.3;
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = this.opacity;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    update() {
+      this.y -= this.speed;
+      if (this.y < -this.radius) this.reset(), this.y = height + this.radius;
+    }
+  }
+
+  const bubbles = [];
+  for (let i = 0; i < 100; i++) bubbles.push(new Bubble());
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+    bubbles.forEach(b => {
+      b.update();
+      b.draw();
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+</script>
+
+</body>
+</html>
