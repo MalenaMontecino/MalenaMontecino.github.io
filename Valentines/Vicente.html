@@ -81,6 +81,25 @@
 <body>
 
 <audio id="music" src="mothtoaflame.mp3" autoplay loop></audio>
+<!-- Botón central para reproducir música -->
+<button id="playMusic" style="
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px 40px;
+    font-size: 24px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background-color: #a973ff;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 999;
+">
+    🎵 Reproducir música
+</button>
+
 
 <canvas id="bgCanvas"></canvas>
 <div id="gift"></div>
@@ -92,6 +111,11 @@
 </div>
 
 <script>
+    const audio = document.getElementById('music');
+document.getElementById('playMusic').addEventListener('click', () => {
+    audio.play();
+    document.getElementById('playMusic').style.display = 'none'; // ocultar botón
+});
   const gift = document.getElementById('gift');
   const popup = document.getElementById('popup');
   const yesBtn = document.getElementById('yes');
