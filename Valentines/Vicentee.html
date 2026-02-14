@@ -81,7 +81,7 @@
 <body>
 
 <audio id="music" src="mothtoaflame.mp3" autoplay loop></audio>
-<!-- Botón central para reproducir música -->
+
 <button id="playMusic" style="
     position: fixed;
     top: 50%;
@@ -114,7 +114,7 @@
     const audio = document.getElementById('music');
 document.getElementById('playMusic').addEventListener('click', () => {
     audio.play();
-    document.getElementById('playMusic').style.display = 'none'; // ocultar botón
+    document.getElementById('playMusic').style.display = 'none'; 
 });
   const gift = document.getElementById('gift');
   const popup = document.getElementById('popup');
@@ -124,7 +124,7 @@ document.getElementById('playMusic').addEventListener('click', () => {
   let timer = null;
   let noDisabled = false;
 
-  // POSICIÓN DEL REGALO
+  // POSICIÓN REGALO
   function randomPosition() {
     const x = Math.random() * (window.innerWidth - gift.offsetWidth);
     const y = Math.random() * (window.innerHeight - gift.offsetHeight);
@@ -149,10 +149,10 @@ document.getElementById('playMusic').addEventListener('click', () => {
     gift.style.top = y + 'px';
   }
 
-// Mostrar el popup normal
+
 function showPopupNormal() {
     popup.style.display = 'block';
-    gift.style.pointerEvents = 'none'; // bloquea interacción con el regalo
+    gift.style.pointerEvents = 'none'; 
 
     document.getElementById('popupText').textContent = '¿Realmente quieres el regalo?';
     yesBtn.textContent = 'Sí';
@@ -162,33 +162,33 @@ function showPopupNormal() {
     noBtn.style.opacity = noDisabled ? '0.5' : '1';
 
     yesBtn.onclick = () => {
-        // window.open('Vicente.pdf', '_blank'); // solo aquí se abre el PDF
+        // window.open('Vicente.pdf', '_blank'); 
          document.getElementById('popupText').style.display = 'none';
         noBtn.style.display = 'none';
 
-        // Crear iframe para PDF
+       
         const pdfFrame = document.createElement('iframe');
-        pdfFrame.src = 'Vicente.pdf'; // Pon aquí tu PDF
-        pdfFrame.style.width = '70vw'; // más estrecho
+        pdfFrame.src = 'Vicente.pdf'; 
+        pdfFrame.style.width = '70vw'; 
         pdfFrame.style.height = '60vh';
         pdfFrame.style.border = 'none';
         pdfFrame.id = 'pdfFrame';
         pdfFrame.style.borderRadius = '12px';
         pdfFrame.style.boxShadow = '0 0 20px rgba(0,0,0,0.3)';
-        // Ocultar los botones originales del popup
+        
         yesBtn.style.display = 'none';
         noBtn.style.display = 'none';
 
         popup.appendChild(pdfFrame);
 
-        // Contenedor de botones
+       
         const btnContainer = document.createElement('div');
         btnContainer.style.marginTop = '10px';
         btnContainer.style.display = 'flex';
         btnContainer.style.justifyContent = 'center';
         btnContainer.style.gap = '15px';
 
-       // Botón Cerrar (ahora <a> para que sea igual que Descargar)
+      
 const closeBtn = document.createElement('a');
 closeBtn.href = '#';
 closeBtn.textContent = 'Cerrar';
@@ -203,7 +203,7 @@ closeBtn.style.display = 'inline-block';
 closeBtn.style.textAlign = 'center';
 closeBtn.style.minWidth = '120px';
 closeBtn.addEventListener('click', (event) => {
-    event.preventDefault(); // evita que el enlace navegue
+    event.preventDefault(); 
     pdfFrame.remove();
     btnContainer.remove();
     document.getElementById('popupText').style.display = 'block';
@@ -213,14 +213,14 @@ closeBtn.addEventListener('click', (event) => {
     noBtn.style.display = 'inline-block';
     popup.style.display = 'none';
 
-    // Reinicia timer y desbloquea regalo
+    
     gift.style.pointerEvents = 'auto';
     firstAttemptTime = null;
 });
 
-        // Botón Descargar
+       
         const downloadBtn = document.createElement('a');
-        downloadBtn.href = 'Vicente.pdf'; // mismo PDF
+        downloadBtn.href = 'Vicente.pdf'; 
         downloadBtn.download = 'Acuerdo_de_Noviazgo.pdf';
         downloadBtn.textContent = 'Descargar';
         downloadBtn.style.padding = '10px 20px';
@@ -232,7 +232,7 @@ downloadBtn.style.color = '#550099';
 downloadBtn.style.textDecoration = 'none';
 downloadBtn.style.display = 'inline-block';
 downloadBtn.style.textAlign = 'center';
-downloadBtn.style.minWidth = '120px'; // mismo ancho que Cerrar
+downloadBtn.style.minWidth = '120px'; 
 
         btnContainer.appendChild(closeBtn);
         btnContainer.appendChild(downloadBtn);
@@ -241,39 +241,34 @@ downloadBtn.style.minWidth = '120px'; // mismo ancho que Cerrar
     };
 
     noBtn.onclick = () => {
-        showPopupRetry(); // llama al popup de retry
+        showPopupRetry(); 
     };
 }
 
-// Mostrar popup de retry después de pulsar "No"
+
 function showPopupRetry() {
     popup.style.display = 'block';
-    gift.style.pointerEvents = 'none'; // bloquea interacción con el regalo mientras el popup está visible
+    gift.style.pointerEvents = 'none'; 
 
     document.getElementById('popupText').textContent = 'Sé que eres tontito pero no juegues con mis sentimientos, vuelve a intentarlo';
     yesBtn.textContent = 'Entendido';
-    noBtn.style.display = 'none'; // ocultamos el botón No en este popup
+    noBtn.style.display = 'none'; 
 
     yesBtn.onclick = () => {
-        popup.style.display = 'none'; // cierra el popup
-        gift.style.pointerEvents = 'auto'; // desbloquea el regalo para volver a intentar
-        firstAttemptTime = null; // resetea tiempo de primer intento
-        noDisabled = true; // ahora el botón No se deshabilita en la próxima vez
+        popup.style.display = 'none'; 
+        gift.style.pointerEvents = 'auto'; 
+        firstAttemptTime = null; 
+        noDisabled = true; 
     };
 }
 
-
-
-//   yesBtn.addEventListener('click', () => {
-//     window.open('vicente.pdf', '_blank'); 
-//   });
 
  noBtn.addEventListener('click', () => {
     popup.style.display = 'block';
     document.getElementById('popupText').textContent = 'Sé que eres tontito pero no juegues con mis sentimientos, vuelve a intentarlo';
-    yesBtn.textContent = 'Entendido'; // puedes dejar solo un botón
-    noBtn.style.display = 'none'; // oculta el botón No en este popup
-    gift.style.pointerEvents = 'auto'; // desbloquea interacción con el regalo para reintento
+    yesBtn.textContent = 'Entendido'; 
+    noBtn.style.display = 'none'; 
+    gift.style.pointerEvents = 'auto'; 
     firstAttemptTime = null;
     noDisabled = true;
 });
@@ -281,7 +276,7 @@ function showPopupRetry() {
 
   window.addEventListener('resize', randomPosition);
 
-  // --- FONDO CON BURBUJAS ---
+
   const canvas = document.getElementById('bgCanvas');
   const ctx = canvas.getContext('2d');
   let width = canvas.width = window.innerWidth;
