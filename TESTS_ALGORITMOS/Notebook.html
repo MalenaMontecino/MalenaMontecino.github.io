@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen Oficial Interactivo - Estructuras de Datos y Algoritmos</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #2980b9;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --bg-color: #f4f6f7;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-top: 100px; /* Espacio para el panel superior fijo */
+        }
+
+        /* Marcador Superior Fijo */
+        .header-scoreboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            z-index: 1000;
+            padding: 10px 20px;
+        }
+
+        .scoreboard-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .scoreboard-content h1 {
+            margin: 0;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stats-panel {
+            display: flex;
+            gap: 15px;
+            font-size: 1rem;
+        }
+
+        .stat-badge {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .badge-total { background-color: var(--secondary-color); }
+        .badge-correct { background-color: var(--success-color); }
+        .badge-incorrect { background-color: var(--error-color); }
+
+        /* Contenedor Principal */
+        .main-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 20px 80px 20px;
+        }
+
+        .section-title {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+            padding: 22px;
+            margin-bottom: 20px;
+            border-left: 4px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .question-card:hover {
+            border-left-color: var(--accent-color);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .question-number {
+            color: var(--accent-color);
+            margin-right: 5px;
+        }
+
+        /* Opciones */
+        .options-group {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-box {
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .option-box:hover:not(.disabled) {
+            background-color: #f1f7fc;
+            border-color: var(--accent-color);
+        }
+
+        .option-box input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.1);
+            accent-color: var(--accent-color);
+        }
+
+        /* Estados de Validación */
+        .option-box.correct-selected {
+            background-color: #e8f8f0 !important;
+            border-color: var(--success-color) !important;
+            color: #1e7e34;
+            font-weight: 600;
+        }
+
+        .option-box.correct-selected::after {
+            content: "✓ Respuesta Correcta";
+            position: absolute;
+            right: 15px;
+            font-size: 0.8rem;
+            background-color: var(--success-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .option-box.incorrect-selected {
+            background-color: #fce8e6 !important;
+            border-color: var(--error-color) !important;
+            color: #bd2130;
+        }
+
+        .option-box.incorrect-selected::after {
+            content: "✗ Incorrecta";
+            position: absolute;
+            right: 15px;
+            font-size: 0.8rem;
+            background-color: var(--error-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        /* Botón inferior */
+        .action-area {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn-restart {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+        }
+
+        .btn-restart:hover {
+            background-color: #1f6696;
+        }
+
+        @media (max-width: 700px) {
+            body { padding-top: 140px; }
+            .scoreboard-content { flex-direction: column; gap: 10px; text-align: center; }
+            .stats-panel { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-scoreboard">
+        <div class="scoreboard-content">
+            <h1>Evaluación de Contenidos: Java y Algoritmia</h1>
+            <div class="stats-panel">
+                <div class="stat-badge badge-total">Respondidas: <span id="lbl-answered">0</span> / 50</div>
+                <div class="stat-badge badge-correct">Bien: <span id="lbl-correct">0</span></div>
+                <div class="stat-badge badge-incorrect">Mal: <span id="lbl-incorrect">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+
+        <div class="section-title">TEMA 1: El Lenguaje de Programación Java</div>
+
+        <div class="question-card" data-qid="t1_1" data-ans="B">
+            <div class="question-text"><span class="question-number">1.</span> En Java, ¿qué ocurre si una clase intenta heredar de dos clases convencionales simultáneamente?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t1_1">A) Se heredan los métodos de ambas pero no los atributos.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t1_1">B) Se produce un error de compilación ya que Java solo permite herencia simple de clases.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t1_1">C) La clase hija solo hereda de la primera clase mencionada tras la palabra extends.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t1_1">D) Solo es posible si ambas clases base implementan la interfaz Comparable.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t1_2" data-ans="B">
+            <div class="question-text"><span class="question-number">2.</span> ¿Cuál es una विशेषता fundamental de las interfaces en Java según los materiales?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t1_2">A) Pueden contener campos no estáticos con el mismo nombre.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t1_2">B) Solo pueden contener métodos abstractos y campos constantes estáticos (static final).</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t1_2">C) Permiten instanciar objetos directamente usando el operador new.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t1_2">D) No pueden ser implementadas por más de una clase a la vez.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t1_3" data-ans="B">
+            <div class="question-text"><span class="question-number">3.</span> Si la clase A extiende a B y la clase B extiende a C, ¿qué se puede afirmar sobre la relación entre A y C?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t1_3">A) No hay relación jerárquica directa.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t1_3">B) A extiende a C por propiedad transitiva.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t1_3">C) A solo hereda los métodos de B, pero no los de C.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t1_3">D) Es necesario que A implemente explícitamente a C.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t1_4" data-ans="B">
+            <div class="question-text"><span class="question-number">4.</span> ¿Qué ventaja principal ofrece el uso de interfaces frente a la herencia múltiple de clases convencionales?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t1_4">A) Permites el uso de tipos primitivos en métodos genéricos.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t1_4">B) Evita conflictos de firmas de métodos o campos con el mismo nombre y distintas implementaciones.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t1_4">C) Reduce el tiempo de compilación del Bytecode.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t1_4">D) Elimina la necesidad de utilizar el método main.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t1_5" data-ans="C">
+            <div class="question-text"><span class="question-number">5.</span> Sobre la interfaz Comparable&lt;E&gt;, ¿cuál es la firma exacta del único método que posee?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t1_5">A) boolean equals (Object o)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t1_5">B) void compare (E o1, E o2)</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t1_5">C) int compareTo (E o)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t1_5">D) int compare (AnyType x)</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t1_6" data-ans="B">
+            <div class="question-text"><span class="question-number">6.</span> ¿Qué sucede implícitamente al declarar un método dentro de una interfaz en Java?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t1_6">A) El método es tratado como private.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t1_6">B) El método se sobreentiende como público y abstracto.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t1_6">C) El método debe ser estático obligatoriamente.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t1_6">D) El compilador exige que el método devuelva un double.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t1_7" data-ans="B">
+            <div class="question-text"><span class="question-number">7.</span> Si una clase Rectangle extiende Shape e implementa Stretchable, ¿cuál es la sintaxis correcta de declaración?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t1_7">A) public class Rectangle implements Shape, Stretchable</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t1_7">B) public class Rectangle extends Shape implements Stretchable</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t1_7">C) public class Rectangle implements Stretchable extends Shape</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t1_7">D) public class Rectangle extends Shape extends Stretchable</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t1_8" data-ans="B">
+            <div class="question-text"><span class="question-number">8.</span> En el ejemplo de la clase ShapeDemo, ¿qué permite el método totalArea?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t1_8">A) Calcular el área solo de objetos tipo Circle.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t1_8">B) Operar sobre un arreglo de objetos tipo Shape y sumar sus áreas.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t1_8">C) Convertir automáticamente las formas a tipo Stretchable.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t1_8">D) Imprimir todas las formas sin necesidad de un bucle.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t1_9" data-ans="B">
+            <div class="question-text"><span class="question-number">9.</span> ¿Para qué tipos de formas no tiene sentido, según el material, implementar un método stretch (estirar)?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t1_9">A) Rectángulos y Elipses.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t1_9">B) Círculos o Cuadrados, ya que no tienen un "lado más grande" distinguible.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t1_9">C) Triángulos isósceles.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t1_9">D) Cualquier forma que extienda de Shape.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t1_10" data-ans="B">
+            <div class="question-text"><span class="question-number">10.</span> ¿Qué se requiere para que un objeto pueda ser incluido en un arreglo que es procesado por un método stretchAll(Stretchable[] arr)?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t1_10">A) Que el objeto sea de tipo Shape.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t1_10">B) Que el objeto sea una instancia de una clase que implemente la interfaz Stretchable.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t1_10">C) Que el objeto sea obligatoriamente un Rectangle.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t1_10">D) Que el objeto sea un tipo primitivo int o double.</li>
+            </ul>
+        </div>
+
+
+        <div class="section-title">TEMA 2: Algoritmos Recursivos</div>
+
+        <div class="question-card" data-qid="t2_1" data-ans="B">
+            <div class="question-text"><span class="question-number">1.</span> ¿Cuál es la condición necesaria para que una solución recursiva sea válida?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t2_1">A) Que no utilice la pila del sistema.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t2_1">B) Que los subproblemas sean "más pequeños" y converjan estrictamente al caso base.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t2_1">C) Que el algoritmo realice al menos tres llamadas recursivas.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t2_1">D) Que siempre devuelva un valor de tipo long.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t2_2" data-ans="C">
+            <div class="question-text"><span class="question-number">2.</span> En el cálculo recursivo de N!, ¿cuál es el caso base estándar?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t2_2">A) N=10</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t2_2">B) N!=N×(N−1)!</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t2_2">C) 0!=1</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t2_2">D) N=2</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t2_3" data-ans="B">
+            <div class="question-text"><span class="question-number">3.</span> ¿Qué es un "activation record" (registro de activación) en el contexto de la recursión?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t2_3">A) Un archivo de texto que guarda los errores del programa.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t2_3">B) El estado de un método (variables locales, etc.) almacenado en la pila durante una llamada.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t2_3">C) El resultado final de una función recursiva.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t2_3">D) Un tipo de dato primitivo de Java.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t2_4" data-ans="B">
+            <div class="question-text"><span class="question-number">4.</span> ¿Por qué se considera que el cálculo recursivo de Fibonacci es un "mal algoritmo"?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t2_4">A) Porque no tiene caso base definido.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t2_4">B) Porque los subproblemas se repiten con los mismos datos, causando un tiempo de ejecución exponencial.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t2_4">C) Porque Java no permite sumar dos llamadas recursivas.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t2_4">D) Porque solo funciona para valores de N&lt;10.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t2_5" data-ans="B">
+            <div class="question-text"><span class="question-number">5.</span> ¿Qué caracteriza a un algoritmo con "recursión de cola"?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t2_5">A) Realiza más de dos llamadas recursivas por nivel.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t2_5">B) Hace solo una llamada recursiva, lo que facilita su conversión a un programa iterativo.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t2_5">C) El caso base se encuentra al principio del código.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t2_5">D) Utiliza una cola (FIFO) en lugar de una pila para las llamadas.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t2_6" data-ans="B">
+            <div class="question-text"><span class="question-number">6.</span> ¿Cuál es el número de movimientos de platos en el problema de las Torres de Hanoi para N platos?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t2_6">A) N²</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t2_6">B) 2ⁿ − 1 (Exponencial)</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t2_6">C) log N</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t2_6">D) N!</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t2_7" data-ans="B">
+            <div class="question-text"><span class="question-number">7.</span> ¿Qué define estrictamente a un algoritmo como "Divide y Vencerás" (Divide-and-Conquer)?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t2_7">A) Que resuelve un solo subproblema de forma recursiva.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t2_7">B) Que al menos dos subproblemas son resueltos recursivamente.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t2_7">C) Que no requiere combinar las soluciones de los subproblemas.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t2_7">D) Que solo se aplica a arreglos de números negativos.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t2_8" data-ans="B">
+            <div class="question-text"><span class="question-number">8.</span> En el problema de la subsecuencia de suma máxima, ¿qué valor se devuelve si todos los números son negativos?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t2_8">A) El número más cercano a cero.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t2_8">B) 0, ya que la secuencia vacía es formalmente una subsecuencia con suma 0.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t2_8">C) -1.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t2_8">D) El error IllegalArgumentException.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t2_9" data-ans="B">
+            <div class="question-text"><span class="question-number">9.</span> Al resolver la subsecuencia de suma máxima por D&C, ¿cuáles son los tres casos a considerar?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t2_9">A) Suma en el primer elemento, en el último o en el medio.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t2_9">B) Suma en la sub-secuencia 1, en la sub-secuencia 2, o cruzando la mitad (contiene elementos de ambas).</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t2_9">C) Suma de pares, suma de impares o suma total.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t2_9">D) Caso base 1, caso base 2 o caso base 3.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t2_10" data-ans="B">
+            <div class="question-text"><span class="question-number">10.</span> ¿Qué problema presenta intentar resolver el "camino de menor costo en una red" de forma recursiva simple sin control de ciclos?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t2_10">A) Da un resultado erróneo pero termina rápido.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t2_10">B) Crea una solución recursiva cíclica que no resuelve el problema.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t2_10">C) El compilador de Java no permite representar redes.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t2_10">D) Solo funciona si los arcos tienen costo cero.</li>
+            </ul>
+        </div>
+
+
+        <div class="section-title">TEMA 3: Análisis de Algoritmos</div>
+
+        <div class="question-card" data-qid="t3_1" data-ans="B">
+            <div class="question-text"><span class="question-number">1.</span> ¿Qué se busca determinar principalmente mediante el Análisis de Algoritmos?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t3_1">A) El nombre del programador que lo escribió.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t3_1">B) Cuántos recursos (tiempo y espacio) requiere en función del tamaño de la entrada N.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t3_1">C) El número de comentarios en el código fuente.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t3_1">D) La versión de la JVM necesaria para ejecutarlo.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t3_2" data-ans="B">
+            <div class="question-text"><span class="question-number">2.</span> Si T(N)=10N³ + N log N − 15000N², ¿cuál es su complejidad exacta (Θ)?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t3_2">A) Θ(N²)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t3_2">B) Θ(N³) (Término dominante)</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t3_2">C) Θ(log N)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t3_2">D) Θ(N log N)</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t3_3" data-ans="B">
+            <div class="question-text"><span class="question-number">3.</span> ¿Cuál es el tiempo de ejecución en el PEOR caso para el algoritmo que busca el primer valor positivo en un arreglo de tamaño N?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t3_3">A) O(1)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t3_3">B) O(N) (Realiza aproximadamente 3N+6 operaciones).</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t3_3">C) O(N²)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t3_3">D) O(log N)</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t3_4" data-ans="B">
+            <div class="question-text"><span class="question-number">4.</span> ¿Qué complejidad tiene un algoritmo que consiste en tres bucles for aninados, cada uno hasta N?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t3_4">A) O(3N)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t3_4">B) O(N³)</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t3_4">C) O(N log N)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t3_4">D) O(1)</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t3_5" data-ans="B">
+            <div class="question-text"><span class="question-number">5.</span> Según el "Principio de divisiones sucesivas", ¿cuántas veces se puede dividir N entre 2 hasta llegar a 1?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t3_5">A) N/2 veces.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t3_5">B) log N veces.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t3_5">C) N² veces.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t3_5">D) Una cantidad constante de veces.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t3_6" data-ans="B">
+            <div class="question-text"><span class="question-number">6.</span> ¿Cuál es la complejidad del algoritmo de Búsqueda Binaria en un arreglo ordenado de N elementos?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t3_6">A) O(N)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t3_6">B) O(log N)</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t3_6">C) O(N²)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t3_6">D) O(N log N)</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t3_7" data-ans="B">
+            <div class="question-text"><span class="question-number">7.</span> Al analizar un algoritmo recursivo que divide el problema en dos mitades y hace un trabajo lineal O(N) extra, ¿qué complejidad resulta?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t3_7">A) O(N)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t3_7">B) O(N log N).</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t3_7">C) O(2ⁿ)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t3_7">D) O(N²)</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t3_8" data-ans="B">
+            <div class="question-text"><span class="question-number">8.</span> En la ecuación de recurrencia T(N)=A·T(N/B)+O(Nᵏ), ¿qué ocurre si A=Bᵏ?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t3_8">A) T(N)=O(N^(log_B A))</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t3_8">B) T(N)=O(Nᵏ log N)</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t3_8">C) T(N)=O(Nᵏ)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t3_8">D) El algoritmo es exponencial.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t3_9" data-ans="B">
+            <div class="question-text"><span class="question-number">9.</span> ¿Qué representa la notación Ω (Omega) en el análisis asintótico?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t3_9">A) Una cota superior de tiempo.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t3_9">B) Una cota inferior de tiempo.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t3_9">C) El tiempo medio exacto.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t3_9">D) El número de saltos de línea del programa.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t3_10" data-ans="C">
+            <div class="question-text"><span class="question-number">10.</span> ¿Cuál es la complejidad del algoritmo óptimo (lineal) para el problema de la subsecuencia de suma máxima?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t3_10">A) O(N³)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t3_10">B) O(N²)</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t3_10">C) O(N)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t3_10">D) O(1)</li>
+            </ul>
+        </div>
+
+
+        <div class="section-title">TEMA 4: Tipos Abstractos y Concretos de Datos</div>
+
+        <div class="question-card" data-qid="t4_1" data-ans="B">
+            <div class="question-text"><span class="question-number">1.</span> ¿Qué es un Tipo Abstracto de Datos (TAD)?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t4_1">A) Una clase que no tiene métodos.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t4_1">B) Un conjunto de valores junto a un conjunto de operaciones definidas sobre ellos.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t4_1">C) Un lenguaje de programación nuevo.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t4_1">D) Una interfaz gráfica de usuario.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t4_2" data-ans="B">
+            <div class="question-text"><span class="question-number">2.</span> En una implementación de lista mediante ArrayList (arreglo), ¿qué complejidad tiene insertar un elemento en la posición 0?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t4_2">A) O(1)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t4_2">B) O(N), porque hay que desplazar los N elements existentes.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t4_2">C) O(log N)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t4_2">D) Depende del valor del número a insertar.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t4_3" data-ans="B">
+            <div class="question-text"><span class="question-number">3.</span> ¿Cuál es la complejidad de la operación get(int idx) en un ArrayList?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t4_3">A) O(N)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t4_3">B) O(1), por ser un acceso directo en un arreglo.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t4_3">C) O(idx)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t4_3">D) O(N²)</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t4_4" data-ans="B">
+            <div class="question-text"><span class="question-number">4.</span> En una Lista Enlazada simple con referencia solo al primer nodo, ¿cuál es el coste de insertar un elemento al FINAL?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t4_4">A) O(1)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t4_4">B) O(N), porque hay que recorrer toda la lista hasta encontrar el null.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t4_4">C) O(log N)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t4_4">D) O(N²)</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t4_5" data-ans="B">
+            <div class="question-text"><span class="question-number">5.</span> ¿Qué ventaja principal aportan los "nodos centinela" (cabeza y cola) en una lista doblemente enlazada?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t4_5">A) Reducen el uso de memoria a la mitad.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t4_5">B) Permiten que el código de inserción/eliminación sea independiente de si la lista está vacía o de la posición.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t4_5">C) Permiten guardar tipos primitivos directamente.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t4_5">D) Hacen que la búsqueda binaria sea O(1).</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t4_6" data-ans="B">
+            <div class="question-text"><span class="question-number">6.</span> Evalúa la siguiente expresión postfija usando una pila: 6 5 + 2 3 + *. ¿Cuál es el resultado?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t4_6">A) 16</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t4_6">B) 55 ((6+5)×(2+3)=11×5=55)</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t4_6">C) 21</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t4_6">D) 11</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t4_7" data-ans="B">
+            <div class="question-text"><span class="question-number">7.</span> ¿Cuál es el comportamiento característico de una PILA (Stack)?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t4_7">A) FIFO (First In, First Out).</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t4_7">B) LIFO (Last In, First Out).</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t4_7">C) El acceso es aleatorio por índice.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t4_7">D) Los elementos se ordenan automáticamente.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t4_8" data-ans="B">
+            <div class="question-text"><span class="question-number">8.</span> En una COLA (Queue) implementada con un arreglo donde el frente es el índice 0, ¿qué complejidad tiene desencolar?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t4_8">A) O(1)</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t4_8">B) O(N), debido al desplazamiento de elementos hacia la izquierda.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t4_8">C) O(log N)</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t4_8">D) O(N²)</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t4_9" data-ans="B">
+            <div class="question-text"><span class="question-number">9.</span> ¿Qué significa el término "autoboxing" en Java?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t4_9">A) La creación automática de interfaces.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t4_9">B) La conversión automática entre tipos primitivos (ej. int) y sus clases envoltorio (ej. Integer).</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t4_9">C) Que el programa se empaqueta solo en un archivo .exe.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t4_9">D) La eliminación automática de nodos en una lista.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t4_10" data-ans="B">
+            <div class="question-text"><span class="question-number">10.</span> Para que una Pila sea eficiente (O(1)) usando un arreglo dinámico, ¿dónde debe situarse el tope?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t4_10">A) Al principio del arreglo (índice 0).</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t4_10">B) Al final del arreglo.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t4_10">C) En el medio del arreglo.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t4_10">D) Es indiferente la posición.</li>
+            </ul>
+        </div>
+
+
+        <div class="section-title">TEMA 6: Árboles</div>
+
+        <div class="question-card" data-qid="t6_1" data-ans="B">
+            <div class="question-text"><span class="question-number">1.</span> ¿Cómo se define la profundidad de un nodo en un árbol?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t6_1">A) La longitud del camino más largo desde ese nodo a una hoja.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t6_1">B) La longitud del camino único desde la raíz hasta ese nodo.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t6_1">C) El número total de hijos que tiene el nodo.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t6_1">D) Siempre es igual a la altura del árbol.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t6_2" data-ans="B">
+            <div class="question-text"><span class="question-number">2.</span> ¿Cuál es el resultado de un recorrido en INORDEN sobre un Árbol Binario de Búsqueda (ABB)?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t6_2">A) Los nodos se visitan en orden aleatorio.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t6_2">B) Los elementos se visitan en orden creciente de su clave.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t6_2">C) Se visitan primero todas las hojas y luego la raíz.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t6_2">D) Los elementos se visitan en orden decreciente.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t6_3" data-ans="B">
+            <div class="question-text"><span class="question-number">3.</span> En un ABB, si buscamos un elemento X y es MENOR que la clave de la raíz, ¿dónde se continúa la búsqueda?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t6_3">A) En el subárbol derecho.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t6_3">B) En el subárbol izquierdo.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t6_3">C) Se detiene la búsqueda y se devuelve false.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t6_3">D) Se busca en ambos subárboles simultáneamente.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t6_4" data-ans="B">
+            <div class="question-text"><span class="question-number">4.</span> ¿Qué propiedad define a un Árbol Binario?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t6_4">A) Todos los nodos deben tener exactamente dos hijos.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t6_4">B) Cada nodo puede tener como máximo dos hijos.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t6_4">C) Todos los niveles deben estar llenos.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t6_4">D) El número de nodos debe ser una potencia de 2.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t6_5" data-ans="B">
+            <div class="question-text"><span class="question-number">5.</span> En la implementación de BinaryNode, ¿qué campos son necesarios para la estructura?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t6_5">A) Solo el elemento almacenado.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t6_5">B) Elemento, referencia al hijo izquierdo y referencia al hijo derecho.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t6_5">C) Elemento y un arreglo de hijos.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t6_5">D) Únicamente una referencia al padre.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t6_6" data-ans="A">
+            <div class="question-text"><span class="question-number">6.</span> ¿Cuál es el coste temporal de encontrar el mínimo (findMin) en un ABB de N nodos?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t6_6">A) O(N) en el peor caso (árbol degenerado).</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t6_6">B) Siempre O(1).</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t6_6">C) O(N²).</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t6_6">D) O(N log N).</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t6_7" data-ans="B">
+            <div class="question-text"><span class="question-number">7.</span> Al eliminar un nodo con DOS hijos en un ABB, ¿cuál es el procedimiento habitual?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t6_7">A) Se elimina el nodo y sus subárboles.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t6_7">B) Se sustituye por el menor del subárbol derecho (o mayor del izquierdo) y se elimina ese sustituto de su posición original.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t6_7">C) Se mueve la raíz a esa posición.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t6_7">D) No se puede eliminar un nodo con dos hijos.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t6_8" data-ans="B">
+            <div class="question-text"><span class="question-number">8.</span> ¿Para qué sirve añadir un campo size en cada nodo de un árbol binario (árbol aumentado)?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t6_8">A) Para conocer el peso en bytes del árbol.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t6_8">B) Para permitir hallar el K-ésimo menor elemento de forma eficiente.</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t6_8">C) Para evitar el uso de recursión en el borrado.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t6_8">D) Para que el árbol sea AVL automáticamente.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t6_9" data-ans="B">
+            <div class="question-text"><span class="question-number">9.</span> Si un nodo t tiene un t.left.size = 5, ¿qué posición ocupa el elemento del nodo t en el orden creciente del árbol?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t6_9">A) La 5ª posición.</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t6_9">B) La 6ª posición (t.left.size+1).</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t6_9">C) La 1ª posición.</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t6_9">D) La 4ª posición.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-qid="t6_10" data-ans="B">
+            <div class="question-text"><span class="question-number">10.</span> ¿Qué método de la clase File se usa para obtener los archivos contenidos en un directorio?</div>
+            <ul class="options-group">
+                <li class="option-box" data-opt="A"><input type="radio" name="t6_10">A) getName()</li>
+                <li class="option-box" data-opt="B"><input type="radio" name="t6_10">B) listFiles().</li>
+                <li class="option-box" data-opt="C"><input type="radio" name="t6_10">C) isDirectory()</li>
+                <li class="option-box" data-opt="D"><input type="radio" name="t6_10">D) getPath()</li>
+            </ul>
+        </div>
+
+        <div class="action-area">
+            <button class="btn-restart" onclick="clearAndRestart()">Reiniciar Intento</button>
+        </div>
+    </div>
+
+    <script>
+        let goods = 0;
+        let bads = 0;
+        let evaluatedAnswers = new Set();
+        const maxQuestions = 50;
+
+        document.querySelectorAll('.option-box').forEach(box => {
+            box.addEventListener('click', function() {
+                const parentCard = this.closest('.question-card');
+                const questionIdentifier = parentCard.getAttribute('data-qid');
+                
+                // Evitar re-evaluación si la tarjeta ya se contestó
+                if (evaluatedAnswers.has(questionIdentifier)) return;
+
+                const userSelection = this.getAttribute('data-opt');
+                const preciseAnswer = parentCard.getAttribute('data-ans');
+                const currentRadio = this.querySelector('input[type="radio"]');
+                
+                if (currentRadio) currentRadio.checked = true;
+                evaluatedAnswers.add(questionIdentifier);
+
+                if (userSelection === preciseAnswer) {
+                    this.classList.add('correct-selected');
+                    goods++;
+                } else {
+                    this.classList.add('incorrect-selected');
+                    bads++;
+                    // Mostrar cuál era la correcta para ayudar a estudiar
+                    const correctBox = parentCard.querySelector(`[data-opt="${preciseAnswer}"]`);
+                    if (correctBox) correctBox.classList.add('correct-selected');
+                }
+
+                // Inhabilitar interacciones posteriores en esta pregunta
+                parentCard.querySelectorAll('.option-box').forEach(b => b.classList.add('disabled'));
+
+                // Actualizar interfaz síncronamente
+                document.getElementById('lbl-answered').innerText = evaluatedAnswers.size;
+                document.getElementById('lbl-correct').innerText = goods;
+                document.getElementById('lbl-incorrect').innerText = bads;
+            });
+        });
+
+        function clearAndRestart() {
+            goods = 0;
+            bads = 0;
+            evaluatedAnswers.clear();
+
+            document.getElementById('lbl-answered').innerText = '0';
+            document.getElementById('lbl-correct').innerText = '0';
+            document.getElementById('lbl-incorrect').innerText = '0';
+
+            document.querySelectorAll('.option-box').forEach(box => {
+                box.classList.remove('correct-selected', 'incorrect-selected', 'disabled');
+                const radioInput = box.querySelector('input[type="radio"]');
+                if (radioInput) radioInput.checked = false;
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

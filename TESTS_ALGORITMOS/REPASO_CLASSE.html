@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interactivo - Algoritmos y Estructura de Datos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { margin: 0; font-size: 24px; }
+        h2 { margin: 5px 0 15px 0; font-size: 16px; font-weight: normal; color: #bdc3c7; }
+        
+        .marcador {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            background-color: #34495e;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .stat {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .stat-respondidas { color: #3498db; }
+        .stat-correctas { color: #2ecc71; }
+        .stat-incorrectas { color: #e74c3c; }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+            padding-bottom: 60px;
+        }
+        .pregunta-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 5px solid #34495e;
+            transition: all 0.3s ease;
+        }
+        .pregunta-titulo {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .pregunta-texto {
+            font-size: 15px;
+            margin-bottom: 15px;
+            white-space: pre-line;
+        }
+        .codigo {
+            background-color: #272822;
+            color: #f8f8f2;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .opcion-btn {
+            background-color: #fff;
+            border: 1px solid #dcdde1;
+            padding: 12px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 14px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .opcion-btn:hover:not([disabled]) {
+            background-color: #f5f6fa;
+            border-color: #b2bec3;
+        }
+        
+        /* Estados de respuesta */
+        .correcto {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724 !important;
+            font-weight: bold;
+        }
+        .incorrecto {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24 !important;
+        }
+        .deshabilitado {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Algoritmos y Estructura de Datos</h1>
+        <h2>Ejercicios tipo examen - Sesión de repaso</h2>
+        <div class="marcador">
+            <div class="stat stat-respondidas">Respondidas: <span id="respondidas">0</span>/40</div>
+            <div class="stat stat-correctas">Bien: <span id="correctas">0</span></div>
+            <div class="stat stat-incorrectas">Mal: <span id="incorrectas">0</span></div>
+        </div>
+    </header>
+
+    <div class="container" id="quiz-container">
+        </div>
+
+    <script>
+        const preguntas = [
+            {
+                id: 1,
+                titulo: "Pregunta 1. Clase pública y nombre del archivo",
+                texto: "Tenemos un archivo llamado Programa.java. ¿Cuál de las siguientes clases puede declararse como public dentro de ese archivo?",
+                opciones: [
+                    "A) public class Main { }",
+                    "B) public class Programa { }",
+                    "C) public class Prueba { }",
+                    "D) Cualquier nombre es válido si la clase tiene método main."
+                ],
+                correcta: 1
+            },
+            {
+                id: 2,
+                titulo: "Pregunta 2. Salida por pantalla",
+                texto: "¿Qué imprime el siguiente fragmento?",
+                codigo: "int x = 4;\nint y = 3;\nSystem.out.println(x + y);",
+                opciones: [
+                    "A) x + y",
+                    "B) 43",
+                    "C) 7",
+                    "D) Da error de compilación"
+                ],
+                correcta: 2
+            },
+            {
+                id: 3,
+                titulo: "Pregunta 3. Completar una instrucción de salida",
+                texto: "Completa el espacio en blanco para imprimir el texto Hola en consola:\n___________(\"Hola\");",
+                opciones: [
+                    "A) System.out.print",
+                    "B) System.out.println",
+                    "C) Console.write",
+                    "D) Tanto A como B son correctas, dependiendo de si se quiere salto de línea o no."
+                ],
+                correcta: 3
+            },
+            {
+                id: 4,
+                titulo: "Pregunta 4. Método de inicio de un programa Java",
+                texto: "¿Cuál de las siguientes cabeceras es la forma habitual correcta del método que inicia la ejecución de un programa Java?",
+                opciones: [
+                    "A) public static void main(String[] args)",
+                    "B) public void start(String[] args)",
+                    "C) static public int main(String args)",
+                    "D) public main(String[] args)"
+                ],
+                correcta: 0
+            },
+            {
+                id: 5,
+                titulo: "Pregunta 5. Detecta error de compilación: mayúsculas en palabras reservadas",
+                texto: "Detecta el error de compilación en el siguiente código y corrígelo:",
+                codigo: "Public class Prueba {\n    public static void main(String[] args) {\n        System.out.println(\"Hola\");\n    }\n}",
+                opciones: [
+                    "A) El método main debe devolver int.",
+                    "B) La palabra 'Public' debe estar en minúsculas ('public').",
+                    "C) Falta un punto y coma después de la llave de cierre.",
+                    "D) String debe escribirse con minúscula 'string'."
+                ],
+                correcta: 1
+            },
+            {
+                id: 6,
+                titulo: "Pregunta 6. Índices de un array",
+                texto: "Dado el código:\nint[] datos = new int[5];\n¿Cuáles son las posiciones válidas del array?",
+                opciones: [
+                    "A) 1, 2, 3, 4, 5",
+                    "B) 0, 1, 2, 3, 4",
+                    "C) 0, 1, 2, 3, 4, 5",
+                    "D) Depende de los valores que guardemos"
+                ],
+                correcta: 1
+            },
+            {
+                id: 7,
+                titulo: "Pregunta 7. Recorrido de array y acumulador",
+                texto: "¿Qué valor imprime este código?",
+                codigo: "int[] a = {2, 4, 6};\nint suma = 0;\nfor (int i = 0; i < a.length; i++) {\n    suma = suma + a[i];\n}\nSystem.out.println(suma);",
+                opciones: [
+                    "A) 6",
+                    "B) 12",
+                    "C) 246",
+                    "D) Da error de compilación"
+                ],
+                correcta: 1
+            },
+            {
+                id: 8,
+                titulo: "Pregunta 8. Completar condición de un bucle",
+                texto: "Completa el hueco para recorrer correctamente todas las posiciones del array sin salirse:",
+                codigo: "int[] v = {3, 1, 9, 2};\nfor (int i = 0; ___________ ; i++) {\n    System.out.println(v[i]);\n}",
+                opciones: [
+                    "A) i <= v.length",
+                    "B) i < v.length",
+                    "C) i < 3",
+                    "D) i <= 4"
+                ],
+                correcta: 1
+            },
+            {
+                id: 9,
+                titulo: "Pregunta 9. Detecta error de compilación: falta punto y coma",
+                texto: "Detecta el error de compilación y corrígelo:",
+                codigo: "int x = 10\nSystem.out.println(x);",
+                opciones: [
+                    "A) Falta un punto y coma al final de 'int x = 10;'.",
+                    "B) El System.out.println está mal escrito.",
+                    "C) No se puede declarar una variable llamada x.",
+                    "D) Falta abrir llaves."
+                ],
+                correcta: 0
+            },
+            {
+                id: 10,
+                titulo: "Pregunta 10. Detecta error de compilación: conversión no permitida",
+                texto: "Detecta el error de compilación y corrígelo de una forma razonable:",
+                codigo: "int edad = 20.5;\nSystem.out.println(edad);",
+                opciones: [
+                    "A) Cambiar el tipo de edad a double: 'double edad = 20.5;'",
+                    "B) Quitar los decimales: 'int edad = 20;'",
+                    "C) Hacer un cast explícito: 'int edad = (int) 20.5;'",
+                    "D) Todas las anteriores son soluciones válidas y razonables según el contexto."
+                ],
+                correcta: 3
+            },
+            {
+                id: 11,
+                titulo: "Pregunta 11. Detecta error de compilación: tipo incompatible en array",
+                texto: "Detecta el error de compilación y corrígelo:",
+                codigo: "int[] numeros = new int[3];\nnumeros[0] = \"5\";",
+                opciones: [
+                    "A) El tamaño del array debe ser string.",
+                    "B) No se puede asignar un String '\"5\"' a una posición de un array de enteros. Debe ser: 'numeros[0] = 5;'",
+                    "C) Los índices empiezan en 1, no en 0.",
+                    "D) Falta la palabra reservada 'new' en la asignación."
+                ],
+                correcta: 1
+            },
+            {
+                id: 12,
+                titulo: "Pregunta 12. Verdadero/Falso: tipos primitivos y objetos",
+                texto: "Indica si la afirmación es verdadera o falsa:\nEn Java, int es un tipo primitivo, mientras que String es un tipo de referencia.",
+                opciones: [
+                    "A) Verdadero",
+                    "B) Falso"
+                ],
+                correcta: 0
+            },
+            {
+                id: 13,
+                titulo: "Pregunta 13. Interfaz en Java",
+                texto: "¿Qué describe mejor una interfaz en Java?",
+                opciones: [
+                    "A) Un contrato que indica qué métodos debe ofrecer una clase.",
+                    "B) Una clase que siempre contiene atributos privados.",
+                    "C) Un tipo especial de array.",
+                    "D) Un método que se ejecuta al iniciar el programa."
+                ],
+                correcta: 0
+            },
+            {
+                id: 14,
+                titulo: "Pregunta 14. Clase abstracta",
+                texto: "¿Cuál de las siguientes afirmaciones sobre una clase abstracta es correcta?",
+                opciones: [
+                    "A) No puede tener métodos.",
+                    "B) No se puede instanciar directamente con new.",
+                    "C) Solo puede contener atributos static.",
+                    "D) Es lo mismo que un array."
+                ],
+                correcta: 1
+            },
+            {
+                id: 15,
+                titulo: "Pregunta 15. Polimorfismo",
+                texto: "Observa el fragmento:\nShape s = new Circle();\ns.area();\n\nSi Circle redefine el método area(), ¿qué idea de programación orientada a objetos se está usando principalmente?",
+                opciones: [
+                    "A) Polimorfismo",
+                    "B) Encapsulación de arrays",
+                    "C) Recursión",
+                    "D) Búsqueda binaria"
+                ],
+                correcta: 0
+            },
+            {
+                id: 16,
+                titulo: "Pregunta 16. Comparable",
+                texto: "Si una clase implementa Comparable<T>, ¿qué método debe proporcionar normalmente?",
+                opciones: [
+                    "A) print()",
+                    "B) compareTo(T otro)",
+                    "C) equalsTo(T otro)",
+                    "D) main(String[] args)"
+                ],
+                correcta: 1
+            },
+            {
+                id: 17,
+                titulo: "Pregunta 17. Completar caso base en recursión",
+                texto: "Completa el caso base para que el método calcule la suma 1 + 2 + ... + n",
+                codigo: "public static int suma(int n) {\n    if ( ___________ ) return 0;\n    return n + suma(n - 1);\n}",
+                opciones: [
+                    "A) n == 0",
+                    "B) n > 1",
+                    "C) n == 1",
+                    "D) n < 0"
+                ],
+                correcta: 0
+            },
+            {
+                id: 18,
+                titulo: "Pregunta 18. Verdadero/Falso: recursión",
+                texto: "Indica si la afirmación es verdadera o falsa:\nUn método recursivo necesita al menos un caso base y llamadas recursivas que se acerquen a ese caso base.",
+                opciones: [
+                    "A) Verdadero",
+                    "B) Falso"
+                ],
+                correcta: 0
+            },
+            {
+                id: 19,
+                titulo: "Pregunta 19. Divide y vencerás",
+                texto: "¿Cuál de estas descripciones se ajusta mejor a la técnica de divide y vencerás?",
+                opciones: [
+                    "A) Resolver siempre el problema con un único bucle.",
+                    "B) Dividir un problema en subproblemas más pequeños del mismo tipo y combinar sus soluciones.",
+                    "C) Guardar todos los datos en una pila.",
+                    "D) Evitar por completo la recursión."
+                ],
+                correcta: 1
+            },
+            {
+                id: 20,
+                titulo: "Pregunta 20. Complejidad logarítmica",
+                texto: "¿Qué complejidad temporal tiene, en función de N, el siguiente fragmento?",
+                codigo: "while (N > 1) {\n    N = N / 2;\n}",
+                opciones: [
+                    "A) O(1)",
+                    "B) O(N)",
+                    "C) O(log N)",
+                    "D) O(N^2)"
+                ],
+                correcta: 2
+            },
+            {
+                id: 21,
+                titulo: "Pregunta 21. Correspondencias: lista, pila y cola",
+                texto: "Relaciona cada estructura con su descripción:\n1. Lista | 2. Pila | 3. Cola\n\nA. Estructura FIFO: el primero que entra es el primero que sale.\nB. Estructura donde los elementos se mantienen colocados en posiciones o enlaces y se pueden recorrer.\nC. Estructura LIFO: el último que entra es el primero que sale.",
+                opciones: [
+                    "A) 1-A, 2-B, 3-C",
+                    "B) 1-B, 2-C, 3-A",
+                    "C) 1-C, 2-A, 3-B",
+                    "D) 1-B, 2-A, 3-C"
+                ],
+                correcta: 1
+            },
+            {
+                id: 22,
+                titulo: "Pregunta 22. LIFO",
+                texto: "En una pila inicialmente vacía se hacen estas operaciones:\npush(4);\npush(9);\npush(1);\npop();\n\n¿Qué valor devuelve pop()?",
+                opciones: [
+                    "A) 4",
+                    "B) 9",
+                    "C) 1",
+                    "D) La pila queda vacía sin devolver nada"
+                ],
+                correcta: 2
+            },
+            {
+                id: 23,
+                titulo: "Pregunta 23. FIFO",
+                texto: "En una cola inicialmente vacía se hacen estas operaciones:\nencolar(4);\nencolar(9);\nencolar(1);\ndesencolar();\n\n¿Qué valor devuelve desencolar()?",
+                opciones: [
+                    "A) 4",
+                    "B) 9",
+                    "C) 1",
+                    "D) No se puede saber"
+                ],
+                correcta: 0
+            },
+            {
+                id: 24,
+                titulo: "Pregunta 24. Expresión postfija con pila",
+                texto: "Evaluamos con una pila la expresión postfija:\n8 2 3 * + 4 - \n\n¿Qué valor queda al final?",
+                opciones: [
+                    "A) 6",
+                    "B) 10",
+                    "C) 18",
+                    "D) 28"
+                ],
+                correcta: 1
+            },
+            {
+                id: 25,
+                titulo: "Pregunta 25. Detecta error de compilación: tipo genérico incorrecto",
+                texto: "Detecta el error de compilación y corrígelo:",
+                codigo: "Stack<Integer> pila = new Stack<Integer>();\npila.push(\"7\");",
+                opciones: [
+                    "A) Falta el operador new.",
+                    "B) La pila está declarada para enteros (<Integer>), pero se le intenta meter un String '\"7\"'. Se corrige usando: 'pila.push(7);'",
+                    "C) Stack no acepta el tipo Integer.",
+                    "D) El método push no existe en las pilas."
+                ],
+                correcta: 1
+            },
+            {
+                id: 26,
+                titulo: "Pregunta 26. Tipo abstracto de datos e implementación",
+                texto: "¿Cuál es la diferencia principal entre un TAD y una implementación concreta?",
+                opciones: [
+                    "A) El TAD describe qué operaciones existen; la implementación explica cómo se realizan internamente.",
+                    "B) El TAD solo existe en Python.",
+                    "C) La implementación no contiene código.",
+                    "D) No hay ninguna diferencia."
+                ],
+                correcta: 0
+            },
+            {
+                id: 27,
+                titulo: "Pregunta 27. Verdadero/Falso: conjuntos",
+                texto: "Indica si la afirmación es verdadera o falsa:\nEn un conjunto, un mismo elemento no debe almacenarse dos veces.",
+                opciones: [
+                    "A) Verdadero",
+                    "B) Falso"
+                ],
+                correcta: 0
+            },
+            {
+                id: 28,
+                titulo: "Pregunta 28. Unión de conjuntos",
+                texto: "Sean A = {1, 4, 6} y B = {2, 4, 8}. Si hacemos la unión A U B, ¿cuál es el resultado correcto?",
+                opciones: [
+                    "A) {1, 2, 4, 6, 8}",
+                    "B) {4}",
+                    "C) {1, 6, 2, 8}",
+                    "D) {1, 4, 4, 6, 2, 8}"
+                ],
+                correcta: 0
+            },
+            {
+                id: 29,
+                titulo: "Pregunta 29. Copia defensiva de array",
+                texto: "Si una clase guarda sus datos en un array privado, ¿por qué puede ser conveniente que devolver_arreglo() devuelva un array nuevo en lugar del array interno?",
+                opciones: [
+                    "A) Para que el código externo no pueda modificar directamente la estructura interna.",
+                    "B) Porque Java no permite devolver arrays.",
+                    "C) Porque los arrays nuevos siempre están ordenados.",
+                    "D) Porque así se elimina automáticamente la recursión."
+                ],
+                correcta: 0
+            },
+            {
+                id: 30,
+                titulo: "Pregunta 30. Detecta error de compilación: método no implementado correctamente",
+                texto: "La interfaz contiene el método:\ninterface Conjunto<T> { void agregar(T elemento); }\n\nLa clase intenta implementarla así:",
+                codigo: "class ConjuntoEnteros implements Conjunto<Integer> {\n    public void agregar(int elemento) {\n        System.out.println(elemento);\n    }\n}",
+                opciones: [
+                    "A) Debería usar 'extends' en vez de 'implements'.",
+                    "B) La interfaz usa un tipo genérico que se ha ligado a Integer. Por lo tanto, el método en ConjuntoEnteros debe recibir obligatoriamente un 'Integer' objeto, no un tipo primitivo 'int'.",
+                    "C) El método agregar no puede usar System.out.println.",
+                    "D) Falta añadir un constructor."
+                ],
+                correcta: 1
+            },
+            {
+                id: 31,
+                titulo: "Pregunta 31. Árbol: padre, hijo y hermano",
+                texto: "Observa el siguiente árbol:\n        10\n       /  \\\n      5    15\n     / \\   / \\\n    2   7 12 20\n       /\n      6\n\n¿Cuál de las siguientes afirmaciones es correcta?",
+                opciones: [
+                    "A) 10 es hijo de 5.",
+                    "B) 7 es hermano de 12.",
+                    "C) 5 es padre de 2 y de 7.",
+                    "D) 20 es padre de 15."
+                ],
+                correcta: 2
+            },
+            {
+                id: 32,
+                titulo: "Pregunta 32. Árbol: antecedente y descendiente",
+                texto: "Usa el mismo árbol de la pregunta anterior. ¿Cuál de estas relaciones es FALSA?",
+                opciones: [
+                    "A) 10 es antecedente no propio de 10. (Verdadero)",
+                    "B) 10 es antecedente propio de 6. (Verdadero)",
+                    "C) 6 es descendiente propio de 5. (Verdadero)",
+                    "D) 7 es descendiente propio de 12. (Falso)"
+                ],
+                correcta: 3
+            },
+            {
+                id: 33,
+                titulo: "Pregunta 33. Árbol: profundidad y altura",
+                texto: "Usa el árbol de la pregunta 31. Si la profundidad de la raíz es 0, ¿cuál es la profundidad del nodo 6?",
+                opciones: [
+                    "A) 0",
+                    "B) 1",
+                    "C) 2",
+                    "D) 3"
+                ],
+                correcta: 3
+            },
+            {
+                id: 34,
+                titulo: "Pregunta 34. Recorrido inorden",
+                texto: "Usa el árbol de la pregunta 31. Si lo recorremos en inorden (Izquierda-Raíz-Derecha), ¿qué secuencia se obtiene?",
+                opciones: [
+                    "A) 10, 5, 2, 7, 6, 15, 12, 20",
+                    "B) 2, 5, 6, 7, 10, 12, 15, 20",
+                    "C) 2, 6, 7, 5, 12, 20, 15, 10",
+                    "D) 10, 5, 15, 2, 7, 12, 20, 6"
+                ],
+                correcta: 1
+            },
+            {
+                id: 35,
+                titulo: "Pregunta 35. Propiedad de un ABB",
+                texto: "¿Cuál de estos árboles NO puede ser un árbol binario de búsqueda (ABB)?",
+                opciones: [
+                    "A) Raíz 8, hijo izquierdo 3 e hijo derecho 10.",
+                    "B) Raíz 8, hijo izquierdo 9 e hijo derecho 10.",
+                    "C) Raíz 8, hijo izquierdo 3; el 3 tiene hijo derecho 5.",
+                    "D) Raíz 8, hijo derecho 10; el 10 tiene hijo izquierdo 9."
+                ],
+                correcta: 1
+            },
+            {
+                id: 36,
+                titulo: "Pregunta 36. Inserción en ABB",
+                texto: "Partimos de este ABB:\n       8\n      / \\\n     3   10\n      \\    \\\n       6    14\n           /\n          11\n\n¿Dónde se inserta el valor 5?",
+                opciones: [
+                    "A) Como hijo izquierdo de 6.",
+                    "B) Como hijo derecho de 6.",
+                    "C) Como hijo izquierdo de 10.",
+                    "D) Como nueva raíz."
+                ],
+                correcta: 0
+            },
+            {
+                id: 37,
+                titulo: "Pregunta 37. Eliminación en ABB",
+                texto: "En el siguiente ABB, se elimina el nodo 10 usando el criterio de sustituirlo por el menor del subárbol derecho:\n        10\n       /  \\\n      4    18\n     /    /  \\\n    1    12  25\n           \\\n           15\n\n¿Qué valor sustituye al 10?",
+                opciones: [
+                    "A) 4",
+                    "B) 12",
+                    "C) 15",
+                    "D) 18"
+                ],
+                correcta: 1
+            },
+            {
+                id: 38,
+                titulo: "Pregunta 38. Detecta error de compilación: falta return",
+                texto: "Detecta el error de compilación y corrígelo:",
+                codigo: "public static int doble(int x) {\n    int resultado = 2 * x;\n}",
+                opciones: [
+                    "A) El método debe llamarse obligatoriamente main.",
+                    "B) Falta el punto y coma final en la asignación.",
+                    "C) El método declara que devuelve un entero (int), pero no tiene ninguna instrucción de retorno. Falta añadir 'return resultado;' antes de cerrar el método.",
+                    "D) La variable resultado debe ser de tipo double."
+                ],
+                correcta: 2
+            },
+            {
+                id: 39,
+                titulo: "Pregunta 39. Completar método pertenece",
+                texto: "Completa el hueco para que el método devuelva true si el elemento está en las posiciones ocupadas del array datos:",
+                codigo: "public boolean pertenece (Integer elemento) {\n    for (int i = 0; i < numElementos; i++) {\n        if ( ___________ ){\n            return true;\n        }\n    }\n    return false;\n}",
+                opciones: [
+                    "A) datos[i].equals(elemento)",
+                    "B) elemento == i",
+                    "C) datos.length == elemento",
+                    "D) datos != null"
+                ],
+                correcta: 0
+            },
+            {
+                id: 40,
+                titulo: "Pregunta 40. Pregunta teórica: estructura adecuada",
+                texto: "Queremos modelar una cola de personas esperando en una ventanilla. La primera persona que llega debe ser la primera atendida.\n¿Qué estructura encaja mejor?",
+                opciones: [
+                    "A) Pila, porque usa LIFO.",
+                    "B) Cola, porque usa FIFO.",
+                    "C) Árbol, porque todos tienen un padre.",
+                    "D) Array sin ninguna operación de salida."
+                ],
+                correcta: 1
+            }
+        ];
+
+        let respondidasCount = 0;
+        let correctasCount = 0;
+        let incorrectasCount = 0;
+
+        const container = document.getElementById('quiz-container');
+
+        function inicializarQuiz() {
+            preguntas.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = 'pregunta-card';
+                card.id = `pregunta-${index}`;
+
+                const titulo = document.createElement('div');
+                titulo.className = 'pregunta-titulo';
+                titulo.innerText = q.titulo;
+                card.appendChild(titulo);
+
+                const texto = document.createElement('div');
+                texto.className = 'pregunta-texto';
+                texto.innerText = q.texto;
+                card.appendChild(texto);
+
+                if (q.codigo) {
+                    const codigoDiv = document.createElement('pre');
+                    codigoDiv.className = 'codigo';
+                    codigoDiv.innerText = q.codigo;
+                    card.appendChild(codigoDiv);
+                }
+
+                const opcionesDiv = document.createElement('div');
+                opcionesDiv.className = 'opciones';
+
+                q.opciones.forEach((opcion, opcIndex) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'opcion-btn';
+                    btn.innerText = opcion;
+                    btn.onclick = () => verificarRespuesta(index, opcIndex, btn);
+                    opcionesDiv.appendChild(btn);
+                });
+
+                card.appendChild(opcionesDiv);
+                container.appendChild(card);
+            });
+        }
+
+        function verificarRespuesta(pIndex, opcIndex, botonSeleccionado) {
+            const q = preguntas[pIndex];
+            const card = document.getElementById(`pregunta-${pIndex}`);
+            const botones = card.querySelectorAll('.opcion-btn');
+
+            // Incrementar contador de respondidas
+            respondidasCount++;
+            document.getElementById('respondidas').innerText = respondidasCount;
+
+            if (opcIndex === q.correcta) {
+                botonSeleccionado.classList.add('correcto');
+                correctasCount++;
+                document.getElementById('correctas').innerText = correctasCount;
+            } else {
+                botonSeleccionado.classList.add('incorrecto');
+                // Mostrar la correcta también para aprender del error
+                botones[q.correcta].classList.add('correcto');
+                incorrectasCount++;
+                document.getElementById('incorrectas').innerText = incorrectasCount;
+            }
+
+            // Deshabilitar todos los botones de esta tarjeta para que no se vuelva a votar
+            botones.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('deshabilitado');
+            });
+        }
+
+        // Arrancar el test al cargar
+        window.onload = inicializarQuiz;
+    </script>
+</body>
+</html>

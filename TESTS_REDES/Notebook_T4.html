@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interactivo de Redes de Comunicaciones</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --primary: #3498db;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .score-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-box {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .score-box.correct { color: #4ade80; }
+        .score-box.incorrect { color: #f87171; }
+
+        main {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+        }
+
+        .tema-section {
+            margin-top: 40px;
+        }
+
+        .tema-title {
+            background-color: #334155;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .option-item:hover:not(.disabled) {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .option-item.correct {
+            background-color: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #166534 !important;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #991b1b !important;
+        }
+
+        .option-item.disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="score-container">
+            <div class="score-box">Preguntas: <span id="total-answered">0</span> / 20</div>
+            <div class="score-box correct">Correctas: <span id="correct-count">0</span></div>
+            <div class="score-box incorrect">Incorrectas: <span id="incorrect-count">0</span></div>
+        </div>
+    </header>
+
+    <main>
+        <h1>Evaluación de Redes de Comunicaciones</h1>
+        <div id="quiz-container"></div>
+    </main>
+
+    <script>
+        const quizData = [
+            {
+                tema: "TEMA 4: Enrutamiento (Routing)",
+                preguntas: [
+                    { q: "1. ¿Qué sistema operativo es el estándar absoluto de la industria corporativa para routers?", a: ["MikroTik RouterOS.", "Cisco IOS.", "Juniper Junos.", "Linux Ubuntu."], correct: 1 },
+                    { q: "2. ¿Qué herramienta gráfica es característica de MikroTik para gestionar dispositivos?", a: ["Cisco CLI.", "WinBox.", "VirtualBox.", "Web Proxy."], correct: 1 },
+                    { q: "3. ¿Qué versión de RouterOS se utiliza para despliegues en entornos virtuales como VirtualBox?", a: ["RouterOS L6.", "CHR (Cloud Hosted Router).", "RouterOS Home.", "MikroTik VM."], correct: 1 },
+                    { q: "4. ¿Qué adaptador de red en VirtualBox simula un cable directo entre routers sin salir a la red externa?", a: ["Modo Puente.", "NAT.", "Red Interna.", "Adaptador solo-host."], correct: 2 },
+                    { q: "5. ¿Qué lógica aplica un host para enviar un paquete a un destino fuera de su subred?", a: ["Lo envía mediante broadcast.", "Lo envía a su puerta de enlace (Gateway).", "Lo envía directamente a la IP de destino.", "Pide permiso al servidor DNS."], correct: 1 },
+                    { q: "6. ¿Qué es el 'Next-Hop' en enrutamiento?", a: ["El puerto TCP de destino.", "El siguiente salto (gateway) para alcanzar una red remota.", "El tiempo de vida de un paquete.", "La velocidad del enlace inalámbrico."], correct: 1 },
+                    { q: "7. ¿Qué significan las siglas ECMP?", a: ["Ethernet Control Media Protocol.", "Equal Cost Multi Path.", "Enterprise Cisco Management Platform.", "Encryption Code Mobile Path."], correct: 1 },
+                    { q: "8. ¿Qué permite hacer el mecanismo ECMP?", a: ["Cifrar los paquetes de extremo a extremo.", "Tener más de un gateway para un mismo destino y hacer balanceo de carga.", "Eliminar el firewall de red.", "Conectar switches de distintas marcas."], correct: 1 },
+                    { q: "9. ¿Qué algoritmo utiliza MikroTik para el balanceo de carga en rutas ECMP?", a: ["Dijkstra.", "SPF.", "Round Robin.", "FIFO."], correct: 2 },
+                    { q: "10. ¿Qué sucede en ECMP si un gateway se vuelve inalcanzable?", a: ["El router deja de funcionar por completo.", "El gateway deja de participar en el balanceo Round Robin.", "Se envían todos los paquetes por broadcast.", "Se borra la tabla de rutas."], correct: 1 },
+                    { q: "11. ¿En qué sección del firewall de un router se implementa el NAT?", a: ["Tabla FILTER.", "Tablas de NAT (chains srcnat y dstnat).", "Tabla MANGLE.", "Tabla RAW."], correct: 1 },
+                    { q: "12. ¿Cómo se analizan las reglas de NAT y Firewall en el router?", a: ["De forma aleatoria.", "De forma secuencial hasta encontrar la primera coincidencia.", "Siempre la última regla tiene prioridad.", "Según la velocidad de la interfaz."], correct: 1 },
+                    { q: "13. ¿Para qué se utiliza normalmente el 'Destination NAT' (dstnat)?", a: ["Para navegar por Internet.", "Para permitir que un servicio interno (ej. servidor web) sea accesible desde fuera.", "Para cambiar la MAC de origen.", "Para bloquear el tráfico de spam."], correct: 1 },
+                    { q: "14. ¿Qué tipo de protocolo es OSPF?", a: ["EGP (Exterior Gateway Protocol).", "IGP (Interior Gateway Protocol).", "Protocolo de capa 2.", "Protocolo de aplicación."], correct: 1 },
+                    { q: "15. ¿En qué algoritmo se basa OSPF para calcular la ruta más rápida?", a: ["Round Robin.", "Dijkstra (basado en el 'Costo').", "Búsqueda binaria.", "Algoritmo de flujo máximo."], correct: 1 },
+                    { q: "16. ¿Qué ventaja ofrece la 'rápida convergencia' en protocolos dinámicos?", a: ["Los paquetes viajan a la velocidad de la luz.", "Los routers recalculan las rutas casi al instante si falla un enlace.", "No se necesita configurar contraseñas.", "Se ahorra ancho de banda en streaming."], correct: 1 },
+                    { q: "17. ¿Cómo se llama el área central obligatoria en una arquitectura OSPF?", a: ["Área Estándar.", "Área Stub.", "Área 0 (Backbone).", "Área Remota."], correct: 2 },
+                    { q: "18. ¿Qué es un 'Área Stub' en OSPF?", a: ["Un área que no tiene conexión a Internet.", "Un área que no recibe todas las rutas externas para ahorrar recursos de memoria.", "El núcleo de la red.", "Un área que solo usa cables de cobre."], correct: 1 },
+                    { q: "19. ¿Cuál es el objetivo principal de dividir OSPF en áreas?", a: ["Aumentar la latencia.", "Mejorar la escalabilidad evitando que el mapa de red consuma toda la memoria.", "Identificar la marca del router.", "Eliminar el uso de switches."], correct: 1 },
+                    { q: "20. ¿Qué protocolo es el estándar para el enrutamiento en el Internet global (entre Sistemas Autónomos)?", a: ["OSPF.", "STP.", "BGP.", "RIP."], correct: 2 }
+                ]
+            }
+              
+        ];
+
+        let answeredCount = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        quizData.forEach((block, blockIdx) => {
+            const section = document.createElement('section');
+            section.className = 'tema-section';
+
+            const title = document.createElement('h2');
+            title.className = 'tema-title';
+            title.innerText = block.tema;
+            section.appendChild(title);
+
+            block.preguntas.forEach((p, pIdx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+
+                const qText = document.createElement('div');
+                qText.className = 'question-text';
+                qText.innerText = p.q;
+                card.appendChild(qText);
+
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options-list';
+
+                const optionLetters = ['A', 'B', 'C', 'D'];
+
+                p.a.forEach((opt, optIdx) => {
+                    const li = document.createElement('li');
+                    li.className = 'option-item';
+                    li.innerText = `${optionLetters[optIdx]}) ${opt}`;
+
+                    li.addEventListener('click', function() {
+                        if (li.classList.contains('disabled')) return;
+
+                        answeredCount++;
+                        document.getElementById('total-answered').innerText = answeredCount;
+
+                        const allOptions = optionsList.querySelectorAll('.option-item');
+                        allOptions.forEach(item => item.classList.add('disabled'));
+
+                        if (optIdx === p.correct) {
+                            li.classList.add('correct');
+                            correctCount++;
+                            document.getElementById('correct-count').innerText = correctCount;
+                        } else {
+                            li.classList.add('incorrect');
+                            allOptions[p.correct].classList.add('correct');
+                            incorrectCount++;
+                            document.getElementById('incorrect-count').innerText = incorrectCount;
+                        }
+                    });
+
+                    optionsList.appendChild(li);
+                });
+
+                card.appendChild(optionsList);
+                section.appendChild(card);
+            });
+
+            quizContainer.appendChild(section);
+        });
+    </script>
+</body>
+</html>

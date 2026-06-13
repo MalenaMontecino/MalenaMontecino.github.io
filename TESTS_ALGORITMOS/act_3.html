@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 3 - Test de Estructuras de Datos y Árboles</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #2980b9;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-top: 90px; /* Espacio para el marcador fijo */
+        }
+
+        /* Barra de puntuación fija */
+        .scoreboard-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 15px 20px;
+        }
+
+        .scoreboard {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .scoreboard h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 1.1rem;
+        }
+
+        .stat-box {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .stat-total { background-color: var(--secondary-color); }
+        .stat-correct { background-color: var(--success-color); }
+        .stat-incorrect { background-color: var(--error-color); }
+
+        /* Contenido del Test */
+        .main-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px 60px 20px;
+        }
+
+        .intro-card {
+            background-color: var(--card-bg);
+            border-left: 5px solid var(--accent-color);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .question-header {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .question-number {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-right: 12px;
+            white-space: nowrap;
+        }
+
+        /* Opciones de respuesta */
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .option-item:hover:not(.disabled) {
+            background-color: #f1f7fc;
+            border-color: var(--accent-color);
+        }
+
+        .option-item input[type="radio"] {
+            margin-right: 14px;
+            transform: scale(1.2);
+            accent-color: var(--accent-color);
+        }
+
+        /* Estados de validación interactiva */
+        .option-item.correct-answer {
+            background-color: #e8f8f0 !important;
+            border-color: var(--success-color) !important;
+            color: #1e7e34;
+            font-weight: 500;
+        }
+
+        .option-item.correct-answer::after {
+            content: "✓ Correcta";
+            position: absolute;
+            right: 20px;
+            font-size: 0.85rem;
+            background-color: var(--success-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .option-item.incorrect-answer {
+            background-color: #fce8e6 !important;
+            border-color: var(--error-color) !important;
+            color: #bd2130;
+        }
+
+        .option-item.incorrect-answer::after {
+            content: "✗ Incorrecta";
+            position: absolute;
+            right: 20px;
+            font-size: 0.85rem;
+            background-color: var(--error-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        /* Botón de reinicio */
+        .reset-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn-reset {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+        }
+
+        .btn-reset:hover {
+            background-color: #1f6696;
+        }
+
+        @media (max-width: 600px) {
+            body { padding-top: 120px; }
+            .scoreboard { flex-direction: column; gap: 10px; text-align: center; }
+            .stats { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scoreboard-container">
+        <div class="scoreboard">
+            <h1>Actividad 3 - Autoevaluación</h1>
+            <div class="stats">
+                <div class="stat-box stat-total">Respondidas: <span id="answered-count">0</span> / 24</div>
+                <div class="stat-box stat-correct">Bien: <span id="correct-count">0</span></div>
+                <div class="stat-box stat-incorrect">Mal: <span id="incorrect-count">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="intro-card">
+            <p><strong>Instrucciones:</strong> Haz clic en cualquier opción para comprobar tu respuesta en tiempo real. El panel superior registrará de manera estricta el avance según las claves del PDF original.</p>
+        </div>
+
+        <div class="question-card" data-question="1" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 1</span>
+                <div>Evaluamos con una pila la expresión postfija 6 3 7 * 5 + 9 + *. ¿Qué valor queda al final?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q1">A) 210</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q1">B) 156</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q1">C) 35</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q1">D) 41</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="2" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 2</span>
+                <div>En un árbol binario de búsqueda, los elementos del subárbol izquierdo de la raíz son...</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q2">A) mayores que el elemento de la raíz</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q2">B) menores que el elemento de la raíz</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q2">C) iguales al elemento de la raíz</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q2">D) independientes de la clave</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="3" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 3</span>
+                <div>En el ABB con raíz 6; hijos 2 y 8; 2 con hijos 1 y 5; y 5 con hijo izquierdo 3, si hacemos remove(5), ¿qué ocurre?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q3">A) el 3 ocupa el lugar del 5 como hijo derecho de 2</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q3">B) el 3 pasa a ser la raíz del árbol</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q3">C) se elimina todo el subárbol de 5</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q3">D) el 5 se sustituye por 8</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="4" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 4</span>
+                <div>Los nodos que no tienen hijos se llaman hojas.</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q4">Verdadero</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q4">Falso</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="5" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 5</span>
+                <div>La altura de un nodo es...</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q5">A) el número de arcos del árbol completo</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q5">B) el número de nodos hermanos</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q5">C) la longitud más grande de un camino desde ese nodo hasta una hoja</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q5">D) la longitud del camino desde la raíz hasta ese nodo</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="6" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 6</span>
+                <div>Una lista es una estructura donde guardamos elementos...</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q6">A) sin posibilidad de recorrerlos</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q6">B) siempre en forma de árbol</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q6">C) colocados en orden</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q6">D) solo con una raíz</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="7" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 7</span>
+                <div>En el ABB con raíz 6; hijos 2 y 8; y 2 con hijos 1 y 4, al hacer insert(7), ¿dónde queda el 7?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q7">A) como hijo derecho de 8</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q7">B) como hijo derecho de 6</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q7">C) como hijo izquierdo de 8</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q7">D) como hijo izquierdo de 4</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="8" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 8</span>
+                <div>Partimos del ABB con raíz 6; hijos 2 y 8; y 2 con hijos 1 y 4. Tras hacer insert(5), ¿cuál es el recorrido inorden?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q8">A) 6, 2, 1, 4, 5, 8</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q8">B) 1, 4, 5, 2, 6, 8</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q8">C) 1, 2, 4, 5, 6, 8</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q8">D) 1, 2, 5, 4, 6, 8</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="9" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 9</span>
+                <div>En el método remove() de un ABB, si el nodo tiene dos hijos, la acción principal es:</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q9">El hijo ocupa su lugar</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q9">Sustituir por el menor del subárbol derecho</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q9">Eliminar directamente</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q9">No modificar el árbol</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="10" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 10</span>
+                <div>En el método remove() de un ABB, si el nodo es una hoja, la acción principal es:</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q10">El hijo ocupa su lugar</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q10">Sustituir por el menor del subárbol derecho</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q10">Eliminar directamente</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q10">No modificar el árbol</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="11" data-correct="D">
+            <div class="question-header">
+                <span class="question-number">Pregunta 11</span>
+                <div>En el método remove() de un ABB, si el elemento no es encontrado, la acción principal es:</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q11">El hijo ocupa su lugar</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q11">Sustituir por el menor del subárbol derecho</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q11">Eliminar directamente</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q11">No modificar el árbol</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="12" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 12</span>
+                <div>En el método remove() de un ABB, si el nodo tiene un único hijo, la acción principal es:</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q12">El hijo ocupa su lugar</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q12">Sustituir por el menor del subárbol derecho</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q12">Eliminar directamente</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q12">No modificar el árbol</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="13" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 13</span>
+                <div>La profundidad o nivel de un nodo es...</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q13">A) la longitud máxima desde ese nodo hasta una hoja</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q13">B) el número total de hijos del nodo</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q13">C) la longitud del camino desde la raíz hasta ese nodo</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q13">D) el número de hermanos del nodo</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="14" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 14</span>
+                <div>Por convenio visto en los apuntes, la altura de un árbol vacío es...</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q14">A) -1</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q14">B) 0</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q14">C) 1</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q14">D) N-1</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="15" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 15</span>
+                <div>En un árbol, ¿cómo se denomina el nodo que no tiene padre?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q15">A) raíz</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q15">B) hoja</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q15">C) subárbol</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q15">D) hermano</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="16" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 16</span>
+                <div>Si remove(x) busca un elemento que no existe en un ABB, ¿qué se hace?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q16">A) se inserta x como hoja</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q16">B) se elimina la raíz</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q16">C) no se modifica el árbol</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q16">D) se vacía el árbol</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="17" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 17</span>
+                <div>En un árbol binario de búsqueda se permiten elementos repetidos.</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q17">Verdadero</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q17">Falso</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="18" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 18</span>
+                <div>En el ABB con raíz 6; hijos 2 y 8; 2 con hijos 1 y 5; y 5 con hijo izquierdo 3, si hacemos remove(2), ¿qué valor sustituye al 2 según el criterio visto de usar el menor del subárbol derecho?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q18">A) 5</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q18">B) 6</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q18">C) 3</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q18">D) 1</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="19" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 19</span>
+                <div>Relacionando conceptos: ¿Qué es una parte del árbol que también es un árbol?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q19">Subárbol</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q19">Raíz</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q19">Hoja</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q19">Hermanos</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="20" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 20</span>
+                <div>Relacionando conceptos: ¿Qué definición corresponde a un nodo sin hijos?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q20">Subárbol</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q20">Raíz</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q20">Hoja</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q20">Hermanos</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="21" data-correct="D">
+            <div class="question-header">
+                <span class="question-number">Pregunta 21</span>
+                <div>Relacionando conceptos: Nodos con el mismo padre se denominan...</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q21">Subárbol</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q21">Raíz</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q21">Hoja</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q21">Hermanos</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="22" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 22</span>
+                <div>Relacionando conceptos: Un nodo sin padre es la...</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q22">Subárbol</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q22">Raíz</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q22">Hoja</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q22">Hermanos</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="23" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 23</span>
+                <div>En el ABB con raíz 6; hijos 2 y 8; 2 con hijos 1 y 5; y 5 con hijo izquierdo 3, tras remove(2), ¿cuál es el hijo izquierdo de 6?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q23">A) 5</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q23">B) 3</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q23">C) 8</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q23">D) 1</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="24" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 24</span>
+                <div>En un árbol con N nodos, ¿cuántos arcos tiene?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q24">A) 2N</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q24">B) N-1</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q24">C) N</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q24">D) N+1</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="25" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 25</span>
+                <div>En el ABB con raíz 6; hijos 2 y 8; y 2 con hijos 1 y 4, al hacer insert(5), ¿dónde queda el 5?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q25">A) como hijo izquierdo de 8</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q25">B) como hijo derecho de 4</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q25">C) como hijo izquierdo de 4</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q25">D) como nueva raíz</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="26" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 26</span>
+                <div>En una lista doblemente enlazada con centinelas de cabeza y cola, los centinelas son nodos auxiliares.</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q26">Verdadero</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q26">Falso</li>
+            </ul>
+        </div>
+
+        <div class="reset-container">
+            <button class="btn-reset" onclick="resetQuiz()">Reiniciar Intento</button>
+        </div>
+    </div>
+
+    <script>
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let answeredQuestions = new Set();
+        const totalQuestions = 26; // Total desglosado para las estadísticas de autoevaluación
+
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const card = this.closest('.question-card');
+                const qNum = card.getAttribute('data-question');
+                
+                if (answeredQuestions.has(qNum)) return;
+
+                const selectedOption = this.getAttribute('data-option');
+                const correctOption = card.getAttribute('data-correct');
+                const radio = this.querySelector('input[type="radio"]');
+                
+                radio.checked = true;
+                answeredQuestions.add(qNum);
+
+                if (selectedOption === correctOption) {
+                    this.classList.add('correct-answer');
+                    correctCount++;
+                } else {
+                    this.classList.add('incorrect-answer');
+                    incorrectCount++;
+                    card.querySelector(`[data-option="${correctOption}"]`).classList.add('correct-answer');
+                }
+
+                card.querySelectorAll('.option-item').forEach(opt => opt.classList.add('disabled'));
+
+                document.getElementById('answered-count').innerText = answeredQuestions.size;
+                document.getElementById('correct-count').innerText = correctCount;
+                document.getElementById('incorrect-count').innerText = incorrectCount;
+            });
+        });
+
+        function resetQuiz() {
+            correctCount = 0;
+            incorrectCount = 0;
+            answeredQuestions.clear();
+
+            document.getElementById('answered-count').innerText = '0';
+            document.getElementById('correct-count').innerText = '0';
+            document.getElementById('incorrect-count').innerText = '0';
+
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('correct-answer', 'incorrect-answer', 'disabled');
+                const radio = item.querySelector('input[type="radio"]');
+                if(radio) radio.checked = false;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interactivo de Redes de Comunicaciones</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --primary: #3498db;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .score-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-box {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .score-box.correct { color: #4ade80; }
+        .score-box.incorrect { color: #f87171; }
+
+        main {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+        }
+
+        .tema-section {
+            margin-top: 40px;
+        }
+
+        .tema-title {
+            background-color: #334155;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .option-item:hover:not(.disabled) {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .option-item.correct {
+            background-color: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #166534 !important;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #991b1b !important;
+        }
+
+        .option-item.disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="score-container">
+            <div class="score-box">Preguntas: <span id="total-answered">0</span> / 20</div>
+            <div class="score-box correct">Correctas: <span id="correct-count">0</span></div>
+            <div class="score-box incorrect">Incorrectas: <span id="incorrect-count">0</span></div>
+        </div>
+    </header>
+
+    <main>
+        <h1>Evaluación de Redes de Comunicaciones</h1>
+        <div id="quiz-container"></div>
+    </main>
+
+    <script>
+        const quizData = [
+            {
+                tema: "TEMA 6: Monitorización y visión global",
+                preguntas: [
+                    { q: "1. ¿Cuál es el riesgo de no tener monitorización en una red?", a: ["Los cables se rompen más rápido.", "Solo detectas problemas cuando los usuarios se quejan.", "El router consume más electricidad.", "No se pueden usar direcciones IPv6."], correct: 1 },
+                    { q: "2. ¿Qué diferencia principal hay entre una administración reactiva y una proactiva?", a: ["El color de los equipos.", "La proactiva utiliza alertas automáticas y datos históricos para prevenir incidentes.", "La reactiva es siempre más barata a largo plazo.", "No hay diferencia real."], correct: 1 },
+                    { q: "3. ¿Qué mide el parámetro de 'Disponibilidad' (Uptime)?", a: ["La velocidad de descarga.", "Si el dispositivo está encendido y accesible.", "El número de usuarios conectados.", "La temperatura del servidor."], correct: 1 },
+                    { q: "4. ¿Qué porcentaje de Uptime equivale a permitir solo 52,6 minutos de caída al año?", a: ["99.0%.", "99.9%.", "99.99%.", "100%."], correct: 2 },
+                    { q: "5. ¿Qué es un SLA (Service Level Agreement)?", a: ["Un protocolo de enrutamiento.", "Un contrato legal que garantiza niveles mínimos de servicio y disponibilidad.", "Una marca de switches.", "Un tipo de cable de red."], correct: 1 },
+                    { q: "6. ¿Cuál es el protocolo estándar de la industria para monitorizar dispositivos de red remotamente?", a: ["HTTP.", "BGP.", "SNMP.", "NetFlow."], correct: 2 },
+                    { q: "7. ¿Sobre qué puertos UDP opera el protocolo SNMP?", a: ["80 y 443.", "161 y 162.", "53 y 67.", "21 y 22."], correct: 1 },
+                    { q: "8. En SNMP, ¿qué elemento es el software que corre en el dispositivo y responde al Manager?", a: ["NMS.", "MIB.", "Agente.", "Trap."], correct: 2 },
+                    { q: "9. ¿Qué es un 'Trap' en SNMP?", a: ["Un error fatal del router.", "Una alerta que el Agente envía al Manager espontáneamente sin petición previa.", "Un tipo de cable serie.", "Una contraseña de seguridad."], correct: 1 },
+                    { q: "10. ¿Qué es la base de datos jerárquica de SNMP?", a: ["OID.", "MIB (Management Information Base).", "SQL de Red.", "Base de flujos."], correct: 1 },
+                    { q: "11. ¿Qué identifica de forma única a cada parámetro consultable (ej. uptime) en un dispositivo SNMP?", a: ["Dirección MAC.", "Número de serie.", "OID (Object Identifier).", "Puerto TCP."], correct: 2 },
+                    { q: "12. ¿Cuál es la diferencia clave entre NetFlow y SNMP?", a: ["NetFlow es gratuito y SNMP no.", "SNMP mide el total de tráfico, mientras que NetFlow analiza flujos individuales (quién y qué).", "SNMP solo funciona en cables de cobre.", "NetFlow es un protocolo de capa 2."], correct: 1 },
+                    { q: "13. ¿Qué define a un 'Flujo' de red en NetFlow?", a: ["El color de los paquetes.", "La comunicación entre dos puntos (IP:puerto origen→destino).", "La longitud del cable.", "El nombre del fabricante del router."], correct: 1 },
+                    { q: "14. ¿Qué característica es típica de una red doméstica?", a: ["Uso de BGP y MPLS.", "Red plana (192.168.1.0/24) sin segmentación ni VLANs.", "Monitorización extrema con NetFlow.", "Múltiples switches de core en alta disponibilidad."], correct: 1 },
+                    { q: "15. ¿Qué tecnología se usa en redes ISP para crear VPNs virtuales sobre la infraestructura común?", a: ["WPA3.", "MPLS.", "DHCP doméstico.", "NAT de grado medio."], correct: 1 },
+                    { q: "16. ¿Qué metodología de diagnóstico empieza revisando los cables y el estado físico (Capa 1)?", a: ["Top-Down.", "Divide y vencerás.", "Bottom-Up.", "Análisis forense."], correct: 2 },
+                    { q: "17. Si el icono de red está conectado pero el comando 'nslookup google.com' falla, ¿qué servicio es sospechoso?", a: ["El cable físico.", "La configuración DNS.", "La fuente de alimentación del router.", "La dirección MAC del servidor."], correct: 1 },
+                    { q: "18. ¿Qué herramienta permite ver gráficamente si un enlace WAN está saturado al 98%?", a: ["ping.", "Monitorización SNMP (ej. PRTG).", "nslookup.", "Explorador de archivos."], correct: 1 },
+                    { q: "19. ¿Cuál es un error común en el troubleshooting que debemos evitar?", a: ["Documentar todo lo que se prueba.", "Asumir causas sin verificar con datos reales.", "Seguir el modelo OSI.", "Escalar el problema cuando es necesario."], correct: 1 },
+                    { q: "20. ¿Cuándo se considera profesional escalar un problema de red?", a: ["Inmediatamente al recibir la llamada.", "Cuando el problema supera tu nivel de conocimiento o llevas más de 2 horas sin avances.", "Solo si se rompe el router físicamente.", "Nunca, hay que resolverlo siempre uno mismo."], correct: 1 }
+                ]
+            }
+        ];
+
+        let answeredCount = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        quizData.forEach((block, blockIdx) => {
+            const section = document.createElement('section');
+            section.className = 'tema-section';
+
+            const title = document.createElement('h2');
+            title.className = 'tema-title';
+            title.innerText = block.tema;
+            section.appendChild(title);
+
+            block.preguntas.forEach((p, pIdx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+
+                const qText = document.createElement('div');
+                qText.className = 'question-text';
+                qText.innerText = p.q;
+                card.appendChild(qText);
+
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options-list';
+
+                const optionLetters = ['A', 'B', 'C', 'D'];
+
+                p.a.forEach((opt, optIdx) => {
+                    const li = document.createElement('li');
+                    li.className = 'option-item';
+                    li.innerText = `${optionLetters[optIdx]}) ${opt}`;
+
+                    li.addEventListener('click', function() {
+                        if (li.classList.contains('disabled')) return;
+
+                        answeredCount++;
+                        document.getElementById('total-answered').innerText = answeredCount;
+
+                        const allOptions = optionsList.querySelectorAll('.option-item');
+                        allOptions.forEach(item => item.classList.add('disabled'));
+
+                        if (optIdx === p.correct) {
+                            li.classList.add('correct');
+                            correctCount++;
+                            document.getElementById('correct-count').innerText = correctCount;
+                        } else {
+                            li.classList.add('incorrect');
+                            allOptions[p.correct].classList.add('correct');
+                            incorrectCount++;
+                            document.getElementById('incorrect-count').innerText = incorrectCount;
+                        }
+                    });
+
+                    optionsList.appendChild(li);
+                });
+
+                card.appendChild(optionsList);
+                section.appendChild(card);
+            });
+
+            quizContainer.appendChild(section);
+        });
+    </script>
+</body>
+</html>

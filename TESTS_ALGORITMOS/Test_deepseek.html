@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Quiz de Algoritmos y Estructuras de Datos</title>
+    <style>
+        /* ----- VARIABLES Y RESET MEJORADO ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f5f7fc 0%, #eef2f8 100%);
+            --card-bg: #ffffff;
+            --text-primary: #1a2634;
+            --text-secondary: #2c3e44;
+            --text-tertiary: #5d6f7a;
+            --border-light: #e2e8f0;
+            --border-med: #cbd5e1;
+            --accent: #4f46e5;
+            --accent-light: #818cf8;
+            --accent-soft: #eef2ff;
+            --correct: #0d9488;
+            --correct-light: #ccfbf5;
+            --wrong: #e11d48;
+            --wrong-light: #ffe4e8;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+            --radius-card: 1.25rem;
+            --radius-opt: 1rem;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+        }
+
+        /* ----- HEADER Y PROGRESO ----- */
+        .quiz-header {
+            background: var(--card-bg);
+            border-radius: var(--radius-card);
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.8rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(2px);
+        }
+
+        .title-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .score-pill {
+            background: var(--accent-soft);
+            padding: 0.3rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            border: 1px solid #e0e7ff;
+        }
+
+        .progress-container {
+            background: #e2e8f0;
+            border-radius: 12px;
+            height: 8px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            width: 0%;
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.3s ease;
+        }
+
+        /* ----- NAV TABS ----- */
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            border-radius: 40px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #eef2ff;
+            color: var(--accent);
+        }
+
+        /* ----- CARDS PREGUNTA ----- */
+        .question-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-card);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .q-num {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f1f5f9;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            color: var(--text-secondary);
+        }
+
+        .feedback-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            background: #f1f5f9;
+        }
+
+        .feedback-badge.correct {
+            background: var(--correct-light);
+            color: #0b5e5a;
+        }
+
+        .feedback-badge.wrong {
+            background: var(--wrong-light);
+            color: #b91c3e;
+        }
+
+        .q-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin: 0.8rem 0 0.5rem 0;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .code-block {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            padding: 0.9rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            margin: 0.75rem 0 1rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* OPCIONES */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            margin-top: 0.5rem;
+        }
+
+        .opt {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-med);
+            border-radius: var(--radius-opt);
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .opt:hover {
+            background: #fafcff;
+            border-color: var(--accent-light);
+            transform: translateX(4px);
+        }
+
+        /* Estados seleccionado (mientras no se valida aún) */
+        .opt.selected {
+            background: var(--accent-soft);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+
+        .opt.correct {
+            background: var(--correct-light);
+            border-color: var(--correct);
+        }
+
+        .opt.wrong {
+            background: var(--wrong-light);
+            border-color: var(--wrong);
+            text-decoration: line-through;
+            text-decoration-thickness: 1.5px;
+            text-decoration-color: #e11d48;
+        }
+
+        .opt-letter {
+            width: 28px;
+            height: 28px;
+            background: #f1f5f9;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1e293b;
+            flex-shrink: 0;
+            transition: all 0.1s;
+        }
+
+        .opt.correct .opt-letter {
+            background: var(--correct);
+            color: white;
+        }
+
+        .opt.wrong .opt-letter {
+            background: var(--wrong);
+            color: white;
+        }
+
+        .opt-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: var(--text-secondary);
+        }
+
+        /* EXPLICACIÓN */
+        .explanation {
+            margin-top: 1rem;
+            padding: 0.9rem 1rem;
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            border-radius: 0.9rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #2c3e44;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: fadeSlide 0.2s ease;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* BOTONES ACCION Y RESULTADOS */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.8rem 0 2rem;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 0.6rem 1.4rem;
+            border-radius: 60px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            border: 1px solid var(--border-med);
+            color: var(--text-secondary);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: scale(0.97);
+        }
+
+        .btn:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .results-card {
+            background: linear-gradient(145deg, #ffffff, #f9fbfe);
+            border-radius: var(--radius-card);
+            padding: 1.8rem;
+            text-align: center;
+            margin-top: 1rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .percent {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #1e293b, #334155);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.2rem 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+        }
+
+        .restart-btn {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.6rem;
+        }
+
+        hr {
+            margin: 0.5rem 0 1rem;
+            border: none;
+            border-top: 1px solid var(--border-light);
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 1rem; }
+            .question-card { padding: 1rem; }
+            .opt-text { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-header">
+        <div class="title-section">
+            <div class="quiz-title">📚 Algoritmos · Big O · Estructuras de datos</div>
+            <div class="score-pill" id="globalCounter">0/0 respondidas</div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+    </div>
+
+    <div class="nav-tabs" id="navTabs"></div>
+    <div id="quizArea"></div>
+    <footer>🎓 Modo aprendizaje — cada respuesta muestra si fue correcta y una justificación detallada</footer>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // TODAS LAS PREGUNTAS (extraídas del test original)
+    // --------------------------------------------------------------
+    const TESTS = {
+        "Tema 1 · Test 1": [
+            {q:"¿Cuál es la diferencia principal entre una clase y un objeto en Java?",opts:["Una clase es la instancia concreta en memoria, mientras que un objeto es la plantilla teórica","Una clase es una plantilla o molde, mientras que un objeto es una instancia concreta de esa clase en memoria","No hay diferencia real, se utilizan como sinónimos absolutos en Java","Una clase solo contiene métodos estáticos y un objeto solo contiene variables primitivas"],ans:1,exp:"La clase es el plano lógico de diseño. El objeto es la materialización de ese plano: ocupa espacio real y único en la memoria Heap durante la ejecución."},
+            {q:"Java es un lenguaje 'fuertemente tipado'. ¿Qué significa exactamente esto?",opts:["Que a toda variable hay que definirle explícitamente un tipo de dato antes de ser usada","Que las variables son dinámicas y su tipo puede cambiar automáticamente","Que el lenguaje no admite tipos de referencia, solo tipos primitivos","Que no es necesario utilizar 'new' para la instanciación"],ans:0,exp:"El compilador de Java exige saber la naturaleza de cada variable. Esto le permite reservar el tamaño de memoria adecuado y validar la seguridad de tipos en compilación."},
+            {q:"¿Cuál de las siguientes afirmaciones describe mejor qué es un arreglo (array) en Java?",opts:["Un tipo primitivo que puede alterar su tamaño según la necesidad","Una colección mutable que permite agrupar múltiples tipos distintos","Un tipo de referencia que representa una colección de elementos del mismo tipo con tamaño inmutable","Una estructura de control exclusiva para iterar sobre números"],ans:2,exp:"Los arreglos en Java son objetos (tipos de referencia). Son homogéneos (todos del mismo tipo) y su tamaño es estático una vez instanciados."},
+            {q:"Al realizar únicamente la declaración 'int[] array1;' en Java, ¿qué sucede?",opts:["Se reserva automáticamente espacio para 100 enteros en cero","El compilador asume un arreglo de tamaño dinámico","Se genera un error de compilación inmediato","Se crea una variable de referencia lista para apuntar a un objeto arreglo, pero la estructura en memoria aún no se ha instanciado"],ans:3,exp:"Solo se crea un puntero en el Stack. Hasta que no se ejecute 'new int[tamaño]', el arreglo no existe en el Heap y el puntero permanece en null."},
+            {q:"¿Para qué se utilizan comúnmente las Interfaces en Java?",opts:["Para crear un mecanismo que simule la herencia múltiple de comportamientos","Para evitar que los arreglos ocupen espacio estático en la memoria","Para instanciar objetos directamente de las clases abstractas","Para transformar un lenguaje orientado a objetos en un lenguaje interpretado"],ans:0,exp:"Java prohíbe la herencia múltiple de clases para evitar el 'problema del diamante'. Las interfaces permiten que una clase adopte múltiples conjuntos de comportamientos."},
+            {q:"¿Qué limitación de los arreglos nativos soluciona la clase ArrayList?",opts:["La lentitud en acceder al primer elemento","El manejo estático del tamaño de la colección","La prohibición de usar variables de referencia dentro de las casillas","La incompatibilidad con el bucle for"],ans:1,exp:"ArrayList gestiona un arreglo interno dinámicamente. Cuando se llena, instancia un nuevo bloque de mayor tamaño y traslada los elementos automáticamente."},
+            {q:"¿Qué indica fundamentalmente la notación Big O?",opts:["La memoria RAM precisa en Megabytes que consumirá un sistema","La velocidad del procesador necesaria para evitar un bucle infinito","El tiempo exacto de ejecución en milisegundos","La cota superior o comportamiento en el peor caso del crecimiento de recursos en función del tamaño de entrada"],ans:3,exp:"Big O mide el ritmo de crecimiento asintótico del algoritmo. Es un análisis pesimista (peor caso) que describe cómo escala la demanda a medida que n tiende al infinito."},
+            {q:"¿Cuál es la complejidad temporal de acceder directamente al elemento en la décima posición de un arreglo (arr[9])?",opts:["O(1)","O(n)","O(log n)","O(n²)"],ans:0,exp:"Al ser bloques de memoria contiguos, se accede mediante: Dirección Base + (Índice × Tamaño del Dato). Al resolverse con una operación aritmética elemental, el tiempo es constante O(1)."},
+            {q:"¿Cuáles son los componentes fundamentales de una función recursiva para no generar bucle infinito?",opts:["El uso de dos ciclos while y un puntero global","Un caso base (condición de parada) y un paso recursivo que se acerque al caso base","Una declaración fuertemente tipada y una clase abstracta auxiliar","Un tipo de retorno void y la manipulación de variables estáticas"],ans:1,exp:"Sin un caso base, el método se llamaría infinitamente. El paso recursivo debe reducir el problema en cada llamada para acercarse al caso base."},
+            {q:"¿Qué es el patrón 'Divide y Vencerás'?",opts:["Dividir el código en múltiples archivos independientes","Separar arreglos de texto y numéricos en Heap y Stack","Romper un problema complejo en subproblemas equivalentes más pequeños, resolverlos recursivamente y combinar las soluciones","Utilizar operaciones de tiempo polinómico con un único bucle for"],ans:2,exp:"Su estrategia: 1) Dividir en partes menores; 2) Conquistar resolviendo recursivamente cada parte; 3) Combinar los resultados (como en Merge Sort o Quick Sort)."},
+            {q:"La Búsqueda Binaria divide el problema por la mitad en cada paso. ¿Qué complejidad temporal introduce esta reducción?",opts:["O(n)","O(log n)","O(n²)","O(1)"],ans:1,exp:"Dividir por 2 repetidamente significa que los pasos máximos equivalen a cuántas veces se puede dividir n entre 2, que es log₂(n), denotado O(log n)."},
+            {q:"¿Qué almacena realmente una variable de referencia (como la clase Circle) en Java?",opts:["El valor literal de los atributos empacados en binario","La dirección de memoria donde reside físicamente el objeto en el sistema","Una copia estática e independiente de la clase original","El Bytecode de la máquina virtual correspondiente a ese bloque"],ans:1,exp:"Las variables de objetos almacenan una dirección hexadecimal que actúa como puntero. Al transferir la variable, se copia el puntero, permitiendo que múltiples variables apunten al mismo objeto."},
+            {q:"¿Cuál es una desventaja crítica del uso de la recursión profunda en Java?",opts:["Cada llamada consume espacio adicional en la pila, arriesgando un StackOverflowError","Es imposible usar condicionales if-else dentro de funciones recursivas","El compilador JIT siempre detendrá el programa por seguridad","Inhabilita permanentemente el recolector de basura"],ans:0,exp:"Cada llamada apila un nuevo Registro de Activación en el Stack. Si la recursión es excesivamente profunda, la pila se queda sin espacio físico y el programa colapsa con StackOverflowError."},
+            {q:"Tienes un arreglo de N elementos sin ordenar. ¿Cuál es la complejidad del peor caso para buscar un valor?",opts:["O(1)","O(log n)","O(n²)","O(n)"],ans:3,exp:"Sin ordenación ni indexación inteligente, en el peor caso el elemento está al final o no existe, forzando al algoritmo a evaluar todos los N elementos secuencialmente: O(n)."},
+            {q:"¿Qué propósito fundamental cumple una 'clase abstracta'?",opts:["Evitar que cualquier programador pueda heredar el comportamiento","Servir como plantilla incompleta que agrupa características comunes, obligando a sus clases hijas a implementarla, sin poder instanciarse directamente","Crear instancias anónimas seguras de memoria de forma ilimitada","Sustituir a los arreglos fijos con arreglos autoajustables"],ans:1,exp:"Las clases abstractas representan conceptos generalizados (como Shape). No tiene sentido instanciar una 'Forma pura'; su propósito es definir atributos y métodos obligatorios para las subclases."},
+            {q:"¿Cuál es el resultado de compilar código fuente Java?",opts:["El código fuente se convierte a Bytecode intermedio (.class), listo para que la JVM lo interprete","Se genera un ejecutable binario (.exe) acoplado a Windows","Un modelo JSON que detalla el diagrama de clases","Se elimina toda la recursión convirtiéndola en ciclos For"],ans:0,exp:"El comando 'javac' transforma el .java en Bytecode (.class). Este código no lo ejecuta directamente el procesador, sino la JVM, permitiendo portabilidad entre sistemas operativos."},
+            {q:"Cuando recorres un arreglo con 'forma.area()' y la JVM elige automáticamente si ejecutar el área de un rectángulo o un círculo, ¿cómo se llama esto?",opts:["Encapsulamiento privado","Polimorfismo (ligadura dinámica)","Notación asintótica constante","Instanciación recursiva múltiple"],ans:1,exp:"El polimorfismo permite tratar múltiples clases hijas mediante la referencia genérica de su superclase. La ligadura dinámica es el mecanismo por el cual la JVM selecciona el método correcto en tiempo de ejecución."},
+            {q:"¿Cuál es la gran ventaja del bucle For-Each (for(Shape s : array))?",opts:["Evita la necesidad de gestionar índices numéricos, eliminando casi totalmente la posibilidad de un error de 'fuera de rango'","Procesa múltiples datos en paralelo consumiendo los hilos multicore","Es el único capaz de redimensionar el arreglo en medio del ciclo","Es la única forma válida en Java para imprimir variables por terminal"],ans:0,exp:"El bucle clásico induce a errores de 'desplazamiento por uno' que lanzan ArrayIndexOutOfBoundsException. El for-each encapsula el iterador interno, extrayendo elementos de forma transparente."},
+            {q:"¿Qué contiene cada casilla de un arreglo de objetos recién creado (Shape[] array = new Shape[5])?",opts:["Datos residuales corruptos de la RAM ('basura')","El número primitivo cero exacto empaquetado como objeto","El valor especial 'null', indicando que el puntero existe pero no tiene asignado un objeto físico","Instancias puras generadas por un constructor vacío oculto en la JVM"],ans:2,exp:"Java garantiza la predictibilidad de la memoria. Al crear un array de referencias, la JVM asigna 'null' a cada celda. Invocar un método sin poblar el array antes provocará NullPointerException."},
+            {q:"El Algoritmo X tiene complejidad O(n²) y el Algoritmo Y tiene O(n log n). ¿Cuál se prefiere para bases de datos monumentales?",opts:["El Algoritmo X, pues las estructuras polinómicas no consumen memoria de pila recursiva","El Algoritmo Y, ya que n log n escala extraordinariamente más leve que el crecimiento cuadrático","El Algoritmo X, ya que depende de bucles for sin compilación JIT especial","Ambos resultarán bloqueados asintóticamente al entrar en conflicto con la RAM"],ans:1,exp:"Con n = 1.000.000: O(n²) ejecuta un billón de operaciones (horas). O(n log n) ejecuta ~20.000.000 de operaciones (fracción de segundo). La diferencia es exponencial."}
+        ],
+        "Tema 1 · Test 2": [
+            {q:"¿Cuál de las siguientes afirmaciones describe mejor cómo se ejecuta un programa en Java?",opts:["Es un lenguaje puramente interpretado desde el código fuente por el sistema operativo","El código fuente se compila a bytecode, interpretado por la JVM","Se compila directamente a código máquina nativo del procesador","El código se precompila en Python y luego se traduce a binario"],ans:1,exp:"Java combina la compilación a bytecode (independiente de la plataforma) con su posterior interpretación/ejecución por la JVM."},
+            {q:"Java es 'fuertemente tipado'. ¿Qué significa esto en comparación con Python?",opts:["Las variables pueden cambiar su tipo automáticamente","Es obligatorio definir explícitamente el tipo de toda variable antes de usarla","El programador puede ignorar los tipos ya que el compilador los asume como cadenas","Solo permite tipos numéricos enteros"],ans:1,exp:"A diferencia del tipado dinámico de Python, Java exige la declaración formal y explícita de los tipos. Esto garantiza la seguridad de datos y captura errores antes de la ejecución."},
+            {q:"¿Cuál de los siguientes pares representa un tipo primitivo y un operador de asignación compuesto en Java?",opts:["int y +=","String y ==","double y +","boolean y &&"],ans:0,exp:"'int' es un tipo primitivo para números enteros. '+=' realiza una suma y asignación simultánea en un solo paso."},
+            {q:"¿Qué valores tendrán x e y al ejecutar: int x = 5; int y = x++;?",opts:["x = 5, y = 5","x = 6, y = 5","x = 6, y = 6","x = 5, y = 6"],ans:1,code:"int x = 5;\nint y = x++;",exp:"Con el operador postfijo x++, primero se asigna el valor actual de x (5) a y, y luego se incrementa x a 6."},
+            {q:"¿Qué resultado produce la expresión '11 % 3' en Java?",opts:["3","2","1","0"],ans:1,exp:"El operador % extrae el residuo de la división entera. 11 ÷ 3 = cociente 3 con residuo 2."},
+            {q:"¿Cuál es la diferencia clave en memoria entre un tipo primitivo (double) y un tipo referencia?",opts:["Los tipos primitivos guardan el valor directamente; las variables de referencia almacenan una dirección que apunta al objeto","Los tipos primitivos consumen más memoria dinámica que cualquier objeto","Las variables de referencia solo se instancian con literales numéricos","Los tipos primitivos son inmutables y las referencias nunca pueden ser null"],ans:0,exp:"Los tipos primitivos almacenan el dato directamente en un espacio fijo. Las variables de referencia son punteros que guardan la dirección de memoria donde reside el objeto."},
+            {q:"¿Cómo procesa Java la instrucción 'if / else'?",opts:["Evalúa una expresión y repite el código mientras sea falsa","Evalúa una expresión booleana; si es verdadera ejecuta el primer bloque, si es falsa ejecuta el 'else'","Se usa únicamente para inicializar arreglos multidimensionales","Obliga al compilador a ignorar errores sintácticos"],ans:1,exp:"La bifurcación condicional se basa en evaluar una condición lógica. El flujo se desvía al bloque principal si es verdadera, o al bloque else si es falsa."},
+            {q:"Respecto a los arreglos en Java, ¿cuál describe una propiedad real?",opts:["Son tipos primitivos cuyo tamaño se expande automáticamente","Permiten combinar enteros y textos dentro del mismo contenedor","Son tipos no primitivos definidos por una clase que representan una colección homogénea con posiciones asignadas","Sus índices comienzan desde la posición número 1"],ans:2,exp:"En Java los arreglos son objetos (tipos no primitivos). Son secuencias indexadas y colecciones estrictamente homogéneas: todos sus elementos comparten el mismo tipo."},
+            {q:"Al ejecutar 'int[] array1 = new int[100];', ¿qué sucede exactamente en memoria?",opts:["Se declara la variable pero no se reserva espacio","Se crea un objeto arreglo con espacio para 100 enteros, inicializados todos con cero","Se genera una lista enlazada dinámica con índices del 1 al 100","El arreglo se llena con datos aleatorios del sistema"],ans:1,code:"int[] array1 = new int[100];",exp:"'new' desencadena la reserva física de espacio en memoria. Java inicializa por defecto todas las celdas numéricas de arreglos recién creados con el valor cero (0)."},
+            {q:"¿Qué ocurre al ejecutar 'array3[4] = 20;' si el arreglo es: int[] array3 = {3, 4, 10, 6}?",opts:["El arreglo incrementará su longitud a 5 elementos","Error de compilación que impedirá generar el bytecode","Se lanzará ArrayIndexOutOfBoundsException porque el índice está fuera de los límites","El valor 20 sobrescribirá exitosamente al 6"],ans:2,code:"int[] array3 = {3, 4, 10, 6};\narray3[4] = 20;",exp:"El arreglo tiene tamaño fijo de 4 elementos (índices 0-3). Acceder al índice 4 excede los límites válidos, disparando un error en tiempo de ejecución."},
+            {q:"¿Cuál es la característica restrictiva de los arreglos que justifica el uso de ArrayList?",opts:["La imposibilidad absoluta de modificar datos en sus índices","Que una vez creados, su tamaño total es fijo y no se puede alterar","Que ArrayList consume menos recursos de CPU en operaciones básicas","La ausencia de una propiedad para consultar la longitud"],ans:1,exp:"Los arreglos tradicionales tienen longitud inmutable tras su inicialización. Cuando el volumen de información fluctúa dinámicamente, ArrayList ofrece redimensionamiento automático."},
+            {q:"¿Cuál es la diferencia entre una Clase y un Objeto?",opts:["El objeto es la plantilla genérica y la clase es la materialización en memoria","La clase constituye el molde que define atributos y comportamientos; el objeto es una instancia particular de esa clase","Son sinónimos creados por el compilador que operan como tipos primitivos","Las clases solo tienen operaciones aritméticas y los objetos almacenan texto"],ans:1,exp:"Una clase es el plano técnico que define qué datos y métodos tendrá una entidad. El objeto es la materialización real (instancia) creada en memoria a partir de ese esquema."},
+            {q:"Si una clase abstracta define un método abstracto 'area()', ¿qué deben hacer sus subclases no abstractas?",opts:["Están obligadas a implementar (dar cuerpo concreto al) método area()","Tienen vetado el uso del término 'area' en todo su código","Deben transformarse en tipos primitivos mediante conversión automática","Deben omitir cualquier otro atributo y permanecer vacías"],ans:0,exp:"Las clases hijas concretas firman un contrato de herencia obligatorio: deben sobrescribir y codificar la lógica del método abstracto heredado, adaptándolo a su especialización."},
+            {q:"¿De qué manera resuelve Java la limitación de la 'Herencia Múltiple' de clases?",opts:["Permitiendo que una clase extienda de cinco o más clases usando comas","Mediante el uso de Interfaces, que definen contratos de comportamiento que una clase puede implementar de manera múltiple","Sustituyendo todos los esquemas de objetos por funciones recursivas","Haciendo obligatorio que todas las clases se unifiquen en un archivo"],ans:1,exp:"Para evitar la ambigüedad de la herencia múltiple (problema del diamante), Java restringe la herencia a un único padre, pero permite implementar múltiples interfaces."},
+            {q:"Al invocar 's.area()' en cada iteración de un arreglo 'Shape[]' con instancias de Circle y Rectangle, ¿qué propiedad de la POO se explota?",opts:["Encapsulamiento estricto de variables locales","Compilación intermedia en tiempo de desarrollo","Polimorfismo","Tipado primitivo estático"],ans:2,exp:"El polimorfismo permite a la JVM evaluar en tiempo de ejecución la naturaleza real del objeto y despachar automáticamente la versión exacta del método correspondiente."},
+            {q:"Si la clase Square NO implementa la interfaz Stretchable, ¿qué ocurre al añadir un Square al arreglo Stretchable[]?",opts:["El programa compilará pero omitirá el cálculo silenciosamente","Se manifestará un error de compilación por la validación estricta de tipos","El objeto se transformará en una elipse borrando sus dimensiones","Se asignará null en esa celda sin advertencias"],ans:1,exp:"Al ser Java fuertemente tipado, realiza verificaciones durante la compilación. Si un objeto no firma el contrato de la interfaz requerida, el compilador rechazará el programa."},
+            {q:"¿Cuál es un requisito imprescindible en el diseño de toda función recursiva?",opts:["Contener un bucle infinito controlado por un if","Disponer de al menos un caso base o condición de parada que resuelva un subproblema sin hacer más llamadas recursivas","Hacer uso exclusivo de variables String de longitud fija","Invocar al método constructor un número par de veces"],ans:1,exp:"El caso base rompe la cadena de autorepetición en la pila de llamadas. Sin él, la función incurriría en recursión infinita y colapsaría la memoria del ordenador."},
+            {q:"¿En qué consiste el paradigma 'Divide y Vencerás'?",opts:["Fraccionar un problema complejo en subproblemas más pequeños e independientes de igual naturaleza, solucionarlos recursivamente y fusionar los resultados","Multiplicar los datos de entrada por sí mismos para agotar el almacenamiento","Eliminar la mitad de las instrucciones del código para acelerar el compilador","Resolver solo los problemas sencillos e ignorar los complejos"],ans:0,exp:"Esta estrategia descompone recursivamente el problema en partes más pequeñas del mismo tipo. Una vez resueltas estas subpartes, se combinan sus soluciones para construir la respuesta global."},
+            {q:"¿Cuál es la finalidad primordial del 'Análisis de algoritmos'?",opts:["Medir el grado estético de identación del código","Evaluar y predecir teóricamente la eficiencia y escalabilidad de un algoritmo en términos de tiempo y espacio conforme crece el volumen de datos","Contar la cantidad de comentarios insertados por los programadores","Validar que la aplicación prescinda de clases abstractas"],ans:1,exp:"El análisis de algoritmos permite estimar el consumo de tiempo de CPU y memoria sin depender de hardware específico, ayudando a seleccionar la solución óptima y predecir su escalabilidad."},
+            {q:"¿Por qué se incluye 'if (s != null)' antes de invocar 's.area()' en el bucle de ShapeDemo?",opts:["Java impide operaciones aritméticas con variables cuyo identificador sea 's'","Las posiciones vacías de un arreglo de objetos contienen null, e invocar un método sobre ellas causaría NullPointerException","Para forzar la transformación del arreglo en una lista enlazada","En Java 'null' equivale matemáticamente al número entero uno"],ans:1,exp:"Al inicializar un arreglo de tipos referencia, sus celdas contienen null por defecto. Llamar a un método sobre una referencia nula provoca NullPointerException, por eso la comprobación es esencial."}
+        ],
+        "Tema 2 · Test 1": [
+            {q:"Si intentamos instanciar una clase abstracta directamente en Java (new Shape()), ¿qué ocurre?",opts:["Se produce un error de compilación","Se produce una excepción en tiempo de ejecución","Se crea un objeto con campos por defecto","El programa compila pero asigna null a la referencia"],ans:0,exp:"Las clases abstractas están incompletas por definición. El compilador de Java prohíbe explícitamente su instanciación directa."},
+            {q:"Si Circle NO implementa la interfaz Stretchable, ¿qué pasa al asignar un Circle a un arreglo Stretchable[]?",opts:["Error de compilación por incompatibilidad de tipos","El código compila pero lanza ClassCastException en ejecución","Java realiza autoboxing para permitirlo","Se almacena correctamente si Circle hereda de Shape"],ans:0,exp:"Para almacenar un objeto en un arreglo de tipo interfaz, la clase debe implementar explícitamente dicha interfaz."},
+            {q:"¿Cuál es el objetivo fundamental del 'caso base' en la recursión?",opts:["Finalizar las llamadas recursivas y evitar un bucle infinito que agote la pila","Dividir el problema en subproblemas más pequeños del mismo tipo","Llamar al método de nuevo modificando el parámetro","Garantizar que el algoritmo se ejecute en tiempo O(1)"],ans:0,exp:"El caso base define la condición de parada que devuelve una solución directa sin nuevas auto-invocaciones, impidiendo que la pila colapse."},
+            {q:"¿Qué valor devolverá la llamada misterio(4)?",opts:["24","12","6","1"],code:"public static int misterio(int n) {\n    if (n <= 1) return 1;\n    return n * misterio(n - 1);\n}",ans:0,exp:"El método calcula el factorial recursivamente. Para n = 4: 4 × 3 × 2 × 1 = 24."},
+            {q:"Si un algoritmo tiene dos bucles anidados que se ejecutan 'n' veces cada uno, ¿cuál es su complejidad?",opts:["O(n²)","O(n)","O(log n)","O(n log n)"],ans:0,exp:"Al estar los bucles acoplados jerárquicamente, las iteraciones se multiplican (n × n), dando lugar a una curva de crecimiento cuadrática."},
+            {q:"¿Cuál es una ventaja principal del uso de clases genéricas (Generics) en Java?",opts:["Proporcionar seguridad de tipos en compilación eliminando la necesidad de casts explícitos","Aumentar la velocidad de los bucles","Permitir la herencia múltiple de clases","Reducir el consumo de memoria Heap automáticamente"],ans:0,exp:"Los genéricos parametrizan los tipos de datos, forzando al compilador a comprobar la validez de los datos en las colecciones antes de la ejecución."},
+            {q:"La técnica 'Divide y Vencerás' se basa principalmente en:",opts:["Dividir un problema en subproblemas del mismo tipo, resolverlos recursivamente y combinar los resultados","Eliminar el caso base para acelerar el procesamiento","Transformar algoritmos recursivos en bucles while automáticamente","Almacenar en un arreglo lineal todas las variables primitivas"],ans:0,exp:"Es la definición fundamental de este paradigma: segmentar tareas complejas en subcomponentes estructuralmente idénticos pero reducidos."},
+            {q:"¿Cuál es el principal problema de eficiencia de Fibonacci recursivo no optimizado?",opts:["Realiza una cantidad masiva de cálculos redundantes duplicando subproblemas ya resueltos","Genera errores de compilación por dos llamadas en una línea","Utiliza espacio en disco excesivo","Su complejidad temporal es lineal O(n), considerada sumamente lenta"],ans:0,exp:"Al no guardar estados intermedios, el algoritmo recalcula las mismas ramas del árbol recursivo una y otra vez, generando complejidad exponencial."},
+            {q:"¿Qué representa estrictamente la notación Big O?",opts:["Una cota superior asintótica del tiempo de ejecución para entradas suficientemente grandes","El número exacto de milisegundos que tarda el programa","El mejor escenario posible (cota inferior)","La cantidad fija de memoria estática que reserva el compilador"],ans:0,exp:"Big O establece un límite superior o 'peor caso posible' en cuanto a la tasa de crecimiento de las operaciones fundamentales del algoritmo."},
+            {q:"¿Cuál es la complejidad temporal del siguiente bucle?",opts:["O(n)","O(1)","O(n²)","O(log n)"],code:"for (int i = 0; i < n; i++) {\n    System.out.println(i);\n}",ans:0,exp:"El bloque interior se ejecuta exactamente n veces, variando de forma estrictamente lineal y proporcional al tamaño del parámetro de entrada."},
+            {q:"¿Cuál es la diferencia fundamental entre un tipo primitivo (int) y un tipo referencia?",opts:["Los tipos primitivos almacenan el valor directamente; los tipos referencia almacenan la dirección de memoria donde se aloja el objeto real","Los tipos referencia no consumen memoria interna","Los tipos primitivos pueden invocar métodos con el operador punto","Los arreglos siempre son tipos primitivos"],ans:0,exp:"Los tipos primitivos guardan valores directos en memoria. Las referencias guardan punteros hacia bloques dinámicos dentro del Heap."},
+            {q:"¿Qué imprimirá 'traza(3)'?",opts:["***","*","Recursión infinita","* *"],code:"public static void traza(int n) {\n    if (n > 0) {\n        System.out.print(\"*\");\n        traza(n - 1);\n    }\n}",ans:0,exp:"El método imprime un asterisco en cada nivel válido. Se llama para n=3, n=2 y n=1, acumulando 3 asteriscos consecutivos antes de frenar cuando n=0."},
+            {q:"¿Cuál presenta el peor rendimiento a medida que 'n' se vuelve extremadamente grande?",opts:["O(2ⁿ)","O(n³)","O(n log n)","O(log n)"],ans:0,exp:"La complejidad exponencial O(2ⁿ) crece a un ritmo que sobrepasa con creces cualquier función polinomial como O(n³) ante conjuntos de datos medianos o grandes."},
+            {q:"¿Cuál es la diferencia estructural clave entre heredar de una clase abstracta e implementar una interfaz?",opts:["Una clase solo puede heredar de una única clase, pero puede implementar múltiples interfaces","Las interfaces permiten heredar variables de estado mutables compartidas","Las clases abstractas no admiten constructores bajo ninguna circunstancia","Las interfaces se instancian con 'new Interface()'"],ans:0,exp:"Java prohíbe la herencia múltiple de clases para evitar conflictos estructurales, pero permite la implementación de múltiples interfaces."},
+            {q:"Si una función recursiva carece de un caso base bien definido, ¿qué error se manifestará?",opts:["StackOverflowError","NullPointerException","OutOfMemoryError en el Heap","El compilador detendrá la ejecución"],ans:0,exp:"Cada llamada reserva un bloque en la pila de ejecución (Stack). Sin condición de parada, la memoria asignada a la pila se desborda por completo."},
+            {q:"¿Cuál es la complejidad temporal del siguiente fragmento?",opts:["O(n)","O(n²)","O(50n²)","O(1)"],code:"for (int i = 0; i < n; i++) {\n    for (int j = 0; j < 50; j++) {\n        // Operación O(1)\n    }\n}",ans:0,exp:"El bucle interno siempre ejecuta un número fijo de 50 iteraciones. Al simplificar las constantes en notación asintótica: 50 × n = O(n)."},
+            {q:"Al invocar 's.area()' en figuras variadas, ¿qué concepto técnico permite ejecutar la versión correcta?",opts:["Polimorfismo / Enlace dinámico (Dynamic Binding)","Sobrecarga estática de operadores","Downcasting explícito","Encapsulamiento primitivo"],ans:0,exp:"El enlace dinámico determina en tiempo de ejecución a qué método concreto llamar basándose en la naturaleza del objeto real almacenado, no en el tipo genérico de la referencia."},
+            {q:"Un algoritmo divide sucesivamente el tamaño de un vector a la mitad (n/2, n/4, n/8...). ¿Cuál es su cota Big O?",opts:["O(log n)","O(n)","O(n log n)","O(n²)"],ans:0,exp:"La reducción sucesiva del espacio de trabajo por un factor constante es el fundamento matemático que da origen a las complejidades de tipo logarítmico."},
+            {q:"¿Qué valor devuelve 'conteo(3)'?",opts:["6","3","0","5"],code:"public static int conteo(int n) {\n    if (n <= 0) return 0;\n    return n + conteo(n - 1);\n}",ans:0,exp:"El método acumula la suma decreciente hasta el caso base: 3 + conteo(2) → 3 + 2 + conteo(1) → 3 + 2 + 1 + 0 = 6."},
+            {q:"¿Cómo se reduce T(n) = 8n³ + 15n² + 100 log n + 7 en notación Big O?",opts:["O(n³)","O(8n³)","O(n³ + n²)","O(log n)"],ans:0,exp:"En Big O se descartan los coeficientes numéricos constantes y se conserva exclusivamente el término de mayor orden (crecimiento dominante), que en este caso es el cúbico."}
+        ],
+        "Tema 4 · Test 1": [
+            {q:"¿Cuáles son los tres Tipos Abstractos de Datos principales que se introducen en el apartado 4.1?",opts:["Árbol Binario, Grafo y Pila","Lista, Pila y Cola","Array Estático, Matriz y Hash","Montículo Binario, Lista y Pila"],ans:1,exp:"El Tema 4 introduce los tres TADs fundamentales: Lista, Pila y Cola, que son la base de las estructuras de datos lineales."},
+            {q:"¿Cuál es la función de los nodos 'centinela' en una lista doblemente enlazada?",opts:["Son nodos especiales situados en los extremos (cabeza y cola) que no contienen datos reales de la secuencia","Son nodos temporales creados durante la búsqueda binaria","Son punteros externos que apuntan al elemento de valor máximo","Representan datos marcados lógicamente como eliminados"],ans:0,exp:"Los centinelas son nodos ficticios en los extremos de la lista. Su función es eliminar la necesidad de casos especiales en los algoritmos de inserción y borrado."},
+            {q:"En una lista doblemente enlazada con centinelas vacía, ¿a qué nodo apunta 'cabeza.siguiente'?",opts:["A null","A la propia cabeza","Al centinela cola","Al primer elemento insertado"],ans:2,exp:"En una lista vacía con centinelas, cabeza.siguiente apunta directamente al centinela cola, ya que no hay elementos reales entre ellos."},
+            {q:"En una lista vacía con centinelas, ¿a qué apunta 'cola.anterior'?",opts:["A null","Al último elemento eliminado","A la propia cola","Al centinela cabeza"],ans:3,exp:"En una lista vacía, cola.anterior apunta directamente al centinela cabeza, cerrando el enlace bidireccional."},
+            {q:"¿Cuál es la firma del método privado para localizar un nodo a partir de su índice?",opts:["public AnyType buscarElemento(int i)","private Nodo<AnyType> obtenerRef(int i)","private int getIndice(Nodo p)","public void obtenerRef(int i)"],ans:1,exp:"El método auxiliar privado 'obtenerRef(int i)' devuelve una referencia al nodo en la posición i, y es usado internamente por los métodos de inserción y eliminación."},
+            {q:"¿Con qué instrucción se inicializa la variable de rastreo 'p' en 'obtenerRef(int i)'?",opts:["p = cabeza;","p = cola;","p = cabeza.siguiente;","p = null;"],ans:2,exp:"Se inicializa con 'cabeza.siguiente' para empezar desde el primer elemento real de la lista (saltando el centinela cabeza), con j = 0."},
+            {q:"¿Cuál es la condición del bucle while en 'obtenerRef(int i)' si j comienza en 0?",opts:["Mientras (j > i)","Mientras (p != null)","Mientras (j <= i)","Mientras (j < i)"],ans:3,exp:"La condición 'j < i' avanza el puntero p exactamente i veces desde cabeza.siguiente, llegando al nodo en la posición i."},
+            {q:"¿Qué condición debe cumplir la posición i en 'public void insertar(AnyType x, int i)'?",opts:["i debe ser estrictamente mayor que tam","i debe estar entre 0 y tam (0 <= i <= tam)","i solo puede ser 0 o tam","i debe ser negativo para indicar inserción trasera"],ans:1,exp:"La posición i puede ser cualquier valor entre 0 (insertar al inicio) y tam (insertar al final), siendo ambos extremos posiciones válidas."},
+            {q:"¿A qué variable se le asigna el nodo que actualmente ocupa la posición i durante la inserción?",opts:["Nodo<AnyType> nuevo_nodo = obtenerRef(x);","Nodo<AnyType> p = obtenerRef(i);","int p = obtenerRef(i);","Nodo<AnyType> p = cabeza.siguiente;"],ans:1,exp:"Se usa 'Nodo<AnyType> p = obtenerRef(i);' para obtener la referencia al nodo que actualmente ocupa la posición i, donde se insertará el nuevo nodo delante."},
+            {q:"Al crear el nuevo nodo con 'new Nodo<>(x, p.anterior, p)', ¿qué indica esto al constructor?",opts:["El dato x, y que su anterior será p y su siguiente también p","El dato x, que su anterior será p.anterior, y su siguiente será p","El dato x, seguido del índice i, y la referencia a tam","Se omiten los parámetros estructurales y se conectan manualmente"],ans:1,exp:"El constructor recibe: el dato x, la referencia al nodo anterior (p.anterior) y la referencia al nodo siguiente (p), estableciendo los enlaces bidireccionales del nuevo nodo."},
+            {q:"¿Qué instrucción reengancha el nodo previo para que apunte al nuevo nodo?",opts:["p.siguiente = nuevo_nodo;","nuevo_nodo.siguiente = p;","nuevo_nodo.anterior.siguiente = nuevo_nodo;","cabeza.siguiente = nuevo_nodo;"],ans:2,exp:"'nuevo_nodo.anterior.siguiente = nuevo_nodo' actualiza el enlace hacia adelante del nodo que precede al nuevo nodo, completando la conexión en la dirección correcta."},
+            {q:"¿Qué hace la instrucción 'p.anterior = nuevo_nodo;' en la rutina de inserción?",opts:["Borra el elemento p de la estructura","Mueve el nodo p a la posición 0","Cierra el enlace hacia atrás, conectando el nodo desplazado p con el elemento recién insertado","Provoca un error si p es el centinela de cola"],ans:2,exp:"Esta instrucción actualiza el enlace hacia atrás del nodo p (que se desplaza una posición), haciéndolo apuntar al nuevo nodo insertado delante de él."},
+            {q:"¿Qué acción de contabilidad esencial se realiza al finalizar el método 'insertar(x, i)'?",opts:["Llamar al recolector de basura explícitamente","tam++; para incrementar el número de elementos","Reiniciar la cabeza de la lista a null","Imprimir el valor de x por consola obligatoriamente"],ans:1,exp:"Tras insertar el elemento, se debe incrementar 'tam' para mantener actualizado el contador del número de elementos de la lista."},
+            {q:"¿Qué rasgo destaca del código de 'insertar(x, i)' con implementación doblemente enlazada con centinelas?",opts:["Es independiente de si la lista es vacía, o si insertamos de primero o de último","Su complejidad temporal es siempre O(1) independientemente de la posición","Solo funciona para listas con máximo 100 elementos","Requiere sentencias if anidadas para evitar NullPointerException"],ans:0,exp:"El uso de centinelas elimina los casos especiales: el mismo código funciona para listas vacías, inserciones al inicio, al final y en cualquier posición intermedia."},
+            {q:"Al insertar en posición 0 de una lista VACÍA, ¿qué devuelve 'obtenerRef(0)'?",opts:["La referencia al centinela cabeza","Null, provocando un fallo","La referencia al centinela cola","El propio nuevo_nodo a insertar"],ans:2,exp:"En una lista vacía, la posición 0 corresponde al centinela cola (ya que no hay elementos reales). obtenerRef(0) devuelve el centinela cola, y el nuevo nodo se inserta antes de él."},
+            {q:"¿Cuál sería el núcleo para eliminar lógicamente un nodo 'p' en la lista?",opts:["Hacer que p.siguiente apunte a cabeza","Conectar directamente el nodo p.anterior con p.siguiente y viceversa","Asignar null a la variable global tam","Sobrescribir el dato interno de p a 0"],ans:1,exp:"Para eliminar p se deben actualizar los dos enlaces que lo rodean: p.anterior.siguiente = p.siguiente y p.siguiente.anterior = p.anterior, 'cortando' el nodo de la cadena."},
+            {q:"¿Cuál es la diferencia clave entre una Lista y una Pila?",opts:["La Lista permite acceso y modificación en cualquier posición i; la Pila restringe las operaciones al extremo llamado 'cima'","Las Pilas solo pueden almacenar números enteros","Una Lista no puede implementarse con arrays, pero una Pila sí","Las Pilas procesan datos en FIFO y las Listas en orden aleatorio"],ans:0,exp:"La Lista es un TAD de propósito general con acceso posicional. La Pila restringe el acceso al principio LIFO (Last In, First Out): solo se opera en la cima."},
+            {q:"¿Cómo se denominan las dos operaciones básicas de una Pila (Stack)?",opts:["Enqueue y Dequeue","Push y Pop","Insertar y Eliminar por índice","AddNode y RemoveNode"],ans:1,exp:"Push añade un elemento en la cima de la pila. Pop extrae y devuelve el elemento de la cima. Son las operaciones fundamentales del TAD Pila (LIFO)."},
+            {q:"Si no se utilizan nodos centinela en una lista doblemente enlazada, ¿qué complicación se asume?",opts:["Consumo desmedido de memoria ya que los nodos ocuparían el triple de espacio","Incapacidad técnica para recorrer la lista de atrás hacia adelante","Necesidad de múltiples bloques if para tratar inserciones y borrados en extremos y listas vacías","El algoritmo pasaría a ser O(1) en búsquedas automáticamente"],ans:2,exp:"Sin centinelas, se necesitan múltiples condiciones especiales para manejar: lista vacía, inserción/borrado al inicio, inserción/borrado al final. Los centinelas eliminan todos estos casos."},
+            {q:"¿Qué estructura de programación define las 'operaciones permitidas' de un TAD sin aportar el código de cómo ejecutarlas?",opts:["Una clase final","Una Interface","Un método estático","El bloque de código main"],ans:1,exp:"Una Interface en Java define el 'qué' (las operaciones del contrato) sin especificar el 'cómo' (la implementación). Esto es exactamente la definición formal de un Tipo Abstracto de Datos."}
+        ],
+        "Tema 6 · Test 1": [
+            {q:"¿Qué modelo matemático permite implementar el Árbol Binario de Búsqueda con operaciones como pertenencia, inserción y eliminación?",opts:["Grafo","Pila","Conjunto","Lista Enlazada"],ans:2,exp:"El ABB implementa eficientemente el modelo matemático 'Conjunto': agrupa elementos distintos sin duplicados y permite operaciones de búsqueda eficientes."},
+            {q:"Según la propiedad fundamental de un ABB, ¿cómo se distribuyen los elementos respecto a un nodo?",opts:["Los elementos del árbol izquierdo son mayores y los del derecho son menores","Los elementos del árbol izquierdo son menores y los del derecho son mayores","Todos los elementos no tienen un orden específico","Los elementos del árbol izquierdo deben ser estrictamente pares"],ans:1,exp:"Esta es la propiedad fundamental del ABB: para cualquier nodo, todos los valores en su subárbol izquierdo son menores, y todos en el derecho son mayores. Esto permite la búsqueda eficiente."},
+            {q:"¿Qué interfaz de Java se utiliza para ordenar el árbol por una clave secundaria como 'nombre'?",opts:["Comparable","Comparator","Iterator","Cloneable"],ans:1,exp:"Comparator permite definir criterios de comparación externos y alternativos, útil para ordenar el mismo tipo de objeto por diferentes claves (nombre, edad, etc.) sin modificar la clase original."},
+            {q:"Al insertar un elemento en un ABB, ¿qué indica el algoritmo si el elemento ya existe?",opts:["Se inserta como hijo izquierdo","Se lanza un error en tiempo de ejecución","Se inserta como hijo derecho","No se hace nada"],ans:3,exp:"Los apuntes indican: 'si ya existe un elemento igual, no hacer nada', respetando el modelo matemático de Conjunto, donde los elementos son únicos."},
+            {q:"En la inserción recursiva en un ABB, ¿cuál es el caso base que crea el nuevo nodo?",opts:["Cuando el elemento es menor que la raíz actual","Cuando el nodo apuntado actual es null (t == null)","Cuando el nodo apuntado es mayor que cero","Cuando el árbol ya está balanceado"],ans:1,exp:"Al llegar a una referencia nula (t == null), se ha encontrado el 'hueco' disponible en la estructura para crear y alojar el nuevo nodo, deteniendo la recursividad."},
+            {q:"Al eliminar un nodo 'hoja' en un ABB, ¿qué operación se realiza desde su nodo padre?",opts:["Se coloca null a la referencia que apuntaba al nodo a borrar","Se reemplaza por el nodo raíz general","Se llama recursivamente para eliminar todo el subárbol","Se asocia con su nodo hermano"],ans:0,exp:"Al ser hoja, no tiene hijos que reubicar. Simplemente se rompe el enlace asignando null desde el puntero del nodo padre que apuntaba a la hoja eliminada."},
+            {q:"Si el nodo a eliminar posee exactamente un hijo (ej. nodo 4 con hijo 3), ¿qué sucede con ese hijo?",opts:["El nodo hijo pasa a ser hijo directo del padre del nodo eliminado","Se elimina automáticamente por la dependencia","Asciende hasta convertirse en la raíz del árbol","Se mueve a la rama contraria"],ans:0,exp:"Al eliminar el nodo intermedio, su único hijo sube una posición ocupando su lugar exacto para no perder los datos del subárbol descendiente."},
+            {q:"¿Por cuál valor se sustituye un nodo con DOS hijos no nulos en un ABB?",opts:["Por la raíz del subárbol izquierdo","Por el mayor valor de todo el árbol","Por el mayor valor del subárbol derecho","Por el menor valor del subárbol derecho del nodo a eliminar"],ans:3,exp:"Para preservar las propiedades del ABB, se sube el elemento más pequeño del subárbol derecho (el sucesor inmediato). Esto garantiza que todos los elementos menores queden a la izquierda y los mayores a la derecha."},
+            {q:"¿Qué devuelve el método auxiliar 'removeMin' después de eliminar el mínimo de un subárbol?",opts:["El valor del elemento mínimo recién eliminado","La raíz del árbol resultante de la eliminación","Una excepción porque no se puede borrar el mínimo directamente","Un valor nulo obligatoriamente"],ans:1,exp:"El método reasigna y devuelve el apuntador a la raíz de ese subárbol ya modificado tras haber extraído el mínimo, permitiendo la reasignación de enlaces."},
+            {q:"Para simular iterativamente el recorrido en pre-orden de un árbol, ¿qué estructura auxiliar se usa?",opts:["Una cola (Queue)","Un array multidimensional","Una pila (Stack)","Un subárbol secundario"],ans:2,exp:"Una pila (LIFO) permite guardar nodos y retornar a ellos, simulando exactamente el comportamiento del registro de activación de la recursividad en el procesador."},
+            {q:"En el recorrido iterativo con pila, ¿qué controlan los campos booleanos 'recIzq' y 'recDer'?",opts:["Si el nodo pertenece al lado izquierdo o derecho de su padre","Si ya hemos recorrido el subárbol izquierdo y/o derecho de ese nodo","Si el nodo es mayor o menor a la raíz principal","Si el nodo tiene sus dos hijos vacíos"],ans:1,exp:"Actúan como 'banderas' o marcas de estado que le dicen al bucle si ya visitó a los descendientes izquierdo y/o derecho, o si aún faltan por procesar."},
+            {q:"Si sacas un nodo de la pila con recIzq=false y recDer=false, ¿qué ejecutas a continuación?",opts:["Se ignora el nodo","Se visita el nodo, se vuelve a empilar marcando recIzq a true y se empila su hijo izquierdo","Se empila primero su hijo derecho y luego el izquierdo","Se finaliza el bucle"],ans:1,exp:"En pre-orden, se visita la raíz primero. Luego se registra que comenzaremos a tratar la rama izquierda (recIzq=true) y se empila ese hijo para la siguiente iteración."},
+            {q:"Considerando N como el número total de nodos, ¿cuántas iteraciones totales garantiza el algoritmo iterativo propuesto?",opts:["Únicamente N iteraciones","O(N²) iteraciones","3N + 1 iteraciones","log(N) iteraciones"],ans:2,exp:"Cada nodo se extrae bajo 3 estados diferentes (false-false, true-false, true-true), más 1 por la última comprobación de pila vacía: total 3N + 1 iteraciones."},
+            {q:"El algoritmo efectúa 3N + 1 iteraciones con operaciones O(1). ¿Cuál es la complejidad temporal resultante?",opts:["Lineal, O(N)","Cuadrático, O(N²)","Constante, O(1)","Logarítmico, O(log N)"],ans:0,exp:"Al ignorar las constantes (el 3 y el 1) en el límite asintótico, la complejidad depende de forma proporcional y plana a la cantidad de elementos N: O(N)."},
+            {q:"Si se agrega un campo en cada nodo que almacene el número de elementos de su subárbol, ¿qué operación se logra resolver eficientemente?",opts:["El balanceo automático del árbol en O(N)","La inserción de N elementos a la vez","La eliminación de todo el árbol en un paso","La búsqueda del K-ésimo menor elemento"],ans:3,exp:"Aumentar la estructura almacenando el tamaño de los subárboles permite recorrer inteligentemente el árbol buscando índices específicos, como si fuera una lista indexada."},
+            {q:"¿Cuál define la 'propiedad de balance' de un Árbol AVL?",opts:["Las alturas de los subárboles izquierdo y derecho de un nodo difieren en a lo sumo 1","Ambos subárboles deben tener la misma altura exacta","La diferencia de alturas no puede superar los 3 niveles","La raíz debe ser el elemento medio de todos los datos"],ans:0,exp:"Esta es la propiedad definidora del AVL (creada por Adelson-Velskii y Landis): la diferencia máxima de alturas entre subárboles de cualquier nodo es ±1."},
+            {q:"¿Qué altura exacta se le asigna por convención a un árbol vacío (null) en los AVL?",opts:["1","0","-1","Infinito negativo"],ans:2,exp:"Los apuntes indican explícitamente: 'el árbol vacío (null) tiene altura -1', para diferenciarlo de una hoja (altura 0). Esta convención simplifica los cálculos de balance."},
+            {q:"La propiedad de equilibrio del AVL garantiza ¿qué complejidad para la altura del árbol?",opts:["O(N)","O(log N)","O(1)","O(N²)"],ans:1,exp:"Mantener la diferencia de alturas máximo en 1 evita que el árbol se degenere en una lista lineal. Esto garantiza operaciones eficientes en tiempo O(log N)."},
+            {q:"En un ABB con raíz 8, hijo izq 3 y der 10; el 3 tiene hijo izq 1 y der 6. ¿Dónde queda el valor 5 al insertarse?",opts:["Como hijo derecho de 6","Como hijo izquierdo de 10","Como hijo izquierdo de 6","Como nueva raíz"],ans:2,exp:"Recorrido: 5 < 8 → baja a 3. 5 > 3 → baja derecha a 6. 5 < 6 → se aloja como hijo izquierdo de 6."},
+            {q:"Para eliminar el nodo 10 (con hijo izq 4, der 18; el 18 tiene hijo izq 12 y der 25), usando el criterio 'menor del subárbol derecho', ¿qué valor sustituye al 10?",opts:["4","18","12","15"],ans:2,exp:"El subárbol derecho de 10 empieza en 18. El valor más a la izquierda (el menor) dentro de ese subárbol es el 12, quien es elegido para subir de nivel y sustituir al nodo eliminado."}
+        ]
+    };
+
+    // Estado de la aplicación
+    let currentTest = Object.keys(TESTS)[0];
+    let userAnswers = {};    // idxPregunta -> opción seleccionada
+    let checkedStatus = {};  // idxPregunta -> true si ya fue verificada (bloqueada)
+
+    function buildTabs() {
+        const container = document.getElementById('navTabs');
+        container.innerHTML = '';
+        Object.keys(TESTS).forEach(key => {
+            const btn = document.createElement('button');
+            btn.textContent = key;
+            btn.className = `tab-btn ${key === currentTest ? 'active' : ''}`;
+            btn.onclick = () => {
+                currentTest = key;
+                userAnswers = {};
+                checkedStatus = {};
+                buildTabs();
+                renderCurrentTest();
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    function updateProgressAndScore() {
+        const questions = TESTS[currentTest];
+        if (!questions) return;
+        const total = questions.length;
+        const answered = Object.keys(userAnswers).length;
+        const verified = Object.keys(checkedStatus).length;
+        const correctCount = verified > 0 ? Object.keys(checkedStatus).filter(i => userAnswers[i] === questions[i].ans).length : 0;
+        const percent = total ? (answered / total) * 100 : 0;
+        document.getElementById('progressFill').style.width = `${percent}%`;
+        document.getElementById('globalCounter').innerHTML = `${answered}/${total} respondidas | ✅ ${correctCount} correctas`;
+    }
+
+    function renderCurrentTest() {
+        const questions = TESTS[currentTest];
+        if (!questions) return;
+        const total = questions.length;
+        let html = '';
+        questions.forEach((q, idx) => {
+            const selected = userAnswers[idx];
+            const isChecked = !!checkedStatus[idx];
+            const isCorrect = isChecked && selected === q.ans;
+            const isWrong = isChecked && selected !== q.ans;
+
+            let codeHtml = q.code ? `<div class="code-block">${q.code}</div>` : '';
+
+            let optsHtml = q.opts.map((opt, optIdx) => {
+                let optClass = 'opt';
+                if (!isChecked && selected === optIdx) optClass += ' selected';
+                else if (isChecked && optIdx === q.ans) optClass += ' correct';
+                else if (isChecked && selected === optIdx && optIdx !== q.ans) optClass += ' wrong';
+                return `<div class="${optClass}" onclick="if(!checkedStatus[${idx}]) selectAnswer(${idx},${optIdx})">
+                            <div class="opt-letter">${String.fromCharCode(65+optIdx)}</div>
+                            <div class="opt-text">${opt}</div>
+                        </div>`;
+            }).join('');
+
+            const badge = isChecked ? (isCorrect ? '<span class="feedback-badge correct">✓ Correcto</span>' : '<span class="feedback-badge wrong">✗ Incorrecto</span>') : '';
+
+            html += `<div class="question-card" data-qidx="${idx}">
+                        <div class="q-header">
+                            <span class="q-num">Pregunta ${idx+1}</span>
+                            ${badge}
+                        </div>
+                        <div class="q-text">${q.q}</div>
+                        ${codeHtml}
+                        <div class="options">${optsHtml}</div>
+                        <div class="explanation ${isChecked ? 'show' : ''}">
+                            <strong>📖 Explicación:</strong> ${q.exp}
+                        </div>
+                    </div>`;
+        });
+
+        const allChecked = Object.keys(checkedStatus).length === total;
+        let bottomActions = '';
+        if (allChecked) {
+            const correctCount = Object.keys(checkedStatus).filter(i => userAnswers[i] === questions[i].ans).length;
+            bottomActions = `<div class="results-card">
+                                <div class="percent">${Math.round((correctCount/total)*100)}%</div>
+                                <div class="stats">
+                                    <div class="stat"><div class="stat-num" style="color:#0d9488;">${correctCount}</div><div class="stat-label">Correctas</div></div>
+                                    <div class="stat"><div class="stat-num" style="color:#e11d48;">${total-correctCount}</div><div class="stat-label">Incorrectas</div></div>
+                                    <div class="stat"><div class="stat-num">${total}</div><div class="stat-label">Total</div></div>
+                                </div>
+                                <button class="btn btn-primary restart-btn" onclick="resetCurrentTest()">🔄 Reintentar este test</button>
+                            </div>`;
+        } else {
+            const canVerify = Object.keys(userAnswers).length === total;
+            bottomActions = `<div class="action-bar">
+                                <button class="btn ${canVerify ? 'btn-primary' : ''}" ${!canVerify ? 'disabled style="opacity:0.5"' : ''} onclick="verifyAllAnswers()">🔍 Verificar todas las respuestas</button>
+                                ${Object.keys(userAnswers).length > 0 ? '<button class="btn" onclick="resetCurrentTest()">🔄 Reiniciar test</button>' : '<div></div>'}
+                            </div>`;
+        }
+
+        document.getElementById('quizArea').innerHTML = html + bottomActions;
+        updateProgressAndScore();
+    }
+
+    window.selectAnswer = (qIdx, optIdx) => {
+        if (checkedStatus[qIdx]) return;
+        userAnswers[qIdx] = optIdx;
+        renderCurrentTest();
+        const card = document.querySelector(`.question-card[data-qidx="${qIdx}"]`);
+        if(card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+
+    window.verifyAllAnswers = () => {
+        const questions = TESTS[currentTest];
+        const total = questions.length;
+        if (Object.keys(userAnswers).length !== total) return;
+        for (let i = 0; i < total; i++) {
+            if (userAnswers[i] !== undefined) checkedStatus[i] = true;
+        }
+        renderCurrentTest();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.resetCurrentTest = () => {
+        userAnswers = {};
+        checkedStatus = {};
+        renderCurrentTest();
+    };
+
+    buildTabs();
+    renderCurrentTest();
+</script>
+</body>
+</html>

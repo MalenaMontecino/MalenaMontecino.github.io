@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 1 - Test de Programación Java y Algoritmos</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-top: 90px; /* Espacio para la barra fija */
+        }
+
+        /* Barra de puntuación fija */
+        .scoreboard-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 15px 20px;
+        }
+
+        .scoreboard {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .scoreboard h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 1.1rem;
+        }
+
+        .stat-box {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .stat-total { background-color: var(--secondary-color); }
+        .stat-correct { background-color: var(--success-color); }
+        .stat-incorrect { background-color: var(--error-color); }
+
+        /* Contenido del Test */
+        .main-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px 60px 20px;
+        }
+
+        .intro-card {
+            background-color: var(--card-bg);
+            border-left: 5px solid var(--accent-color);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .question-header {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .question-number {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-right: 12px;
+            white-space: nowrap;
+        }
+
+        .code-block {
+            background-color: #282c34;
+            color: #abb2bf;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.4;
+        }
+
+        /* Opciones de respuesta */
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .option-item:hover:not(.disabled) {
+            background-color: #f1f7fc;
+            border-color: var(--accent-color);
+        }
+
+        .option-item input[type="radio"] {
+            margin-right: 14px;
+            transform: scale(1.2);
+            accent-color: var(--accent-color);
+        }
+
+        /* Estados de validación interactiva */
+        .option-item.correct-answer {
+            background-color: #e8f8f0 !important;
+            border-color: var(--success-color) !important;
+            color: #1e7e34;
+            font-weight: 500;
+        }
+
+        .option-item.correct-answer::after {
+            content: "✓ Correcta";
+            position: absolute;
+            right: 20px;
+            font-size: 0.85rem;
+            background-color: var(--success-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .option-item.incorrect-answer {
+            background-color: #fce8e6 !important;
+            border-color: var(--error-color) !important;
+            color: #bd2130;
+        }
+
+        .option-item.incorrect-answer::after {
+            content: "✗ Incorrecta";
+            position: absolute;
+            right: 20px;
+            font-size: 0.85rem;
+            background-color: var(--error-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        /* Botón de reinicio */
+        .reset-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn-reset {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+        }
+
+        .btn-reset:hover {
+            background-color: #2980b9;
+        }
+
+        @media (max-width: 600px) {
+            body { padding-top: 120px; }
+            .scoreboard { flex-direction: column; gap: 10px; text-align: center; }
+            .stats { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scoreboard-container">
+        <div class="scoreboard">
+            <h1>Actividad 1 - Autoevaluación</h1>
+            <div class="stats">
+                <div class="stat-box stat-total">Respondidas: <span id="answered-count">0</span> / 20</div>
+                <div class="stat-box stat-correct">Bien: <span id="correct-count">0</span></div>
+                <div class="stat-box stat-incorrect">Mal: <span id="incorrect-count">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="intro-card">
+            <p><strong>Instrucciones:</strong> Selecciona una opción para validar tu respuesta de inmediato. El contador superior registrará tu progreso actual en base a las respuestas correctas e incorrectas del documento original.</p>
+        </div>
+
+        <div class="question-card" data-question="1" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 1</span>
+                <div>¿Qué es una Interfaz en Java?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q1">Contrato que define qué métodos debe implementar una clase</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q1">Colección de elementos del mismo tipo</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q1">Método que se ejecuta al iniciar un programa</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q1">Caso que detiene la recursión</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="2" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 2</span>
+                <div>¿Qué es el Método main?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q2">Técnica recursiva que resuelve subproblemas más pequeños</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q2">Método que se ejecuta al iniciar un programa</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q2">Límite superior del tiempo o espacio de un algoritmo</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q2">Contrato que define qué métodos debe implementar una clase</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="3" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 3</span>
+                <div>¿Qué es un Caso base en recursión?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q3">La subsecuencia contigua con la mayor suma de elementos</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q3">Ejemplo clásico de un algoritmo recursivo</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q3">Caso que detiene la recursión</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q3">Técnica recursiva que resuelve subproblemas más pequeños</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="4" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 4</span>
+                <div>¿Qué es un Array?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q4">Colección de elementos del mismo tipo</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q4">Contrato que define qué métodos debe implementar una clase</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q4">Un tipo de bucle estructurado</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q4">Una clase que no se puede usar</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="5" data-correct="D">
+            <div class="question-header">
+                <span class="question-number">Pregunta 5</span>
+                <div>¿Qué es la estrategia Divide y vencerás?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q5">Una función para dibujar gráficos</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q5">Un objeto que se comporta de diferentes maneras</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q5">Límite superior del tiempo o espacio de un algoritmo</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q5">Técnica recursiva que resuelve subproblemas más pequeños y luego fusiona las soluciones</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="6" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 6</span>
+                <div>¿Qué es la Subsecuencia máxima?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q6">Un método para ordenar listas de datos numéricos</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q6">La subsecuencia contigua con la mayor suma de elementos</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q6">Límite superior del tiempo o espacio de un algoritmo</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q6">Un tipo de estructura de datos bidimensional</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="7" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 7</span>
+                <div>¿Qué es la O-grande (Big-O)?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q7">Límite superior del tiempo o espacio de un algoritmo</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q7">Una propiedad de las variables en memoria dinámica</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q7">Caso que detiene la recursión de forma indefinida</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q7">Una clase que crea números pseudoaleatorios</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="8" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 8</span>
+                <div>¿Qué representan las Torres de Hanoi?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q8">Una forma de duplicar código eficientemente</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q8">Una función especial que solo funciona con números</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q8">Ejemplo clásico de un algoritmo recursivo</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q8">Una clase que no puede tener métodos implementados</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="9" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 9</span>
+                <div>En una solución recursiva debe existir al menos un caso base y las llamadas recursivas deben acercarse a ese caso base.</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q9">Verdadero</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q9">Falso</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="10" data-correct="D">
+            <div class="question-header">
+                <span class="question-number">Pregunta 10</span>
+                <div>En la interfaz aparece: <code style="background:#eee; padding:2px 5px; border-radius:3px;">Public String toString();</code> ¿Qué error hay?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q10">String no existe en Java.</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q10">toString no puede aparecer en una interfaz.</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q10">Falta static.</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q10">Public debe escribirse public.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="11" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 11</span>
+                <div>Una función recursiva siempre es más eficiente que su versión iterativa equivalente.</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q11">Verdadero</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q11">Falso</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="12" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 12</span>
+                <div>¿Qué diferencia hay entre tipos de referencia y tipos primitivos en Java?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q12">Las referencias no existen en Java</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q12">Los primitivos son valores simples, los de referencia son objetos</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q12">Los primitivos son objetos</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q12">Todos son iguales</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="13" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 13</span>
+                <div>¿Qué es Divide y Vencerás cuando se aplica a problemas?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q13">Una función matemática</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q13">Un tipo de estructura de datos</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q13">Dividir un problema grande en subproblemas más pequeños</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q13">Una técnica para ordenar listas</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="14" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 14</span>
+                <div>¿Qué imprime System.out.println en Java?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q14">Un archivo de texto</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q14">Una línea en la consola</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q14">Una base de datos</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q14">Una ventana emergente</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="15" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 15</span>
+                <div>¿Qué se entiende por 'Comparable' en Java?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q15">Una interfaz para comparar dos objetos de la misma clase</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q15">Un tipo de colección</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q15">Una clase que crea números</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q15">Un método para convertir objetos a texto</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="16" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 16</span>
+                <div>¿Qué significa 'polimorfismo' en Java de forma simple?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q16">Una forma de ordenar datos</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q16">Una propiedad de las variables</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q16">Un objeto puede comportarse de diferentes maneras según el contexto</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q16">Una función para dibujar gráficos</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="17" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 17</span>
+                <div>¿Qué significa herencia en programación orientada a objetos?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q17">Una forma de escribir comentarios</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q17">Una técnica para ordenar datos</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q17">Una clase nueva toma ideas de una clase ya existente</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q17">Una forma de duplicar código</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="18" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 18</span>
+                <div>¿Qué método se ejecuta al iniciar un programa Java?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q18">run</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q18">init</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q18">main</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q18">start</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="19" data-correct="C">
+            <div class="question-header">
+                <span class="question-number">Pregunta 19</span>
+                <div>¿Qué estrategia permite calcular e imprimir la suma de los elementos de un arreglo en Java?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q19">Se multiplica todos los elementos</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q19">Se imprime el primer elemento</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q19">Se recorre el arreglo y se acumula la suma en una variable</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q19">Se usa solo un bucle sin acumulador</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="20" data-correct="D">
+            <div class="question-header">
+                <span class="question-number">Pregunta 20</span>
+                <div>¿Qué es una clase abstracta?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q20">Una clase que no puede tener métodos</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q20">Una clase que solo tiene variables</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q20">Una clase que siempre se puede crear como objeto</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q20">Una clase que no se puede instanciar y puede contener métodos sin implementar</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="21" data-correct="D">
+            <div class="question-header">
+                <span class="question-number">Pregunta 21</span>
+                <div>¿Qué representa una interfaz en Java?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q21">Un tipo de ciclo de programa</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q21">Una función especial que solo funciona con números</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q21">Una clase que no se puede usar</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q21">Un contrato que dice qué métodos debe tener una clase</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="22" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 22</span>
+                <div>¿Qué es un arreglo (array) en Java?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q22">Un tipo de bucle</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q22">Una colección de elementos del mismo tipo</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q22">Una sola variable</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q22">Un método especial</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="23" data-correct="D">
+            <div class="question-header">
+                <span class="question-number">Pregunta 23</span>
+                <div>¿Qué hace una expresión recursiva para calcular factorial (n!)?</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q23">Resta 1 de n sin usar factorial</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q23">Suma n con el factorial de n-1</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q23">Divide n entre el factorial de n-1</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q23">Multiplica n por el factorial de n-1</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="24" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 24</span>
+                <div>En el siguiente método recursivo:
+                    <div class="code-block">public static int factorial(int n) {
+    if (n == 0) return 1;
+    else return n * factorial(n - 1);
+}</div>
+                    ¿Cuál es el caso base?
+                </div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q24">n == 0</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q24">n * factorial(n - 1)</li>
+                <li class="option-item" data-option="C"><input type="radio" name="q24">public static int factorial</li>
+                <li class="option-item" data-option="D"><input type="radio" name="q24">factorial(n - 1)</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="25" data-correct="B">
+            <div class="question-header">
+                <span class="question-number">Pregunta 25</span>
+                <div>En Java, un array puede almacenar elementos de distintos tipos sin restricciones.</div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q25">Verdadero</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q25">Falso</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-question="26" data-correct="A">
+            <div class="question-header">
+                <span class="question-number">Pregunta 26</span>
+                <div>En la implementación de un conjunto con un array, el método agregar debe comprobar si el elemento ya pertenece al conjunto antes de insertarlo, para evitar elementos repetidos.
+                    <div class="code-block">public void agregar (T elemento) {
+    if (!pertenece(elemento) && n &lt; datos.length) {
+        datos[n] = elemento;
+        n++;
+    }
+}</div>
+                </div>
+            </div>
+            <ul class="options-list">
+                <li class="option-item" data-option="A"><input type="radio" name="q26">Verdadero</li>
+                <li class="option-item" data-option="B"><input type="radio" name="q26">Falso</li>
+            </ul>
+        </div>
+
+        <div class="reset-container">
+            <button class="btn-reset" onclick="resetQuiz()">Reiniciar Intento</button>
+        </div>
+    </div>
+
+    <script>
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let answeredQuestions = new Set();
+        const totalQuestions = 26; // El total real mapeado
+
+        // Actualizar la interfaz
+        document.querySelector('.stat-total').innerHTML = `Respondidas: <span id="answered-count">0</span> / ${totalQuestions}`;
+
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const card = this.closest('.question-card');
+                const qNum = card.getAttribute('data-question');
+                
+                // Si la pregunta ya fue respondida, no hacer nada
+                if (answeredQuestions.has(qNum)) return;
+
+                const selectedOption = this.getAttribute('data-option');
+                const correctOption = card.getAttribute('data-correct');
+                const radio = this.querySelector('input[type="radio"]');
+                
+                radio.checked = true;
+                answeredQuestions.add(qNum);
+
+                // Validar
+                if (selectedOption === correctOption) {
+                    this.classList.add('correct-answer');
+                    correctCount++;
+                } else {
+                    this.classList.add('incorrect-answer');
+                    incorrectCount++;
+                    // Mostrar también cuál era la correcta
+                    card.querySelector(`[data-option="${correctOption}"]`).classList.add('correct-answer');
+                }
+
+                // Bloquear las demás opciones de esta tarjeta
+                card.querySelectorAll('.option-item').forEach(opt => opt.classList.add('disabled'));
+
+                // Actualizar contadores
+                document.getElementById('answered-count').innerText = answeredQuestions.size;
+                document.getElementById('correct-count').innerText = correctCount;
+                document.getElementById('incorrect-count').innerText = incorrectCount;
+            });
+        });
+
+        function resetQuiz() {
+            correctCount = 0;
+            incorrectCount = 0;
+            answeredQuestions.clear();
+
+            document.getElementById('answered-count').innerText = '0';
+            document.getElementById('correct-count').innerText = '0';
+            document.getElementById('incorrect-count').innerText = '0';
+
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('correct-answer', 'incorrect-answer', 'disabled');
+                const radio = item.querySelector('input[type="radio"]');
+                if(radio) radio.checked = false;
+            });
+        }
+    </script>
+</body>
+</html>

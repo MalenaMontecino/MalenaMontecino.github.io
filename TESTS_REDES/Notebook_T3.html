@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interactivo de Redes de Comunicaciones</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --primary: #3498db;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .score-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-box {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .score-box.correct { color: #4ade80; }
+        .score-box.incorrect { color: #f87171; }
+
+        main {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+        }
+
+        .tema-section {
+            margin-top: 40px;
+        }
+
+        .tema-title {
+            background-color: #334155;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .option-item:hover:not(.disabled) {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .option-item.correct {
+            background-color: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #166534 !important;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #991b1b !important;
+        }
+
+        .option-item.disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="score-container">
+            <div class="score-box">Preguntas: <span id="total-answered">0</span> / 20</div>
+            <div class="score-box correct">Correctas: <span id="correct-count">0</span></div>
+            <div class="score-box incorrect">Incorrectas: <span id="incorrect-count">0</span></div>
+        </div>
+    </header>
+
+    <main>
+        <h1>Evaluación de Redes de Comunicaciones</h1>
+        <div id="quiz-container"></div>
+    </main>
+
+    <script>
+        const quizData = [
+      {
+                tema: "TEMA 3: Direccionamiento IP y Subnetting",
+                preguntas: [
+                    { q: "1. ¿En qué capa del modelo OSI funciona el direccionamiento IP?", a: ["Capa 2.", "Capa 3 (Red).", "Capa 4.", "Capa 7."], correct: 1 },
+                    { q: "2. ¿Cuántos bits componen una dirección IPv4?", a: ["16 bits.", "32 bits.", "64 bits.", "128 bits."], correct: 1 },
+                    { q: "3. ¿Cuál es el rango de valores decimales posibles para cada octeto de una IP?", a: ["0 a 127.", "1 a 254.", "0 a 255.", "0 a 1024."], correct: 2 },
+                    { q: "4. ¿Qué dirección se utiliza para la prueba interna del propio dispositivo (loopback)?", a: ["0.0.0.0.", "255.255.255.255.", "127.0.0.1.", "169.254.0.1."], correct: 2 },
+                    { q: "5. ¿Qué tipo de dirección es 169.254.x.x?", a: ["Dirección de servidor web.", "Dirección pública global.", "APIPA (Autoconfiguración link-local).", "Dirección de multicast."], correct: 2 },
+                    { q: "6. ¿Qué estándar define los ranges de direcciones IP privadas?", a: ["IEEE 802.1Q.", "RFC 1918.", "RFC 1122.", "ISO 9001."], correct: 1 },
+                    { q: "7. ¿Cuál es el rango de direcciones privadas para redes de clase C (pequeñas)?", a: ["10.0.0.0/8.", "172.16.0.0/12.", "192.168.0.0/16.", "8.8.8.8/32."], correct: 2 },
+                    { q: "8. ¿Qué tecnología permite que múltiples direcciones privadas compartan una única IP pública?", a: ["ARP.", "STP.", "NAT.", "DHCP."], correct: 2 },
+                    { q: "9. ¿Qué organismo asigna las direcciones IP públicas?", a: ["El fabricante del router.", "Organismos oficiales jerárquicos.", "Google.", "El administrador de la red local."], correct: 1 },
+                    { q: "10. ¿Qué se entiende por direcciones 'Bogon'?", a: ["Direcciones de alto rendimiento.", "Direcciones no válidas o no asignadas en el Internet público.", "Direcciones exclusivas para IPv6.", "Direcciones MAC en formato IP."], correct: 1 },
+                    { q: "11. ¿Cuál es la función de la máscara de red?", a: ["Cifrar la dirección IP.", "Definir qué parte de la IP corresponde a la red y cuál al host.", "Aumentar la velocidad de descarga.", "Identificar el fabricante de la tarjeta de red."], correct: 1 },
+                    { q: "12. ¿Qué indica el prefijo CIDR /24 en términos de máscara decimal?", a: ["255.0.0.0.", "255.255.0.0.", "255.255.255.0.", "255.255.255.240."], correct: 2 },
+                    { q: "13. ¿Cuántos hosts utilizables ofrece una subred con prefijo /24?", a: ["256.", "254 (se resta red y broadcast).", "126.", "510."], correct: 1 },
+                    { q: "14. Si dividimos una red /24 en 8 subredes iguales, ¿cuál será el nuevo prefijo?", a: ["/25.", "/26.", "/27.", "/28."], correct: 2 },
+                    { q: "15. ¿Qué técnica permite agrupar varias subredes en un prefijo más pequeño para reducir las tablas de rutas?", a: ["Subnetting.", "Resumen de rutas (Summarization).", "NAT estático.", "ARP Spoofing."], correct: 1 },
+                    { q: "16. ¿Qué prefijo mínimo se necesita para albergar exactamente 60 hosts?", a: ["/27 (30 hosts).", "/26 (62 hosts).", "/25 (126 hosts).", "/24 (254 hosts)."], correct: 1 },
+                    { q: "17. ¿Cuál es uno de los errores más comunes y críticos al configurar subredes?", a: ["Usar cables de colores distintos.", "Configurar subredes que se solapan entre sí.", "Reiniciar el router frecuentemente.", "Usar DNS públicos."], correct: 1 },
+                    { q: "18. ¿Cuántos bits tiene una dirección IPv6?", a: ["32 bits.", "64 bits.", "128 bits.", "256 bits."], correct: 2 },
+                    { q: "19. ¿Cuál es la representación correcta de una dirección IPv6?", a: ["Decimal punteada.", "Hexadecimal con ocho bloques separados por dos puntos.", "Binaria pura.", "Octal separada por guiones."], correct: 1 },
+                    { q: "20. ¿Qué se elimina totalmente en el protocolo IPv6 frente a IPv4?", a: ["El direccionamiento.", "El broadcast (sustituido por multicast/anycast).", "La seguridad.", "El uso de puertos."], correct: 1 }
+                ]
+            }
+        ];
+
+        let answeredCount = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        quizData.forEach((block, blockIdx) => {
+            const section = document.createElement('section');
+            section.className = 'tema-section';
+
+            const title = document.createElement('h2');
+            title.className = 'tema-title';
+            title.innerText = block.tema;
+            section.appendChild(title);
+
+            block.preguntas.forEach((p, pIdx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+
+                const qText = document.createElement('div');
+                qText.className = 'question-text';
+                qText.innerText = p.q;
+                card.appendChild(qText);
+
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options-list';
+
+                const optionLetters = ['A', 'B', 'C', 'D'];
+
+                p.a.forEach((opt, optIdx) => {
+                    const li = document.createElement('li');
+                    li.className = 'option-item';
+                    li.innerText = `${optionLetters[optIdx]}) ${opt}`;
+
+                    li.addEventListener('click', function() {
+                        if (li.classList.contains('disabled')) return;
+
+                        answeredCount++;
+                        document.getElementById('total-answered').innerText = answeredCount;
+
+                        const allOptions = optionsList.querySelectorAll('.option-item');
+                        allOptions.forEach(item => item.classList.add('disabled'));
+
+                        if (optIdx === p.correct) {
+                            li.classList.add('correct');
+                            correctCount++;
+                            document.getElementById('correct-count').innerText = correctCount;
+                        } else {
+                            li.classList.add('incorrect');
+                            allOptions[p.correct].classList.add('correct');
+                            incorrectCount++;
+                            document.getElementById('incorrect-count').innerText = incorrectCount;
+                        }
+                    });
+
+                    optionsList.appendChild(li);
+                });
+
+                card.appendChild(optionsList);
+                section.appendChild(card);
+            });
+
+            quizContainer.appendChild(section);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interactivo de Redes de Comunicaciones</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --primary: #3498db;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .score-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-box {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .score-box.correct { color: #4ade80; }
+        .score-box.incorrect { color: #f87171; }
+
+        main {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+        }
+
+        .tema-section {
+            margin-top: 40px;
+        }
+
+        .tema-title {
+            background-color: #334155;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .option-item:hover:not(.disabled) {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .option-item.correct {
+            background-color: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #166534 !important;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #991b1b !important;
+        }
+
+        .option-item.disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="score-container">
+            <div class="score-box">Preguntas: <span id="total-answered">0</span> / 20</div>
+            <div class="score-box correct">Correctas: <span id="correct-count">0</span></div>
+            <div class="score-box incorrect">Incorrectas: <span id="incorrect-count">0</span></div>
+        </div>
+    </header>
+
+    <main>
+        <h1>Evaluación de Redes de Comunicaciones</h1>
+        <div id="quiz-container"></div>
+    </main>
+
+    <script>
+        const quizData = [
+            {
+                tema: "TEMA 5: Servicios de red y transporte",
+                preguntas: [
+                    { q: "1. ¿En qué tipo de comunicación se centra la Capa 4 (Transporte)?", a: ["Comunicación entre routers.", "Comunicación extremo a extremo entre aplicaciones.", "Señalización de bits físicos.", "Enrutamiento de paquetes IP."], correct: 1 },
+                    { q: "2. ¿Qué mecanismo permite que varias aplicaciones usen la red simultáneamente en el mismo PC?", a: ["Direccionamiento MAC.", "Multiplexación.", "Routing dinámico.", "Segmentación física."], correct: 1 },
+                    { q: "3. ¿Cómo identifica la capa de transporte a la aplicación correcta al recibir datos?", a: ["Mediante la dirección IP.", "Mediante números de Puerto (Demultiplexación).", "Mirando el nombre del host.", "Analizando el voltaje del cable."], correct: 1 },
+                    { q: "4. ¿Cuál de los siguientes es un protocolo principal de la capa de transporte?", a: ["HTTP.", "IP.", "TCP.", "Ethernet."], correct: 2 },
+                    { q: "5. ¿Qué significa DHCP?", a: ["Domain Host Control Protocol.", "Dynamic Host Configuration Protocol.", "Data High Communication Path.", "Distributed Host Connection Port."], correct: 1 },
+                    { q: "6. ¿Cómo se llama el proceso de 4 pasos que sigue DHCP para asignar una IP?", a: ["DIAL.", "OSPF.", "DORA (Discover, Offer, Request, Ack).", "HANDSHAKE."], correct: 2 },
+                    { q: "7. En el proceso DORA, ¿qué mensaje envía el cliente al principio para buscar un servidor?", a: ["DHCP Offer.", "DHCP Discover.", "DHCP Request.", "DHCP Ack."], correct: 1 },
+                    { q: "8. ¿Qué sucede cuando termina el 'Lease Time' de una dirección IP asignada por DHCP?", a: ["El PC se apaga.", "La IP se pierde y debe renovarse o pedir una nueva.", "El servidor DNS deja de responder.", "El cable de red se desconecta lógicamente."], correct: 1 },
+                    { q: "9. ¿A qué porcentaje del tiempo de concesión suele intentar el cliente renovar su IP?", a: ["Al 10%.", "Al 50%.", "Solo cuando expira al 100%.", "Cada 5 minutos."], correct: 1 },
+                    { q: "10. ¿Cuál es la función principal del servicio DNS?", a: ["Asignar IPs dinámicas.", "Traducir nombres de dominio legibles en direcciones IP.", "Cifrar el tráfico de red.", "Monitorizar el estado de los routers."], correct: 1 },
+                    { q: "11. ¿Qué tipo de registro DNS se utiliza para crear un alias (un nombre que apunta a otro nombre)?", a: ["Registro A.", "Registro MX.", "Registro CNAME.", "Registro TXT."], correct: 2 },
+                    { q: "12. ¿Qué información proporciona un registro MX en el DNS?", a: ["La dirección IPv6 del host.", "El servidor de correo encargado de gestionar el dominio.", "El nombre del administrador de la red.", "La ubicación física del servidor."], correct: 1 },
+                    { q: "13. ¿Para qué se utilizan hoy en día los registros TXT en el DNS de forma crítica?", a: ["Para guardar notas personales.", "Para seguridad del correo electrónico (SPF, DKIM, DMARC).", "Para definir la velocidad de la red.", "Para almacenar imágenes de perfil."], correct: 1 },
+                    { q: "14. ¿Qué tecnología de seguridad de correo permite firmar digitalmente mensajes para verificar su autenticidad?", a: ["SPF.", "DKIM.", "DMARC.", "BGP."], correct: 1 },
+                    { q: "15. ¿Qué comando se utiliza para leer y escribir datos en red y puede crear 'reverse shells'?", a: ["ping.", "nmap.", "netcat (nc).", "traceroute."], correct: 2 },
+                    { q: "16. ¿Para qué sirve la herramienta 'nmap'?", a: ["Para navegar por la web de forma anónima.", "Para explorar redes, descubrir hosts y auditar la seguridad de puertos abiertos.", "Para asignar direcciones IP manualmente.", "Para medir la longitud de un cable de fibra."], correct: 1 },
+                    { q: "17. ¿Qué parámetro de nmap se usa para detectar el Sistema Operativo y versiones de servicios?", a: ["-sU.", "-p 1-100.", "-A.", "-v."], correct: 2 },
+                    { q: "18. ¿Sobre qué protocolo de transporte suele funcionar el DNS para consultas rápidas?", a: ["TCP.", "UDP.", "ICMP.", "ARP."], correct: 1 },
+                    { q: "19. ¿Qué unidad de datos se maneja en la Capa de Aplicación?", a: ["Trama.", "Segmento.", "Datos.", "Bits."], correct: 2 },
+                    { q: "20. ¿Qué puerto bien conocido utiliza el servicio web seguro HTTPS?", a: ["80.", "22.", "443 [History/T5 Summary].", "53."], correct: 2 }
+                ]
+            }
+        ];
+
+        let answeredCount = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        quizData.forEach((block, blockIdx) => {
+            const section = document.createElement('section');
+            section.className = 'tema-section';
+
+            const title = document.createElement('h2');
+            title.className = 'tema-title';
+            title.innerText = block.tema;
+            section.appendChild(title);
+
+            block.preguntas.forEach((p, pIdx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+
+                const qText = document.createElement('div');
+                qText.className = 'question-text';
+                qText.innerText = p.q;
+                card.appendChild(qText);
+
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options-list';
+
+                const optionLetters = ['A', 'B', 'C', 'D'];
+
+                p.a.forEach((opt, optIdx) => {
+                    const li = document.createElement('li');
+                    li.className = 'option-item';
+                    li.innerText = `${optionLetters[optIdx]}) ${opt}`;
+
+                    li.addEventListener('click', function() {
+                        if (li.classList.contains('disabled')) return;
+
+                        answeredCount++;
+                        document.getElementById('total-answered').innerText = answeredCount;
+
+                        const allOptions = optionsList.querySelectorAll('.option-item');
+                        allOptions.forEach(item => item.classList.add('disabled'));
+
+                        if (optIdx === p.correct) {
+                            li.classList.add('correct');
+                            correctCount++;
+                            document.getElementById('correct-count').innerText = correctCount;
+                        } else {
+                            li.classList.add('incorrect');
+                            allOptions[p.correct].classList.add('correct');
+                            incorrectCount++;
+                            document.getElementById('incorrect-count').innerText = incorrectCount;
+                        }
+                    });
+
+                    optionsList.appendChild(li);
+                });
+
+                card.appendChild(optionsList);
+                section.appendChild(card);
+            });
+
+            quizContainer.appendChild(section);
+        });
+    </script>
+</body>
+</html>

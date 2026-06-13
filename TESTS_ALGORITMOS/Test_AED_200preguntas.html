@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test AED — 200 Preguntas</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1f2d45;
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --correct-bg: #052e16;
+    --correct-border: #16a34a;
+    --wrong-bg: #2d0707;
+    --wrong-border: #dc2626;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background-image: radial-gradient(ellipse at 20% 20%, #0d1f3c 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 80%, #0c1a2e 0%, transparent 60%);
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0f1729 0%, #1a2744 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    backdrop-filter: blur(12px);
+  }
+  .logo { display: flex; flex-direction: column; gap: 2px; }
+  .logo-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--accent); letter-spacing: -0.5px; }
+  .logo-sub { font-size: 0.72rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+  .stats-bar { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .stat-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.1rem; }
+  .stat-lbl { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .stat-val.correct { color: var(--green); }
+  .stat-val.wrong { color: var(--red); }
+  .stat-val.pending { color: var(--accent); }
+  .progress-bar-wrap { flex: 1; min-width: 120px; max-width: 200px; }
+  .progress-bar { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+  .progress-txt { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+  /* FILTERS */
+  .controls { padding: 16px 24px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .filter-btn { padding: 6px 14px; border-radius: 99px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); font-family: 'DM Sans', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .tag { padding: 4px 10px; border-radius: 99px; font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tag-repaso { background: #451a03; color: #fb923c; border: 1px solid #92400e; }
+  .tag-practica { background: #1e1b4b; color: #a5b4fc; border: 1px solid #3730a3; }
+  .tag-extra { background: #0c2a1a; color: #6ee7b7; border: 1px solid #065f46; }
+  .controls-right { margin-left: auto; display: flex; gap: 8px; }
+  .btn-reset { padding: 6px 16px; border-radius: 8px; border: 1px solid var(--red); background: transparent; color: var(--red); font-family: 'DM Sans', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; }
+  .btn-reset:hover { background: var(--red); color: white; }
+  .btn-shuffle { padding: 6px 16px; border-radius: 8px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; }
+  .btn-shuffle:hover { background: var(--accent); color: white; }
+
+  /* MAIN */
+  main { max-width: 860px; margin: 0 auto; padding: 24px 20px 60px; }
+  .section-header { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: var(--accent2); text-transform: uppercase; letter-spacing: 2px; margin: 32px 0 12px; display: flex; align-items: center; gap: 8px; }
+  .section-header::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .q-card.answered-correct { border-color: var(--correct-border); }
+  .q-card.answered-wrong { border-color: var(--wrong-border); }
+  .q-header {
+    padding: 14px 18px 10px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .q-num { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-muted); min-width: 32px; margin-top: 3px; }
+  .q-text { font-size: 0.9rem; line-height: 1.55; color: var(--text); flex: 1; }
+  .q-text code { font-family: 'JetBrains Mono', monospace; background: #0f172a; padding: 1px 5px; border-radius: 4px; font-size: 0.82rem; color: var(--accent2); }
+  .q-tags { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 18px 10px 60px; }
+  .q-options { padding: 0 18px 14px 18px; display: flex; flex-direction: column; gap: 7px; }
+  .option {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 14px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer; transition: all 0.2s;
+    font-size: 0.86rem; line-height: 1.45; color: var(--text-dim);
+  }
+  .option:hover:not(.disabled) { border-color: var(--accent); color: var(--text); background: #1e2d4a; }
+  .option.disabled { cursor: not-allowed; }
+  .option.correct-ans { background: var(--correct-bg); border-color: var(--correct-border); color: #4ade80; }
+  .option.wrong-ans { background: var(--wrong-bg); border-color: var(--wrong-border); color: #f87171; }
+  .opt-letter { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.8rem; min-width: 20px; color: var(--text-muted); }
+  .option.correct-ans .opt-letter { color: #4ade80; }
+  .option.wrong-ans .opt-letter { color: #f87171; }
+  .option.tried { background: #1a0a0a; border-color: #7f1d1d; color: #fca5a5; opacity: 0.55; cursor: pointer; }
+  .option.tried .opt-letter { color: #f87171; }
+  .option.tried:hover:not(.disabled) { border-color: #ef4444; opacity: 0.75; }
+  .tries-badge { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--yellow); margin-left: 8px; }
+  .opt-text code { font-family: 'JetBrains Mono', monospace; background: #0f172a; padding: 1px 5px; border-radius: 4px; font-size: 0.8rem; }
+  .feedback {
+    margin: 0 18px 14px 18px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .feedback.correct { background: #052e16; border: 1px solid #16a34a; color: #86efac; display: block; }
+  .feedback.wrong { background: #2d0707; border: 1px solid #dc2626; color: #fca5a5; display: block; }
+  .feedback strong { font-weight: 600; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+
+  /* HIDDEN */
+  .hidden { display: none !important; }
+
+  /* FINISH BANNER */
+  #finish-banner {
+    display: none; text-align: center; padding: 40px 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-top: 32px;
+  }
+  #finish-banner h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 8px; }
+  #finish-banner p { color: var(--text-dim); margin-bottom: 16px; }
+  #finish-banner .score-big { font-family: 'JetBrains Mono', monospace; font-size: 3rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-title">AED · Test 200 Preguntas</span>
+    <span class="logo-sub">06GCIB · Algoritmos y Estructuras de Datos · VIU</span>
+  </div>
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-val correct" id="stat-ok">0</span><span class="stat-lbl">Correctas</span></div>
+    <div class="stat"><span class="stat-val wrong" id="stat-ko">0</span><span class="stat-lbl">Errores</span></div>
+    <div class="stat"><span class="stat-val pending" id="stat-left">200</span><span class="stat-lbl">Restantes</span></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+      <div class="progress-txt" id="prog-txt">0 / 200</div>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <button class="filter-btn active" onclick="filterQuestions('all',this)">Todas (200)</button>
+  <button class="filter-btn" onclick="filterQuestions('repaso',this)">🔴 Repaso</button>
+  <button class="filter-btn" onclick="filterQuestions('practica',this)">🔵 Práctica Java</button>
+  <button class="filter-btn" onclick="filterQuestions('extra',this)">🟢 Extra</button>
+  <button class="filter-btn" onclick="filterQuestions('wrong',this)">❌ Solo errores</button>
+  <div class="controls-right">
+    <button class="btn-shuffle" onclick="shuffleAll()">⇄ Barajar</button>
+    <button class="btn-reset" onclick="resetAll()">↺ Reiniciar</button>
+  </div>
+</div>
+
+<main id="main"></main>
+
+<script>
+const QUESTIONS = [
+// ── REPASO OFICIAL (del documento REPASO_AED) ──────────────────────────────
+{id:1,tags:['repaso'],text:'Tenemos un archivo llamado <code>Programa.java</code>. ¿Cuál de las siguientes clases puede declararse como <code>public</code> dentro de ese archivo?',
+options:['public class Main {}','public class Programa {}','public class Prueba {}','Cualquier nombre es válido si la clase tiene método main'],
+correct:1,explanation:'En Java, la clase pública DEBE tener exactamente el mismo nombre que el archivo. El archivo es Programa.java, por lo tanto solo puede haber una clase public class Programa {}.'},
+
+{id:2,tags:['repaso'],text:'¿Qué imprime el siguiente fragmento? <code>int x = 4; int y = 3; System.out.println(x + y);</code>',
+options:['x + y','43','7','Da error de compilación'],
+correct:2,explanation:'x e y son enteros, así que el operador + realiza una suma aritmética. 4 + 3 = 7. Si hubieran sido Strings habría concatenado, pero son int.'},
+
+{id:3,tags:['repaso'],text:'Completa para imprimir "Hola" en consola: <code>__________("Hola");</code>',
+options:['print','System.out.println','console.log','System.print'],
+correct:1,explanation:'En Java la instrucción estándar para imprimir una línea en consola es System.out.println("Hola");'},
+
+{id:4,tags:['repaso'],text:'¿Cuál es la cabecera correcta del método que inicia la ejecución de un programa Java?',
+options:['public static void main(String[] args)','public void start(String[] args)','static public int main(String args)','public main(String[] args)'],
+correct:0,explanation:'El método principal de Java debe ser: public static void main(String[] args). Es public (accesible), static (sin instancia), void (no retorna), y recibe un array de Strings.'},
+
+{id:5,tags:['repaso'],text:'Detecta el error: <code>Public class Prueba { public static void main(String[] args) { System.out.println("Hola"); } }</code>',
+options:['Falta el punto y coma al final','Public debe escribirse public (minúscula)','No se puede usar println','El método main no es válido'],
+correct:1,explanation:'En Java todas las palabras reservadas van en minúscula. "Public" con P mayúscula es un error de compilación. Debe ser "public".'},
+
+{id:6,tags:['repaso'],text:'Dado <code>int[] datos = new int[5];</code> ¿Cuáles son las posiciones válidas del array?',
+options:['1, 2, 3, 4, 5','0, 1, 2, 3, 4','0, 1, 2, 3, 4, 5','Depende de los valores que guardemos'],
+correct:1,explanation:'Los arrays en Java se indexan desde 0. Un array de tamaño 5 tiene posiciones válidas 0, 1, 2, 3 y 4. Acceder a la posición 5 lanzaría ArrayIndexOutOfBoundsException.'},
+
+{id:7,tags:['repaso'],text:'¿Qué valor imprime este código? <code>int[] a = {2,4,6}; int suma=0; for(int i=0;i<a.length;i++){suma=suma+a[i];} System.out.println(suma);</code>',
+options:['6','12','246','Da error de compilación'],
+correct:1,explanation:'Se recorre el array acumulando en suma: 0+2=2, 2+4=6, 6+6=12. System.out.println(suma) imprime 12.'},
+
+{id:8,tags:['repaso'],text:'Completa para recorrer correctamente el array: <code>int[] v={3,1,9,2}; for(int i=0; _______; i++){System.out.println(v[i]);}</code>',
+options:['i <= v.length','i < v.length','i < 4','i <= 3'],
+correct:1,explanation:'La condición correcta es i < v.length (que vale 4). Así i toma valores 0,1,2,3 que son todas las posiciones válidas. Con i<=v.length se accedería a v[4] que no existe.'},
+
+{id:9,tags:['repaso'],text:'Detecta el error: <code>int x = 10 System.out.println(x);</code>',
+options:['Falta el punto y coma después de int x = 10','x no puede imprimirse','System.out.println no existe','int no es un tipo válido'],
+correct:0,explanation:'Falta el punto y coma (;) al final de la instrucción "int x = 10". En Java toda sentencia debe terminar con punto y coma.'},
+
+{id:10,tags:['repaso'],text:'Detecta el error: <code>int edad = 20.5; System.out.println(edad);</code>',
+options:['20.5 no es un número válido','No se puede asignar un double (20.5) a un int','System.out.println no acepta int','edad es un nombre reservado'],
+correct:1,explanation:'20.5 es un valor de tipo double. No se puede asignar directamente a una variable int sin casting explícito. La corrección sería: double edad = 20.5; o int edad = 20;'},
+
+{id:11,tags:['repaso'],text:'Detecta el error: <code>int[] numeros = new int[3]; numeros[0] = "5";</code>',
+options:['new int[3] no es válido','No se puede asignar un String a un int[]','numeros[0] debería ser numeros(0)','El array debería tener tamaño 5'],
+correct:1,explanation:'"5" es un String. El array numeros es de tipo int[], por lo que solo puede contener valores enteros. La corrección es numeros[0] = 5; (sin comillas).'},
+
+{id:12,tags:['repaso'],text:'Indica si es verdadera o falsa: "En Java, int es un tipo primitivo, mientras que String es un tipo de referencia."',
+options:['Verdadero','Falso','Depende del contexto','Solo en versiones nuevas de Java'],
+correct:0,explanation:'Verdadero. int es uno de los 8 tipos primitivos de Java (guarda el valor directamente). String es un tipo de referencia (es una clase, guarda una referencia al objeto en memoria).'},
+
+{id:13,tags:['repaso'],text:'¿Qué describe mejor una interfaz en Java?',
+options:['Una clase que siempre contiene atributos privados','Un contrato que indica qué métodos debe ofrecer una clase','Un tipo especial de array','Un método que se ejecuta al iniciar el programa'],
+correct:1,explanation:'Una interfaz en Java es un contrato que define qué métodos debe implementar una clase, pero sin proporcionar la implementación. Las clases que la implementan con "implements" deben definir esos métodos.'},
+
+{id:14,tags:['repaso'],text:'¿Cuál de las siguientes afirmaciones sobre una clase abstracta es correcta?',
+options:['No puede tener métodos','No se puede instanciar directamente con new','Solo puede contener atributos static','Es lo mismo que un array'],
+correct:1,explanation:'Una clase abstracta NO se puede instanciar directamente con new. Puede tener métodos implementados y abstractos. Las subclases que la extienden deben implementar los métodos abstractos.'},
+
+{id:15,tags:['repaso'],text:'Si Circle redefine el método area(), ¿qué idea de POO se usa en: <code>Shape s = new Circle(); s.area();</code>?',
+options:['Polimorfismo','Encapsulación de arrays','Recursión','Búsqueda binaria'],
+correct:0,explanation:'Esto es polimorfismo. La variable s es de tipo Shape, pero apunta a un objeto Circle. Cuando se llama s.area(), Java ejecuta el método area() de Circle (la versión redefinida), no el de Shape.'},
+
+{id:16,tags:['repaso'],text:'Si una clase implementa Comparable<T>, ¿qué método debe proporcionar?',
+options:['print()','compareTo(T otro)','equalsTo(T otro)','main(String[] args)'],
+correct:1,explanation:'La interfaz Comparable<T> define un único método: int compareTo(T otro). Devuelve negativo si this < otro, 0 si son iguales, y positivo si this > otro.'},
+
+{id:17,tags:['repaso'],text:'Completa el caso base: <code>public static int suma(int n) { if (__________) return 0; return n + suma(n-1); }</code>',
+options:['n > 0','n == 0','n < 0','n == 1'],
+correct:1,explanation:'El caso base es n == 0. Cuando n vale 0, la suma 1+2+...+0 es 0. La llamada recursiva suma(n-1) se acerca a 0 en cada paso.'},
+
+{id:18,tags:['repaso'],text:'Verdadero o Falso: "Un método recursivo necesita al menos un caso base y llamadas recursivas que se acerquen a ese caso base."',
+options:['Verdadero','Falso','Solo necesita el caso base','Solo necesita las llamadas recursivas'],
+correct:0,explanation:'Verdadero. Toda solución recursiva correcta necesita: 1) al menos un caso base (se resuelve directamente) y 2) llamadas recursivas que converjan al caso base. Sin caso base → recursión infinita.'},
+
+{id:19,tags:['repaso'],text:'¿Cuál descripción se ajusta mejor a la técnica de Divide y Vencerás?',
+options:['Resolver siempre el problema con un único bucle','Dividir un problema en subproblemas más pequeños del mismo tipo y combinar sus soluciones','Guardar todos los datos en una pila','Evitar por completo la recursión'],
+correct:1,explanation:'Divide y Vencerás (Divide and Conquer) consiste en: 1) Dividir el problema en subproblemas más pequeños del mismo tipo, 2) Resolver recursivamente cada subproblema, 3) Combinar (Conquistar) las soluciones.'},
+
+{id:20,tags:['repaso'],text:'¿Qué complejidad temporal tiene: <code>while (N > 1) { N = N / 2; }</code>?',
+options:['O(1)','O(N)','O(log N)','O(N²)'],
+correct:2,explanation:'En cada iteración N se divide entre 2. El número de veces que puedes dividir N entre 2 hasta llegar a 1 es log₂N. Por tanto la complejidad es O(log N).'},
+
+{id:21,tags:['repaso'],text:'Relaciona: ¿qué estructura es FIFO (el primero que entra es el primero que sale)?',
+options:['Pila (Stack)','Cola (Queue)','Árbol binario','Array'],
+correct:1,explanation:'FIFO (First In First Out) describe el comportamiento de una Cola (Queue). El primer elemento que se encola es el primero que se desencola. Una pila es LIFO (Last In First Out).'},
+
+{id:22,tags:['repaso'],text:'En una pila vacía: push(4), push(9), push(1), pop(). ¿Qué devuelve pop()?',
+options:['4','9','1','La pila queda vacía sin devolver nada'],
+correct:2,explanation:'La pila es LIFO: el último en entrar es el primero en salir. Se añaden 4, 9, 1. El tope es 1 (último en entrar). pop() extrae y devuelve 1.'},
+
+{id:23,tags:['repaso'],text:'En una cola vacía: encolar(4), encolar(9), encolar(1), desencolar(). ¿Qué devuelve desencolar()?',
+options:['4','9','1','No se puede saber'],
+correct:0,explanation:'La cola es FIFO: el primero en entrar es el primero en salir. Se encolan 4, 9, 1 en ese orden. El frente es 4 (primero en entrar). desencolar() extrae y devuelve 4.'},
+
+{id:24,tags:['repaso'],text:'Evaluamos con una pila la expresión postfija: <code>8 2 3 * + 4 -</code> ¿Qué valor queda al final?',
+options:['6','10','18','28'],
+correct:1,explanation:'push 8, push 2, push 3. * → pop 3,2 → 6 → push 6. + → pop 6,8 → 14 → push 14. push 4. - → pop 4,14 → 14-4=10 → push 10. Resultado: 10.'},
+
+{id:25,tags:['repaso'],text:'Detecta el error: <code>Stack&lt;Integer&gt; pila = new Stack&lt;Integer&gt;(); pila.push("7");</code>',
+options:['No se puede usar Stack en Java','"7" es un String, no un Integer. El tipo genérico es Integer','Stack necesita paréntesis vacíos','new Stack() no es válido'],
+correct:1,explanation:'"7" entre comillas es un String. La pila está definida como Stack<Integer>, por lo que solo acepta enteros. La corrección es pila.push(7); (sin comillas).'},
+
+{id:26,tags:['repaso'],text:'¿Cuál es la diferencia principal entre un TAD y una implementación concreta?',
+options:['El TAD describe qué operaciones existen; la implementación explica cómo se realizan internamente','El TAD solo existe en Python','La implementación no contiene código','No hay ninguna diferencia'],
+correct:0,explanation:'Un TAD (Tipo Abstracto de Datos) especifica QUÉ operaciones hay (su interfaz), sin decir cómo se implementan. La implementación concreta (con array, lista enlazada, etc.) decide el CÓMO.'},
+
+{id:27,tags:['repaso'],text:'Verdadero o Falso: "En un conjunto, un mismo elemento no debe almacenarse dos veces."',
+options:['Verdadero','Falso','Depende del tipo de conjunto','Solo en conjuntos ordenados'],
+correct:0,explanation:'Verdadero. Por definición matemática, un conjunto es una colección sin elementos repetidos. Si intentas añadir un elemento que ya está, simplemente no se añade.'},
+
+{id:28,tags:['repaso'],text:'Sean A={1,4,6} y B={2,4,8}. ¿Cuál es el resultado de A∪B?',
+options:['{1,2,4,6,8}','{4}','{1,6,2,8}','{1,4,4,6,2,8}'],
+correct:0,explanation:'La unión contiene todos los elementos de A y de B sin repetidos. A∪B = {1, 2, 4, 6, 8}. El 4 aparece en ambos conjuntos pero solo se incluye una vez.'},
+
+{id:29,tags:['repaso'],text:'¿Por qué devolver_arreglo() debe devolver un array NUEVO en lugar del array interno de la clase?',
+options:['Para que el código externo no pueda modificar directamente la estructura interna','Porque Java no permite devolver arrays','Porque los arrays nuevos siempre están ordenados','Porque así se elimina automáticamente la recursión'],
+correct:0,explanation:'Esto es "copia defensiva". Si devolvemos el array interno, el código externo podría modificarlo directamente rompiendo la encapsulación. Devolviendo una copia, protegemos la estructura interna de la clase.'},
+
+{id:30,tags:['repaso'],text:'Detecta el error: la interfaz tiene <code>void agregar(T elemento)</code> y la clase implementa <code>public void agregar(int elemento)</code>',
+options:['La interfaz no puede tener void','El error es que falta implements','Si T=Integer, el método debe recibir Integer, no int','El nombre agregar no es válido'],
+correct:2,explanation:'Si la interfaz Conjunto<Integer> declara agregar(T elemento) con T=Integer, la implementación debe ser agregar(Integer elemento). int y Integer son tipos distintos en Java (primitivo vs objeto). Es un error de compilación.'},
+
+{id:31,tags:['repaso'],text:'En el árbol con raíz 10, hijos 5 y 15, el 5 tiene hijos 2 y 7, el 15 tiene hijos 12 y 20, el 7 tiene hijo izquierdo 6. ¿Cuál afirmación es correcta?',
+options:['10 es hijo de 5','7 es hermano de 12','5 es padre de 2 y de 7','20 es padre de 15'],
+correct:2,explanation:'5 es padre de 2 y de 7 (los dos son hijos del nodo 5). 10 es la raíz (no es hijo de nadie). 7 y 12 no son hermanos (tienen padres distintos: 5 y 15). 20 es hijo de 15.'},
+
+{id:32,tags:['repaso'],text:'En el mismo árbol. ¿Cuál afirmación es falsa?',
+options:['10 es antecedente propio de 6','6 es descendiente propio de 5','7 es descendiente propio de 12','La profundidad del nodo 6 es 3'],
+correct:2,explanation:'7 es hijo de 5 (está en el subárbol de 5, no del 12). 12 es hijo de 15. No existe ninguna relación padre-hijo entre 7 y 12, son primos. Por tanto "7 es descendiente propio de 12" es FALSA.'},
+
+{id:33,tags:['repaso'],text:'En el árbol descrito (raíz=10). Si la profundidad de la raíz es 0, ¿cuál es la profundidad del nodo 6?',
+options:['0','1','2','3'],
+correct:3,explanation:'El camino desde la raíz a 6 es: 10→5→7→6. Tiene 3 arcos. La profundidad = número de arcos desde la raíz = 3.'},
+
+{id:34,tags:['repaso'],text:'Recorrido inorden del árbol (raíz 10, con estructura descrita). ¿Qué secuencia se obtiene?',
+options:['10, 5, 2, 7, 6, 15, 12, 20','2, 5, 6, 7, 10, 12, 15, 20','2, 6, 7, 5, 12, 20, 15, 10','10, 5, 15, 2, 7, 12, 20, 6'],
+correct:1,explanation:'Inorden: izquierda→raíz→derecha. Recorriendo: subárbol izquierdo de 10 (que da 2,5,6,7), luego 10, luego subárbol derecho (12,15,20). Resultado: 2,5,6,7,10,12,15,20.'},
+
+{id:35,tags:['repaso'],text:'¿Cuál de estos árboles NO puede ser un árbol binario de búsqueda (ABB)?',
+options:['Raíz 8, hijo izquierdo 3, hijo derecho 10','Raíz 8, hijo izquierdo 9, hijo derecho 10','Raíz 8, hijo izquierdo 3; el 3 tiene hijo derecho 5','Raíz 8, hijo derecho 10; el 10 tiene hijo izquierdo 9'],
+correct:1,explanation:'En un ABB, el subárbol izquierdo debe contener valores menores que la raíz. Si la raíz es 8 y el hijo izquierdo es 9, se viola la propiedad (9 > 8). Por eso esa opción NO puede ser un ABB.'},
+
+{id:36,tags:['repaso'],text:'ABB: raíz 8, hijo izq 3, hijo der 10; el 3 tiene hijo derecho 6; el 10 tiene hijo derecho 14. ¿Dónde se inserta el valor 5?',
+options:['Como hijo izquierdo de 6','Como hijo derecho de 6','Como hijo izquierdo de 10','Como nueva raíz'],
+correct:0,explanation:'Insertar 5: 5<8 → ir a izquierda (3). 5>3 → ir a derecha (6). 5<6 → ir a izquierda → vacío. Se inserta como hijo izquierdo de 6.'},
+
+{id:37,tags:['repaso'],text:'En el ABB con raíz 10, hijo izq 4, hijo der 18 (que tiene hijos 12 con hijo der 15, y 25). Se elimina el nodo 10 usando el menor del subárbol derecho. ¿Qué valor sustituye al 10?',
+options:['4','12','15','18'],
+correct:1,explanation:'Para eliminar 10 (que tiene dos hijos), se busca el menor del subárbol derecho. El subárbol derecho tiene raíz 18, con hijo izquierdo 12 (y 12 tiene hijo derecho 15). El menor es 12. Así que 12 sustituye a 10.'},
+
+{id:38,tags:['repaso'],text:'Detecta el error: <code>public static int doble(int x) { int resultado = 2 * x; }</code>',
+options:['2*x no es válido','El método dice que retorna int pero falta el return resultado;','doble no es un nombre válido','int x debería ser Integer x'],
+correct:1,explanation:'El método declara retornar int (public static int) pero no tiene ninguna instrucción return. La corrección es añadir "return resultado;" antes del cierre de la llave.'},
+
+{id:39,tags:['repaso'],text:'Completa el método pertenece: <code>if (__________) { return true; }</code> para verificar si elemento está en datos[i]',
+options:['datos[i] == elemento','datos[i].equals(elemento)','datos[i] = elemento','datos.contains(elemento)'],
+correct:1,explanation:'Para comparar objetos Integer (tipo referencia), se debe usar .equals() y no == (que compararía referencias, no valores). datos[i].equals(elemento) es la forma correcta.'},
+
+{id:40,tags:['repaso'],text:'¿Qué estructura encaja mejor para modelar una cola de personas en una ventanilla?',
+options:['Pila, porque usa LIFO','Cola, porque usa FIFO','Árbol, porque todos tienen un padre','Array sin ninguna operación de salida'],
+correct:1,explanation:'Una cola de espera funciona como FIFO: la primera persona que llega es la primera atendida. Esto es exactamente el comportamiento de una Cola (Queue).'},
+
+// ── ACTIVIDADES (de los PDFs de actividades) ──────────────────────────────
+{id:41,tags:['repaso'],text:'Verdadero o Falso: "En la implementación de un conjunto con un array, el método agregar debe comprobar si el elemento ya pertenece al conjunto antes de insertarlo, para evitar elementos repetidos."',
+options:['Verdadero','Falso','Solo si el array está ordenado','Solo para tipos primitivos'],
+correct:0,explanation:'Verdadero. El método agregar(T elemento) solo debe añadir el elemento si NO está ya en el conjunto (pertenece() devuelve false) y si hay espacio disponible (n < datos.length).'},
+
+{id:42,tags:['repaso'],text:'En el siguiente factorial recursivo: <code>if (n == 0) return 1; else return n * factorial(n-1);</code> ¿Cuál es el caso base?',
+options:['n == 0','public static int factorial','n * factorial(n-1)','factorial(n-1)'],
+correct:0,explanation:'El caso base es la condición n == 0. Cuando n es 0, la función devuelve 1 directamente sin hacer ninguna llamada recursiva. Las demás opciones son la declaración del método o la llamada recursiva.'},
+
+{id:43,tags:['repaso'],text:'En la interfaz aparece: <code>Public String toString();</code> ¿Qué error hay?',
+options:['Falta static','String no existe en Java','toString no puede aparecer en una interfaz','Public debe escribirse public'],
+correct:3,explanation:'Las palabras reservadas de Java son case-sensitive. "Public" con P mayúscula es un error de compilación. Debe ser "public" en minúscula.'},
+
+{id:44,tags:['repaso'],text:'¿Qué se entiende por Comparable en Java?',
+options:['Una interfaz para comparar dos objetos de la misma clase','Un método para convertir objetos a texto','Una clase que crea números','Un tipo de colección'],
+correct:0,explanation:'Comparable<T> es una interfaz de Java que permite comparar dos objetos de la misma clase mediante el método compareTo(T otro). Retorna negativo, 0 o positivo.'},
+
+{id:45,tags:['repaso'],text:'¿Qué hace una expresión recursiva para calcular factorial (n!)?',
+options:['Divide n entre el factorial de n-1','Suma n con el factorial de n-1','Multiplica n por el factorial de n-1','Resta 1 de n sin usar factorial'],
+correct:2,explanation:'La definición recursiva del factorial es: n! = n × (n-1)! con 0! = 1. En código: return n * factorial(n-1). Se multiplica n por el factorial del subproblema más pequeño.'},
+
+{id:46,tags:['repaso'],text:'¿Qué es una clase abstracta?',
+options:['Una clase que siempre se puede crear como objeto','Una clase que no se puede instanciar y puede contener métodos sin implementar','Una clase que no puede tener métodos','Una clase que solo tiene variables'],
+correct:1,explanation:'Una clase abstracta (abstract class) no puede instanciarse directamente con new. Puede contener métodos implementados y métodos abstractos (sin cuerpo) que las subclases deben implementar.'},
+
+{id:47,tags:['repaso'],text:'¿Qué diferencia hay entre tipos de referencia y tipos primitivos en Java?',
+options:['Los primitivos son valores simples, los de referencia son objetos','Todos son iguales','Las referencias no existen en Java','Los primitivos son objetos'],
+correct:0,explanation:'Los tipos primitivos (int, double, boolean...) guardan el valor directamente. Los tipos de referencia (String, arrays, objetos) guardan una referencia (dirección de memoria) al objeto creado con new.'},
+
+{id:48,tags:['repaso'],text:'¿Qué es Divide y Vencerás cuando se aplica a problemas?',
+options:['Una función matemática','Dividir un problema grande en subproblemas más pequeños del mismo tipo y combinar las soluciones','Una técnica para ordenar listas','Un tipo de estructura de datos'],
+correct:1,explanation:'Divide y Vencerás es una técnica recursiva: 1) Dividir el problema en subproblemas más pequeños del mismo tipo. 2) Resolver cada subproblema recursivamente. 3) Combinar las soluciones.'},
+
+{id:49,tags:['repaso'],text:'¿Qué método se ejecuta al iniciar un programa Java?',
+options:['main','start','run','init'],
+correct:0,explanation:'El método de entrada de cualquier programa Java es main, con la firma exacta: public static void main(String[] args). Es el punto de inicio de la ejecución.'},
+
+{id:50,tags:['repaso'],text:'¿Qué es un arreglo (array) en Java?',
+options:['Una sola variable','Un método especial','Un tipo de bucle','Una colección de elementos del mismo tipo'],
+correct:3,explanation:'Un array es una estructura de datos que almacena una colección de elementos del mismo tipo, en posiciones contiguas de memoria, con un tamaño fijo definido al crearlo.'},
+
+{id:51,tags:['repaso'],text:'¿Qué significa polimorfismo en Java?',
+options:['Una forma de ordenar datos','Un objeto puede comportarse de diferentes maneras según el contexto','Una propiedad de las variables','Una función para dibujar gráficos'],
+correct:1,explanation:'El polimorfismo permite que un objeto de una subclase sea tratado como un objeto de su superclase o interfaz, y que el método ejecutado dependa del tipo real del objeto en tiempo de ejecución.'},
+
+{id:52,tags:['repaso'],text:'¿Qué significa herencia en programación orientada a objetos?',
+options:['Una forma de duplicar código','Una clase nueva toma características de una clase ya existente','Una forma de escribir comentarios','Una técnica para ordenar datos'],
+correct:1,explanation:'La herencia permite que una clase hija (subclase) extienda a una clase padre (superclase), heredando sus atributos y métodos. Permite reutilizar código y crear jerarquías de tipos.'},
+
+{id:53,tags:['repaso'],text:'¿Qué estrategia permite calcular e imprimir la suma de los elementos de un arreglo en Java?',
+options:['Se recorre el arreglo y se acumula la suma en una variable','Se multiplica todos los elementos','Se imprime el primer elemento','Se usa solo un bucle sin acumulador'],
+correct:0,explanation:'Se debe declarar una variable suma=0 fuera del bucle, luego recorrer el array con un for y en cada iteración hacer suma += a[i]. Al final se imprime suma.'},
+
+{id:54,tags:['repaso'],text:'¿Qué imprime System.out.println en Java?',
+options:['Una base de datos','Una línea en la consola','Una ventana emergente','Un archivo de texto'],
+correct:1,explanation:'System.out.println() imprime el texto proporcionado en la consola de la aplicación y añade un salto de línea al final (ln = line).'},
+
+// ── PRÁCTICA JAVA — Preguntas basadas en el código real ────────────────────
+{id:55,tags:['practica'],text:'¿Qué imprime este fragmento de código?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">Integer[] datos = new Integer[5];\nint numElementos = 0;\ndatos[numElementos] = 7;\nnumElementos++;\nSystem.out.println(numElementos);</pre>',
+options:['0','7','1','5'],
+correct:2,explanation:'Se guarda 7 en datos[0] (posición que vale numElementos=0), y luego numElementos++ lo incrementa a 1. System.out.println imprime numElementos, que es 1. Este patrón es exactamente el que usa el método agregar().'},
+
+{id:56,tags:['practica'],text:'¿Qué error tiene este método pertenece()?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">public boolean pertenece(Integer elemento) {\n  for (int i = 0; i &lt; datos.length; i++) {\n    if (datos[i] == elemento) return true;\n  }\n  return false;\n}</pre>',
+options:['El bucle debería ir de 1 a datos.length','Dos errores: usa datos.length en vez de numElementos (compara con nulls) y usa == en vez de .equals() para Integer','El return false no debería estar','No hay ningún error'],
+correct:1,explanation:'Hay dos errores: 1) datos.length es 100 (el tamaño total del array), pero solo las posiciones 0..numElementos-1 tienen datos reales; el resto son null → NullPointerException. Debe ser i < numElementos. 2) == compara referencias de memoria en objetos Integer, no el valor numérico. Debe ser datos[i].equals(elemento).'},
+
+{id:57,tags:['practica'],text:'¿Cuál es la versión CORRECTA del método agregar()?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">// Opción A\nif (!pertenece(elemento) && numElementos &lt; MAX) {\n  datos[numElementos] = elemento;\n  numElementos++;\n}\n// Opción B\nnumElementos++;\ndatos[numElementos] = elemento;\n// Opción C\nif (pertenece(elemento) || numElementos >= MAX) {\n  datos[numElementos] = elemento;\n  numElementos++;\n}\n// Opción D\ndatos[numElementos] = elemento;\n  numElementos++;</pre>',
+options:['Opción A','Opción B','Opción C','Opción D'],
+correct:0,explanation:'La opción A es correcta: comprueba que el elemento NO esté ya (evita duplicados) Y que haya espacio (numElementos < MAX), luego guarda en la posición actual y finalmente incrementa. La B incrementa antes de guardar (error de índice). La C invierte la lógica (añadiría solo duplicados). La D nunca comprueba duplicados ni espacio.'},
+
+{id:58,tags:['practica'],text:'¿Qué imprime este código si se ejecuta tal cual?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">Conjunto&lt;Integer&gt; c = new Conjunto_Array();\nc.agregar(3);\nc.agregar(3);\nc.agregar(5);\nSystem.out.println(c.num_elem());</pre>',
+options:['3','2','1','0'],
+correct:1,explanation:'agregar(3) añade el 3 (numElementos pasa a 1). agregar(3) de nuevo: pertenece(3) devuelve true, así que NO se añade. agregar(5): pertenece(5) devuelve false, se añade (numElementos pasa a 2). num_elem() devuelve 2.'},
+
+{id:59,tags:['practica'],text:'¿Qué hace exactamente este fragmento del método union()?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">Integer[] aux = otro.devolver_arreglo();\nfor (int i = 0; i &lt; otro.num_elem(); i++) {\n  this.agregar(aux[i]);\n}</pre>',
+options:['Crea un nuevo conjunto con los elementos comunes de this y otro','Obtiene una copia de los elementos de otro y los añade uno a uno a this; agregar ya evita duplicados','Vacía this y lo llena con los elementos de otro','Intercambia los contenidos de this y otro'],
+correct:1,explanation:'Se obtiene una copia del array interno de otro con devolver_arreglo(). Luego se itera sobre esa copia y se llama a this.agregar() por cada elemento. Como agregar() ya comprueba pertenece(), los elementos que ya estén en this no se duplican.'},
+
+{id:60,tags:['practica'],text:'¿Qué imprime toString() si numElementos=0?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">public String toString() {\n  if (numElementos == 0) return "{}";\n  String res = "{";\n  for (int i = 0; i &lt; numElementos; i++) {\n    res += datos[i] + (i &lt; numElementos - 1 ? ", " : "");\n  }\n  return res + "}";\n}</pre>',
+options:['null','""','{}','[]'],
+correct:2,explanation:'Cuando numElementos == 0, el método retorna directamente el String "{}". Este es el formato exacto para el conjunto vacío según las especificaciones de la práctica.'},
+
+{id:61,tags:['practica'],text:'¿Cuántos elementos tiene el array interno <code>datos[]</code> en memoria después de crear <code>new Conjunto_Array()</code>?',
+options:['0 (el array no se crea hasta añadir elementos)','El número de elementos que se vayan añadiendo','100 posiciones (todas a null)','1 posición'],
+correct:2,explanation:'El constructor ejecuta: this.datos = new Integer[MAX]; con MAX=100. Se crea inmediatamente un array de 100 posiciones, todas inicializadas a null. numElementos=0 indica cuántas de esas posiciones tienen datos reales.'},
+
+{id:62,tags:['practica'],text:'¿Qué error de compilación tiene este código?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">class Conjunto_Array implements Conjunto&lt;Integer&gt; {\n  public void agregar(int elemento) { ... }\n  public boolean pertenece(int elemento) { ... }\n  // resto de métodos correctos...\n}</pre>',
+options:['No hay error, int e Integer son equivalentes','Error: la interfaz declara agregar(Integer elemento) pero la clase implementa agregar(int elemento). int e Integer son tipos distintos.','Error: falta implements','Error: Conjunto_Array no puede tener métodos propios'],
+correct:1,explanation:'La interfaz Conjunto<Integer> declara los métodos con Integer (tipo objeto). La clase implementa con int (tipo primitivo). Java los trata como firmas distintas: agregar(Integer) ≠ agregar(int). La clase no implementa correctamente la interfaz → error de compilación.'},
+
+{id:63,tags:['practica'],text:'¿Qué devuelve devolver_arreglo() si el conjunto tiene 3 elementos (1, 2, 3)?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">public Integer[] devolver_arreglo() {\n  Integer[] copia = new Integer[numElementos];\n  for (int i = 0; i &lt; numElementos; i++) {\n    copia[i] = this.datos[i];\n  }\n  return copia;\n}</pre>',
+options:['El array interno datos[] de 100 posiciones','Un nuevo array de 100 posiciones con los 3 primeros rellenos','Un nuevo array de exactamente 3 posiciones con valores [1, 2, 3]','null'],
+correct:2,explanation:'Se crea un nuevo array de tamaño numElementos (que es 3), se copian los 3 elementos, y se devuelve. El array devuelto tiene exactamente 3 posiciones (no 100). Así la copia solo tiene los elementos reales.'},
+
+{id:64,tags:['practica'],text:'¿Cuál es el problema si devolver_arreglo() devolviera <code>return this.datos;</code> en lugar de la copia?',
+options:['No habría ningún problema','El llamador podría modificar directamente el array interno del conjunto, rompiendo la encapsulación (ej: meter nulls o duplicados)','El programa sería más lento','El array devuelto sería null'],
+correct:1,explanation:'Si se devuelve la referencia al array interno datos[], el código externo puede hacer copia[2] = null o copia[0] = copia[1], modificando directamente los datos del conjunto sin pasar por agregar() ni pertenece(). La encapsulación se rompe.'},
+
+{id:65,tags:['practica'],text:'¿Qué imprime este código?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">Conjunto&lt;Integer&gt; c1 = new Conjunto_Array();\nc1.agregar(1); c1.agregar(2); c1.agregar(3);\nConjunto&lt;Integer&gt; c2 = new Conjunto_Array();\nc2.agregar(2); c2.agregar(3); c2.agregar(4);\nc1.union(c2);\nSystem.out.println(c1.toString());</pre>',
+options:['{1, 2, 3, 2, 3, 4}','{1, 2, 3, 4}','{2, 3}','{4}'],
+correct:1,explanation:'c1 tiene {1,2,3}. union(c2) intenta agregar 2 (ya está, se ignora), 3 (ya está, se ignora), 4 (nuevo, se añade). c1 queda como {1, 2, 3, 4}. toString() devuelve "{1, 2, 3, 4}".'},
+
+{id:66,tags:['practica'],text:'¿Qué error tiene este toString()?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">public String toString() {\n  String res = "{";\n  for (int i = 0; i &lt; numElementos; i++) {\n    res += datos[i] + ", ";\n  }\n  return res + "}";\n}</pre>',
+options:['No hay error','Siempre añade ", " después del último elemento, produciendo "{1, 2, 3, }" en vez de "{1, 2, 3}"','El bucle debería empezar en 1','No maneja el caso del conjunto vacío (devolvería "{}" pero sin el return especial es "{}")'],
+correct:1,explanation:'El código añade ", " después de CADA elemento, incluido el último. Para c={1,2,3} devolvería "{1, 2, 3, }" con la coma al final. La solución correcta es usar el operador ternario: datos[i] + (i < numElementos-1 ? ", " : "") para no añadir la coma tras el último.'},
+
+{id:67,tags:['practica'],text:'¿Qué significa que en el main c1 sea de tipo <code>Conjunto&lt;Integer&gt;</code> y no de tipo <code>Conjunto_Array</code>?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">Conjunto&lt;Integer&gt; c1 = new Conjunto_Array();</pre>',
+options:['Es un error, debería ser Conjunto_Array c1 = new Conjunto_Array()','Polimorfismo: c1 usa la interfaz, el objeto real es Conjunto_Array; si se cambia la implementación el código del main no cambia','No hay diferencia entre los dos tipos','Conjunto<Integer> es más eficiente que Conjunto_Array'],
+correct:1,explanation:'Esto es programar contra la interfaz. La variable c1 conoce solo los métodos de Conjunto<Integer>. Si mañana se crea Conjunto_AVL que también implements Conjunto<Integer>, basta cambiar new Conjunto_Array() por new Conjunto_AVL() sin tocar el resto del main.'},
+
+{id:68,tags:['practica'],text:'¿Qué imprime este código?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">Conjunto&lt;Integer&gt; c = new Conjunto_Array();\nSystem.out.println(c.toString());</pre>',
+options:['null','""','{}','0'],
+correct:2,explanation:'Se crea un Conjunto_Array vacío (numElementos=0). toString() comprueba if (numElementos == 0) return "{}"; por lo que devuelve el String "{}". System.out.println lo imprime.'},
+
+{id:69,tags:['practica'],text:'¿Cuál de estos fragmentos implementa correctamente el método num_elem()?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">// A\npublic int num_elem() { return datos.length; }\n// B\npublic int num_elem() { return MAX; }\n// C\npublic int num_elem() { return numElementos; }\n// D\npublic int num_elem() { return datos.length - numElementos; }</pre>',
+options:['A','B','C','D'],
+correct:2,explanation:'datos.length siempre vale 100 (tamaño del array). MAX también vale 100. numElementos es el contador que se incrementa con cada agregar(), y es el número REAL de elementos en el conjunto. La respuesta correcta es C: return numElementos.'},
+
+{id:70,tags:['practica'],text:'¿Qué ocurre si se intenta añadir un elemento cuando numElementos ya es 100?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">public void agregar(Integer elemento) {\n  if (!pertenece(elemento) && numElementos &lt; MAX) {\n    datos[numElementos] = elemento;\n    numElementos++;\n  }\n}</pre>',
+options:['Se lanza ArrayIndexOutOfBoundsException','El programa se detiene con error','La condición numElementos < MAX es false, así que el elemento simplemente no se añade (sin error)','Se sobreescribe el primer elemento'],
+correct:2,explanation:'La condición numElementos < MAX protege contra el desbordamiento. Si numElementos==100 (=MAX), la condición es false y el cuerpo del if no se ejecuta. El elemento se descarta silenciosamente sin excepción.'},
+
+{id:71,tags:['practica'],text:'¿Cuál es el resultado de este trace paso a paso?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">Conjunto&lt;Integer&gt; c = new Conjunto_Array();\nc.agregar(5);\nc.agregar(3);\nc.agregar(5);\nc.agregar(7);\nSystem.out.println(c.num_elem() + " " + c.toString());</pre>',
+options:['4 {5, 3, 5, 7}','3 {5, 3, 7}','3 {3, 5, 7}','4 {5, 3, 7}'],
+correct:1,explanation:'agregar(5): no estaba → se añade. agregar(3): no estaba → se añade. agregar(5): ya estaba → se ignora. agregar(7): no estaba → se añade. num_elem()=3. toString() muestra en orden de inserción: {5, 3, 7}. Resultado: "3 {5, 3, 7}".'},
+
+{id:72,tags:['practica'],text:'¿Qué error de compilación tiene este código?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">public class Prueba_Conjunto {\n  public static void main(String[] args) {\n    Conjunto&lt;Integer&gt; c1 = new Conjunto_Array();\n    c1.agregar(1);\n    c1.agregar(2);\n    c1.union(c1);\n  }\n}</pre>',
+options:['No hay error de compilación','Falta importar Conjunto','c1.union(c1) no compila porque union recibe Conjunto<Integer> no Conjunto_Array','Conjunto<Integer> no es válido'],
+correct:0,explanation:'No hay error de compilación. c1 es de tipo Conjunto<Integer>, y union() espera un Conjunto<Integer>. c1 es compatible. (Aunque en tiempo de ejecución hacer union de un conjunto consigo mismo puede dar resultados curiosos, compila correctamente.)'},
+
+{id:73,tags:['practica'],text:'¿Qué imprime este código?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">String res = "{";\nint[] d = {1, 2, 3};\nfor (int i = 0; i &lt; d.length; i++) {\n  res += d[i] + (i &lt; d.length - 1 ? ", " : "");\n}\nres += "}";\nSystem.out.println(res);</pre>',
+options:['{1, 2, 3,}','{1, 2, 3}','1, 2, 3','{ 1 2 3 }'],
+correct:1,explanation:'Este es el patrón exacto de toString(). Para i=0: "1" + ", " = "1, ". Para i=1: "2" + ", " = "2, ". Para i=2 (último, i < d.length-1 es false): "3" + "" = "3". res = "{1, 2, 3" + "}" = "{1, 2, 3}".'},
+
+{id:74,tags:['practica'],text:'¿Qué tiene de malo este método union()?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">public void union(Conjunto&lt;Integer&gt; otro) {\n  Integer[] aux = otro.devolver_arreglo();\n  for (int i = 0; i &lt; aux.length; i++) {\n    this.agregar(aux[i]);\n  }\n}</pre>',
+options:['No tiene nada malo','El bucle usa aux.length en vez de otro.num_elem(). aux.length es el tamaño real de la copia (correcto), pero aux podría tener posiciones null si devolver_arreglo() devolviera el array interno de 100','El error es usar this.agregar()','No debería llamar a devolver_arreglo()'],
+correct:1,explanation:'devolver_arreglo() devuelve un array de tamaño numElementos (solo los elementos reales, sin nulls). aux.length coincide con otro.num_elem(). En este caso concreto funcionaría bien porque la copia tiene el tamaño exacto. Sin embargo, el código original usa otro.num_elem() que es más explícito y seguro.'},
+
+{id:75,tags:['practica'],text:'¿Cuál sería la declaración correcta de la interfaz para que la clase Conjunto_Array la implemente?',
+options:['class Conjunto_Array extends Conjunto<Integer>','class Conjunto_Array implements Conjunto<Integer>','class Conjunto_Array implements Conjunto','interface Conjunto_Array implements Conjunto<Integer>'],
+correct:1,explanation:'Las clases implementan interfaces con "implements". La sintaxis correcta es: class Conjunto_Array implements Conjunto<Integer>. Se usa "extends" solo para heredar de otra clase, y "interface" solo para declarar interfaces.'},
+
+{id:76,tags:['practica'],text:'¿Qué imprime este código?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">Conjunto&lt;Integer&gt; c1 = new Conjunto_Array();\nConjunto&lt;Integer&gt; c2 = new Conjunto_Array();\nc1.agregar(10); c1.agregar(20);\nc2.agregar(20); c2.agregar(30);\nString antes = c2.toString();\nc1.union(c2);\nSystem.out.println(c2.toString());</pre>',
+options:['{10, 20, 30}','{20, 30}','{10, 20}','{30}'],
+correct:1,explanation:'union() modifica THIS (c1), no el otro conjunto (c2). c2 queda intacto con sus dos elementos {20, 30}. c1 pasa a ser {10, 20, 30}. El println imprime c2.toString() = "{20, 30}".'},
+
+{id:77,tags:['practica'],text:'¿Qué hace este bucle en el método pertenece()?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">for (int i = 0; i &lt; numElementos; i++) {\n  if (this.datos[i].equals(elemento)) return true;\n}\nreturn false;</pre>',
+options:['Busca en TODOS los 100 elementos del array','Busca solo en las posiciones 0..numElementos-1 donde hay datos reales; si encuentra el elemento devuelve true inmediatamente','Ordena el array antes de buscar','Elimina el elemento si lo encuentra'],
+correct:1,explanation:'El bucle recorre SOLO las posiciones con datos reales (0 a numElementos-1). Si encuentra el elemento (.equals devuelve true) retorna true inmediatamente sin seguir buscando. Si termina el bucle sin encontrarlo, retorna false. Es una búsqueda lineal optimizada.'},
+
+{id:78,tags:['practica'],text:'¿Qué pasa si se hace <code>import java.util.ArrayList</code> y se usa ArrayList en la implementación?',
+options:['Compila perfectamente y funciona bien','Compila pero falla en ejecución','El código compila, pero viola las restricciones de la práctica (no se corregirá)','No compila porque ArrayList no existe'],
+correct:2,explanation:'Las restricciones explícitas de la práctica prohíben usar ArrayList, HashSet, TreeSet y LinkedList. Aunque el código compilaría y funcionaría técnicamente, no se aceptaría para corrección. Hay que implementar con Integer[].'},
+
+{id:79,tags:['practica'],text:'¿Cuántas veces se llama a pertenece() si se hace agregar() con 5 elementos distintos en un conjunto vacío?',
+options:['0 veces','5 veces (una por cada agregar)','10 veces','1 vez solo en la primera llamada'],
+correct:1,explanation:'Cada llamada a agregar() llama exactamente una vez a pertenece(). Con 5 llamadas a agregar(): 5 llamadas a pertenece(). Dentro de pertenece(), el bucle recorre 0 elementos la 1ª vez (conjunto vacío), 1 la 2ª, 2 la 3ª, etc. En total: 0+1+2+3+4 = 10 comparaciones.'},
+
+{id:80,tags:['practica'],text:'¿Qué tiene de incorrecto este constructor?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">public Conjunto_Array() {\n  this.numElementos = 0;\n}</pre>',
+options:['No hay error','Falta inicializar datos[]: sin new Integer[MAX] el array es null; cualquier acceso posterior lanzará NullPointerException','El nombre del constructor es incorrecto','numElementos debería inicializarse a 1'],
+correct:1,explanation:'El constructor no inicializa datos[]. En Java, los atributos de referencia se inicializan a null. Si se llama a agregar() o pertenece() sin haber creado el array, se intentará acceder a null → NullPointerException. Falta: this.datos = new Integer[MAX];'},
+
+{id:81,tags:['practica'],text:'¿Qué resultado produce este trace?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">Conjunto&lt;Integer&gt; c = new Conjunto_Array();\nInteger[] arr = c.devolver_arreglo();\nSystem.out.println(arr.length);</pre>',
+options:['100','0','1','NullPointerException'],
+correct:1,explanation:'El conjunto está vacío (numElementos=0). devolver_arreglo() hace: Integer[] copia = new Integer[numElementos] → new Integer[0]. El bucle no se ejecuta. Devuelve un array de 0 elementos. arr.length = 0.'},
+
+{id:82,tags:['practica'],text:'¿Qué error de compilación hay aquí?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">public class PruebaConjunto {\n  public static void main(String[] args) {\n    Conjunto&lt;Integer&gt; c = new Conjunto_Array();\n    c.agregar(5);\n  }\n}</pre>',
+options:['El nombre del archivo debe ser PruebaConjunto.java y la clase pública también PruebaConjunto — si el archivo se llama Prueba_Conjunto.java hay error','No hay error','Falta el Scanner','Conjunto_Array no se puede instanciar'],
+correct:0,explanation:'En Java, el nombre de la clase pública DEBE coincidir con el nombre del archivo. Si el archivo se llama Prueba_Conjunto.java, la clase pública debe ser public class Prueba_Conjunto. Si se llama PruebaConjunto (sin guion), el archivo también debe llamarse PruebaConjunto.java.'},
+
+{id:83,tags:['practica'],text:'¿Qué imprime este fragmento relacionado con el Scanner?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">Scanner teclado = new Scanner(System.in);\nint n = teclado.nextInt();\nConjunto&lt;Integer&gt; c = new Conjunto_Array();\nfor (int i = 0; i &lt; n; i++) {\n  c.agregar(teclado.nextInt());\n}\nteclado.close();\nSystem.out.println(c.num_elem());</pre><br>Si el usuario escribe: <code>4   1 2 1 3</code>',
+options:['4','3','2','1'],
+correct:1,explanation:'n=4. Se leen 4 números: 1, 2, 1, 3. agregar(1): se añade. agregar(2): se añade. agregar(1): ya está, se ignora. agregar(3): se añade. num_elem() = 3 (el 1 duplicado no se guardó).'},
+
+{id:84,tags:['practica'],text:'¿Cuál de estos fragmentos de toString() produciría "{5}" para un conjunto con un solo elemento (5)?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">// A: res = "{" + datos[0] + ", " + "}" → "{5, }"\n// B: res = "{" + datos[0] + (0 &lt; 0 ? ", " : "") + "}" → "{5}"\n// C: res = "{" + ", " + datos[0] + "}" → "{, 5}"\n// D: res = "{" + datos[0] + "}" sin el bucle → "{5}"</pre>',
+options:['A','B','C','B y D producen el mismo resultado correcto'],
+correct:3,explanation:'Con numElementos=1: la condición i < numElementos-1 es 0 < 0 = false, así que el ternario aporta "". res = "{" + "5" + "" → "{5", luego + "}" → "{5}". La opción D también produce "{5}" si accede directamente a datos[0]. Ambas B y D son correctas para este caso.'},
+
+{id:85,tags:['practica'],text:'¿Por qué este método tiene un error lógico aunque compile correctamente?<br><pre style="background:#0f172a;padding:8px;border-radius:6px;margin-top:6px;font-size:0.8rem">public void union(Conjunto&lt;Integer&gt; otro) {\n  for (int i = 0; i &lt; otro.num_elem(); i++) {\n    this.agregar(otro.devolver_arreglo()[i]);\n  }\n}</pre>',
+options:['No hay error lógico, funciona correctamente','Llama a devolver_arreglo() dentro del bucle: crea un array nuevo en cada iteración (ineficiente pero correcto). El código original lo saca fuera del bucle por eficiencia','El bucle debería empezar en 1','agregar() no debería usarse en union()'],
+correct:1,explanation:'Funciona correctamente pero es ineficiente: devolver_arreglo() crea un objeto Integer[] nuevo en CADA iteración del bucle (si hay 10 elementos, crea 10 arrays). El código original crea la copia una sola vez fuera del bucle (Integer[] aux = otro.devolver_arreglo()) y luego itera sobre ella.'},
+
+// ── PREGUNTAS EXTRA (basadas en los apuntes) ───────────────────────────────
+{id:86,tags:['extra'],text:'¿Cuántos tipos primitivos existen en Java?',
+options:['4','6','8','10'],
+correct:2,explanation:'Java tiene exactamente 8 tipos primitivos: byte, short, int, long, float, double, char y boolean.'},
+
+{id:87,tags:['extra'],text:'¿Cuál es la diferencia entre <code>++x</code> y <code>x++</code>?',
+options:['No hay diferencia','++x incrementa ANTES de usar el valor; x++ incrementa DESPUÉS de usar el valor','++x solo funciona con int; x++ funciona con todos los tipos','++x es más rápido'],
+correct:1,explanation:'Pre-incremento (++x): incrementa x primero, luego usa el nuevo valor. Post-incremento (x++): usa el valor actual de x primero, luego lo incrementa. Esto importa en expresiones como: y = x++ (y recibe el valor anterior).'},
+
+{id:88,tags:['extra'],text:'¿Qué imprime este código? <code>int x = 1; int y = x++; System.out.println(y);</code>',
+options:['2','1','0','Error'],
+correct:1,explanation:'x++ es post-incremento: y recibe el valor ACTUAL de x (que es 1), luego x se incrementa a 2. Así y vale 1. Si fuera ++x, y recibiría 2.'},
+
+{id:89,tags:['extra'],text:'¿Qué significa que Java es "fuertemente tipado" (strongly typed)?',
+options:['Los programas tardan más en compilar','Cada variable tiene un tipo fijo y Java verifica los tipos en tiempo de compilación','Las variables pueden cambiar de tipo','El compilador es muy lento'],
+correct:1,explanation:'En Java, cada variable debe declararse con un tipo específico. El compilador verifica que los tipos sean compatibles. No puedes, por ejemplo, asignar un String a un int sin conversión explícita.'},
+
+{id:90,tags:['extra'],text:'¿Qué operador calcula el resto de la división entera en Java?',
+options:['/','//','%','mod'],
+correct:2,explanation:'El operador % (módulo) devuelve el resto de la división entera. Por ejemplo: 10 % 3 = 1 (10 dividido entre 3 da 3 con resto 1).'},
+
+{id:91,tags:['extra'],text:'¿Qué ocurre si se accede a la posición array.length de un array en Java?',
+options:['Devuelve null','Devuelve 0','Lanza ArrayIndexOutOfBoundsException','Devuelve el último elemento'],
+correct:2,explanation:'Los índices válidos de un array de tamaño N son 0 a N-1. Acceder a la posición N (= array.length) está fuera de rango y lanza ArrayIndexOutOfBoundsException en tiempo de ejecución.'},
+
+{id:92,tags:['extra'],text:'¿Qué hace el método <code>Math.sqrt(x)</code> en Java?',
+options:['Eleva x al cuadrado','Devuelve la raíz cuadrada de x','Devuelve el valor absoluto de x','Redondea x'],
+correct:1,explanation:'Math.sqrt(x) devuelve la raíz cuadrada de x como double. Por ejemplo, Math.sqrt(4) devuelve 2.0. La clase Math contiene funciones matemáticas estáticas.'},
+
+{id:93,tags:['extra'],text:'¿Cuál de estas afirmaciones sobre los bucles for y while es correcta?',
+options:['for solo funciona con números','while no puede tener condición','Ambos pueden usarse para la misma tarea; se elige según el contexto','for es más rápido que while'],
+correct:2,explanation:'for y while son intercambiables en poder expresivo. Por convención: for se usa cuando se conoce el número de iteraciones, while cuando se repite hasta que una condición cambie.'},
+
+{id:94,tags:['extra'],text:'¿Qué significa <code>static final</code> en un atributo de clase Java?',
+options:['El atributo puede cambiar de valor una vez','Es una constante: su valor no puede modificarse tras la inicialización','static significa que es privado','final significa que es público'],
+correct:1,explanation:'static: el atributo pertenece a la clase (no a cada instancia). final: su valor no puede cambiar después de inicializarse. Juntos crean una constante de clase. En la práctica: private static final int MAX = 100.'},
+
+{id:95,tags:['extra'],text:'¿Cuál es la complejidad temporal de buscar un elemento en un array desordenado de N elementos?',
+options:['O(1)','O(log N)','O(N)','O(N²)'],
+correct:2,explanation:'En el peor caso, el elemento buscado está al final o no existe. Hay que comparar con todos los N elementos. La complejidad es O(N) (lineal).'},
+
+{id:96,tags:['extra'],text:'¿Cuál es la complejidad de la búsqueda binaria en un array ordenado?',
+options:['O(1)','O(log N)','O(N)','O(N²)'],
+correct:1,explanation:'La búsqueda binaria divide el espacio de búsqueda a la mitad en cada paso. El número de pasos para encontrar un elemento en N elementos es log₂N. Complejidad: O(log N).'},
+
+{id:97,tags:['extra'],text:'¿Qué complejidad tiene un algoritmo con dos bucles anidados donde cada uno itera N veces?',
+options:['O(N)','O(N + N)','O(N²)','O(2N)'],
+correct:2,explanation:'Dos bucles anidados de N iteraciones cada uno producen N × N = N² operaciones en total. La complejidad es O(N²) (cuadrática).'},
+
+{id:98,tags:['extra'],text:'¿Cuál de estas complejidades crece MÁS RÁPIDO para valores grandes de N?',
+options:['O(N log N)','O(N²)','O(2ᴺ)','O(N³)'],
+correct:2,explanation:'La jerarquía de crecimiento es: O(1) < O(log N) < O(N) < O(N log N) < O(N²) < O(N³) < O(2ᴺ). La exponencial O(2ᴺ) crece mucho más rápido que cualquier polinomio.'},
+
+{id:99,tags:['extra'],text:'¿Cuál es el término dominante de: <code>10N³ + N² + 40N + 80</code>?',
+options:['80','40N','N²','10N³'],
+correct:3,explanation:'El término dominante es el de mayor grado, que determina el comportamiento para N grande. En 10N³ + N² + 40N + 80, el término dominante es 10N³, así que la función es O(N³).'},
+
+{id:100,tags:['extra'],text:'¿Qué notación representa el límite INFERIOR del tiempo de ejecución?',
+options:['O-grande (Big-O)','Omega (Ω)','Theta (Θ)','Delta (Δ)'],
+correct:1,explanation:'Omega (Ω) representa el límite inferior: T(N) = Ω(f(N)) significa que el algoritmo tarda AL MENOS cf(N) operaciones. O-grande es el límite superior. Theta es cuando ambos coinciden (cota exacta).'},
+
+{id:101,tags:['extra'],text:'¿Qué es la herencia transitiva en Java?',
+options:['Una clase puede heredar de varias clases a la vez','Si A extiende B y B extiende C, entonces A también es de tipo C','La herencia solo funciona con interfaces','Los constructores se heredan automáticamente'],
+correct:1,explanation:'La herencia es transitiva: si A extends B y B extends C, entonces A también es un subtipo de C (A "es un" C). Esto permite el polimorfismo en cadenas de herencia.'},
+
+{id:102,tags:['extra'],text:'¿Una clase en Java puede implementar más de una interfaz?',
+options:['No, solo una interfaz','Sí, puede implementar varias interfaces','Solo si son del mismo paquete','Solo si la clase es abstracta'],
+correct:1,explanation:'Sí. En Java, una clase puede implementar múltiples interfaces: class A extends B implements XX, YY, ZZ {}. Esto es la forma de Java de implementar herencia múltiple de forma segura.'},
+
+{id:103,tags:['extra'],text:'¿Cuál es la diferencia entre <code>extends</code> e <code>implements</code> en Java?',
+options:['Son sinónimos','extends se usa para heredar de una clase; implements para implementar interfaces','implements se usa para clases, extends para interfaces','extends es para métodos, implements para atributos'],
+correct:1,explanation:'extends: hereda de una clase (solo una). implements: implementa una o más interfaces. Una clase puede combinar ambos: class A extends B implements C, D {}.'},
+
+{id:104,tags:['extra'],text:'¿Qué ocurre si una clase declara implementar una interfaz pero no implementa todos sus métodos?',
+options:['Java ignora los métodos no implementados','Error de compilación, a menos que la clase sea abstracta','La clase implementa los métodos vacíos automáticamente','Error en tiempo de ejecución'],
+correct:1,explanation:'Si una clase concreta (no abstracta) declara implementar una interfaz, DEBE implementar todos los métodos que declara la interfaz. Si no lo hace, el compilador da error. Una clase abstracta puede dejar métodos sin implementar.'},
+
+{id:105,tags:['extra'],text:'¿Qué es el recorrido preorden de un árbol binario?',
+options:['Izquierda → raíz → derecha','Raíz → izquierda → derecha','Izquierda → derecha → raíz','Derecha → raíz → izquierda'],
+correct:1,explanation:'Preorden: primero se visita el nodo raíz, luego el subárbol izquierdo recursivamente, luego el subárbol derecho recursivamente. Mnemónico: raíz PRIMERO (pre = antes).'},
+
+{id:106,tags:['extra'],text:'¿Qué es el recorrido postorden de un árbol binario?',
+options:['Raíz → izquierda → derecha','Izquierda → raíz → derecha','Izquierda → derecha → raíz','Derecha → izquierda → raíz'],
+correct:2,explanation:'Postorden: primero subárbol izquierdo, luego subárbol derecho, finalmente el nodo raíz. Mnemónico: la raíz al FINAL (post = después).'},
+
+{id:107,tags:['extra'],text:'¿El recorrido inorden de un ABB produce los elementos en qué orden?',
+options:['Orden descendente','Orden aleatorio','Orden ascendente','Orden de inserción'],
+correct:2,explanation:'El recorrido inorden de un ABB produce los elementos en orden ascendente (de menor a mayor). Esto se debe a la propiedad del ABB: izquierda < raíz < derecha.'},
+
+{id:108,tags:['extra'],text:'¿Qué es un árbol AVL?',
+options:['Un árbol sin hijos','Un ABB con propiedad de balance: la diferencia de alturas de los subárboles de cada nodo es como máximo 1','Un árbol donde todos los nodos tienen exactamente dos hijos','Un árbol ordenado por nombre de sus creadores'],
+correct:1,explanation:'Un árbol AVL (Adelson-Velskii y Landis) es un ABB autobalanceado: para cada nodo, |altura(subárbol izquierdo) - altura(subárbol derecho)| ≤ 1. Garantiza operaciones en O(log N).'},
+
+{id:109,tags:['extra'],text:'¿Cuál es la ventaja principal de un árbol AVL frente a un ABB normal?',
+options:['Permite duplicados','Garantiza O(log N) para todas las operaciones porque mantiene el árbol balanceado','No necesita comparar elementos','Ocupa menos memoria'],
+correct:1,explanation:'Un ABB normal puede degenerarse (si se insertan elementos en orden, forma una lista → O(N)). El AVL mantiene el balance automáticamente, garantizando siempre O(log N) para búsqueda, inserción y eliminación.'},
+
+{id:110,tags:['extra'],text:'¿Cuál es la complejidad de insertar un elemento en un ArrayList en la posición 0?',
+options:['O(1)','O(log N)','O(N)','O(N²)'],
+correct:2,explanation:'Insertar en la posición 0 de un ArrayList requiere desplazar todos los N elementos una posición hacia la derecha. Esto es O(N). En contraste, insertar al final es O(1) amortizado.'},
+
+{id:111,tags:['extra'],text:'¿Cuál es la complejidad de todas las operaciones básicas de una Pila implementada con array?',
+options:['O(N)','O(log N)','O(1)','O(N²)'],
+correct:2,explanation:'Una Pila implementada con array (tope = último elemento) realiza push y pop en O(1). No hay búsqueda ni desplazamientos. El tope siempre está en la posición numElementos-1.'},
+
+{id:112,tags:['extra'],text:'¿Cuál es la complejidad de encolar y desencolar en una Cola implementada con lista doblemente enlazada con centinelas?',
+options:['O(N)','O(log N)','O(1)','O(N²)'],
+correct:2,explanation:'Con una lista doblemente enlazada con centinelas, añadir al final (encolar) y eliminar del principio (desencolar) son operaciones O(1). Solo se cambian punteros, no hay desplazamientos.'},
+
+{id:113,tags:['extra'],text:'¿Cuántas veces se llama a pop() para evaluar una expresión postfija con un operador binario (+, -, *, /)?',
+options:['Una vez','Dos veces','Tres veces','Ninguna'],
+correct:1,explanation:'Los operadores binarios (+, -, *, /) operan sobre DOS operandos. Por tanto, cuando se encuentra un operador binario en la expresión postfija, se hacen dos pop() (uno para cada operando), se aplica la operación, y se hace un push() del resultado.'},
+
+{id:114,tags:['extra'],text:'¿Cuál es la forma correcta de declarar un Scanner para leer del teclado en Java?',
+options:['Scanner sc = new Scanner();','Scanner sc = new Scanner(System.in);','Scanner sc = Scanner.create();','Input sc = new Input()'],
+correct:1,explanation:'Para leer del teclado se usa: Scanner teclado = new Scanner(System.in); System.in representa la entrada estándar (teclado). Después se cierra con teclado.close().'},
+
+{id:115,tags:['extra'],text:'¿Qué método de Scanner lee un entero desde teclado?',
+options:['sc.readInt()','sc.getInt()','sc.nextInt()','sc.parseInt()'],
+correct:2,explanation:'El método nextInt() de la clase Scanner lee el siguiente token de la entrada y lo interpreta como un entero. Si el usuario escribe algo que no es un número entero, lanza InputMismatchException.'},
+
+{id:116,tags:['extra'],text:'¿Qué hace <code>teclado.close()</code> al final del programa en Prueba_Conjunto?',
+options:['Cierra el programa','Cierra el Scanner liberando el recurso System.in','Borra todos los datos leídos','No hace nada importante'],
+correct:1,explanation:'teclado.close() cierra el Scanner y libera el recurso asociado (System.in). Es una buena práctica cerrar los recursos abiertos al terminar de usarlos, para evitar fugas de recursos.'},
+
+{id:117,tags:['extra'],text:'Si un algoritmo resuelve dos subproblemas de tamaño N/2 con trabajo lineal adicional, ¿cuál es su complejidad?',
+options:['O(N)','O(N²)','O(N log N)','O(log N)'],
+correct:2,explanation:'Teorema maestro: si T(N) = 2T(N/2) + N, la solución es O(N log N). Esto aplica a algoritmos como MergeSort y el algoritmo D&C para la subsecuencia contigua de suma máxima.'},
+
+{id:118,tags:['extra'],text:'¿Qué es la subsecuencia contigua de suma máxima?',
+options:['El mayor elemento del array','La subsecuencia de elementos consecutivos cuya suma es la mayor posible','El subarray de mayor longitud','El primer elemento positivo'],
+correct:1,explanation:'Dado un array de enteros (que pueden ser negativos), la subsecuencia contigua de suma máxima es el subarray contiguo cuya suma de elementos es la mayor posible. Si todos son negativos, la suma máxima es 0 por convenio.'},
+
+{id:119,tags:['extra'],text:'¿Cuál es la complejidad del algoritmo recursivo de Fibonacci <code>fib(n) = fib(n-1) + fib(n-2)</code>?',
+options:['O(N)','O(N log N)','O(N²)','O(2ᴺ) (exponencial)'],
+correct:3,explanation:'El Fibonacci recursivo simple tiene complejidad exponencial O(2ᴺ). Cada llamada genera dos llamadas recursivas, formando un árbol de tamaño exponencial. Se puede mejorar a O(N) con memoización o programación dinámica.'},
+
+{id:120,tags:['extra'],text:'¿Qué ventaja tiene usar interfaces en Java para definir el TAD Conjunto?',
+options:['Es más fácil de escribir','Permite cambiar la implementación (array, árbol, etc.) sin modificar el código que usa el conjunto','Hace el código más lento','Solo funciona con Integer'],
+correct:1,explanation:'Programar contra la interfaz (Conjunto<Integer> c = new Conjunto_Array()) permite cambiar la implementación en cualquier momento (por ejemplo, a un árbol AVL) sin cambiar el código que usa c. Es el principio de sustitución de Liskov.'},
+
+// ── MÁS PREGUNTAS EXTRA ────────────────────────────────────────────────────
+{id:121,tags:['extra'],text:'¿Cuál es el resultado de <code>"1" + 2 + 3</code> en Java?',
+options:['6','123','Tipo error','1 + 2 + 3'],
+correct:1,explanation:'Cuando el primer operando de + es un String, todos los demás se convierten a String y se concatenan. "1" + 2 = "12", luego "12" + 3 = "123". Si fuera 1 + 2 + "3" el resultado sería "33".'},
+
+{id:122,tags:['extra'],text:'¿Cuál es el resultado de <code>1 + 2 + "a"</code> en Java?',
+options:['"a12"','"3a"','Error de compilación','3a'],
+correct:1,explanation:'Los operadores se evalúan de izquierda a derecha. 1 + 2 = 3 (suma entera), luego 3 + "a" = "3a" (concatenación porque "a" es String). El resultado es el String "3a".'},
+
+{id:123,tags:['extra'],text:'¿Qué hace el método <code>greeting.substring(2, 4)</code> si greeting = "hello"?',
+options:['Devuelve "hel"','Devuelve "ll"','Devuelve "llo"','Devuelve "el"'],
+correct:1,explanation:'substring(inicio, fin) devuelve los caracteres desde la posición inicio (incluida) hasta fin (excluida). "hello".substring(2,4) devuelve "ll" (posiciones 2 y 3 son \'l\' y \'l\').'},
+
+{id:124,tags:['extra'],text:'Una clase puede extender a otra clase usando <code>extends</code>, ¿cuántas clases puede extender como máximo?',
+options:['Dos','Ilimitadas','Una sola','Tres'],
+correct:2,explanation:'En Java, una clase solo puede extender EXACTAMENTE UNA clase usando extends. Esto evita el "problema del diamante" de la herencia múltiple. Para herencia múltiple se usan interfaces con implements.'},
+
+{id:125,tags:['extra'],text:'¿Cuál es la diferencia entre el TAD Lista y el TAD Conjunto?',
+options:['El conjunto puede repetir elementos pero la lista no','La lista admite elementos repetidos y tiene orden posicional; el conjunto no admite repetidos','Son exactamente iguales','El conjunto solo almacena números'],
+correct:1,explanation:'Lista: secuencia ordenada posicionalmente, permite duplicados, se puede acceder por índice. Conjunto: colección sin orden garantizado ni elementos repetidos; las operaciones son pertenencia, unión, intersección, etc.'},
+
+{id:126,tags:['extra'],text:'¿Qué ocurre con la pila cuando se llaman métodos recursivos?',
+options:['No se usa la pila','En cada llamada se crea un "activation record" y se apila; al retornar se desapila','La pila se vacía al entrar en recursión','Solo la primera llamada usa la pila'],
+correct:1,explanation:'Cada llamada a un método (especialmente en recursión) crea un registro de activación (activation record) con las variables locales y el punto de retorno. Este registro se apila. Al retornar, se desapila. Por eso una recursión muy profunda puede causar StackOverflowError.'},
+
+{id:127,tags:['extra'],text:'¿Qué significa que la herencia múltiple en Java se implementa mediante interfaces?',
+options:['Java no soporta herencia múltiple','Java solo permite herencia a través de interfaces','Una clase puede implementar varias interfaces (cada una con métodos abstractos) sin los conflictos de la herencia múltiple de clases','Las interfaces no existen en Java'],
+correct:2,explanation:'Java prohíbe extends de varias clases para evitar conflictos (dos métodos con el mismo nombre pero distinta implementación). Las interfaces solo declaran métodos sin implementarlos, así no hay conflicto cuando una clase implementa varias.'},
+
+{id:128,tags:['extra'],text:'¿Qué es un nodo hoja en un árbol?',
+options:['El nodo raíz','Un nodo que no tiene hijos','Un nodo con exactamente dos hijos','El nodo con mayor profundidad'],
+correct:1,explanation:'Un nodo hoja es aquel que no tiene hijos. En un árbol binario, un nodo hoja tiene left == null y right == null. Las hojas son los nodos terminales del árbol.'},
+
+{id:129,tags:['extra'],text:'¿Cuál es la complejidad de buscar un elemento en un ABB balanceado?',
+options:['O(1)','O(log N)','O(N)','O(N²)'],
+correct:1,explanation:'En un ABB balanceado (como un AVL), la altura es O(log N). En cada paso de la búsqueda se descarta la mitad del árbol. Por tanto la búsqueda es O(log N).'},
+
+{id:130,tags:['extra'],text:'¿Cuál es la complejidad de buscar en un ABB degenerado (lista enlazada)?',
+options:['O(1)','O(log N)','O(N)','O(N²)'],
+correct:2,explanation:'Un ABB degenerado ocurre cuando se insertan elementos en orden creciente o decreciente. Forma una lista enlazada con altura N. La búsqueda recorre todos los nodos en el peor caso: O(N).'},
+
+{id:131,tags:['extra'],text:'Dado el ABB con raíz 6, hijos 2 y 8; 2 con hijos 1 y 5; 5 con hijo izquierdo 3. Tras remove(2), ¿cuál es el hijo izquierdo de 6?',
+options:['1','5','8','3'],
+correct:3,explanation:'remove(2): nodo 2 tiene dos hijos (1 y 5). Se reemplaza por el menor del subárbol derecho (que es 3, hijo de 5). Luego se elimina el 3 de su posición original. El resultado: 3 ocupa el lugar de 2, siendo hijo izquierdo de 6.'},
+
+{id:132,tags:['extra'],text:'¿Qué es un recorrido preorden y en qué se diferencia del inorden?',
+options:['Preorden visita raíz primero; inorden visita raíz entre los subárboles','Son el mismo recorrido','Preorden va de derecha a izquierda; inorden de izquierda a derecha','Preorden es para pilas; inorden para colas'],
+correct:0,explanation:'Preorden: raíz → izq → der (raíz primero). Inorden: izq → raíz → der (raíz en el medio). Postorden: izq → der → raíz (raíz al final). En un ABB, inorden da los elementos ordenados.'},
+
+{id:133,tags:['extra'],text:'¿Qué estructura de datos usa una cola internamente en su implementación más eficiente?',
+options:['Array simple','Lista doblemente enlazada con centinelas','Pila','Árbol binario'],
+correct:1,explanation:'La implementación más eficiente de una cola usa una lista doblemente enlazada con centinelas. Encolar (añadir al final) y desencolar (eliminar del principio) son ambas O(1) porque se accede directamente a los extremos mediante los centinelas.'},
+
+{id:134,tags:['extra'],text:'¿Cuántos arcos tiene un árbol con 7 nodos?',
+options:['7','8','6','5'],
+correct:2,explanation:'Un árbol con N nodos tiene N-1 arcos. Con N=7: 7-1 = 6 arcos. Cada nodo (excepto la raíz) está conectado a su padre por exactamente un arco.'},
+
+{id:135,tags:['extra'],text:'¿Qué significa que una solución recursiva sea "cíclica"?',
+options:['Que el algoritmo funciona en círculo','Que el problema se expresa en términos de sí mismo con los MISMOS datos, sin converger a un caso base','Que usa bucles for','Que es correcta y eficiente'],
+correct:1,explanation:'Una solución recursiva cíclica define el problema en términos de sí mismo pero con los mismos datos (no más pequeños). Nunca llega al caso base → recursión infinita. Es un error de diseño.'},
+
+{id:136,tags:['extra'],text:'¿Qué es la "profundidad de la raíz" en un árbol?',
+options:['La altura del árbol','0, por convenio (la raíz no tiene arcos hacia arriba)','1','El número total de hojas'],
+correct:1,explanation:'La profundidad (o nivel) de la raíz es 0 por definición. Es la longitud del camino desde la raíz hasta sí misma, que es 0 (sin arcos). Los nodos hijos de la raíz tienen profundidad 1, sus nietos profundidad 2, etc.'},
+
+{id:137,tags:['extra'],text:'¿Cuál es la diferencia entre profundidad y altura en un árbol?',
+options:['Son lo mismo','Profundidad: distancia desde la raíz hasta ese nodo. Altura: distancia desde ese nodo hasta la hoja más lejana.','Profundidad es para hojas, altura para la raíz','La profundidad siempre es mayor'],
+correct:1,explanation:'Profundidad de un nodo n: número de arcos desde la raíz hasta n (va "de arriba a abajo"). Altura de un nodo n: longitud del camino más largo desde n hasta una hoja (va "de abajo a arriba"). La altura del árbol = altura de la raíz.'},
+
+{id:138,tags:['extra'],text:'Si insertas en un ABB los valores 5, 3, 7, 1, 4 en ese orden, ¿cuál es la raíz?',
+options:['1','3','5','7'],
+correct:2,explanation:'El primer elemento insertado se convierte en la raíz. 5 es el primer valor, así que 5 es la raíz. Los siguientes se insertan según la propiedad del ABB: 3<5 (izquierda de 5), 7>5 (derecha de 5), etc.'},
+
+{id:139,tags:['extra'],text:'¿Qué complejidad tiene el recorrido inorden de un ABB con N nodos?',
+options:['O(1)','O(log N)','O(N)','O(N²)'],
+correct:2,explanation:'El recorrido inorden visita TODOS los nodos exactamente una vez. Si hay N nodos, realiza N visitas → O(N). No importa si el árbol está balanceado o no; todos los nodos deben visitarse.'},
+
+{id:140,tags:['extra'],text:'¿Qué es el principio de encapsulación en POO?',
+options:['Heredar de varias clases','Ocultar los detalles internos de una clase y exponer solo lo necesario mediante métodos públicos','Crear objetos sin constructores','Usar arrays para todo'],
+correct:1,explanation:'La encapsulación consiste en: 1) ocultar los atributos internos (private), 2) controlar el acceso mediante métodos públicos (getters/setters o métodos de la interfaz). En Prueba_Conjunto, datos[] es private y solo se accede mediante agregar(), pertenece(), etc.'},
+
+{id:141,tags:['extra'],text:'¿Cuál es la notación Big-O de la siguiente función: <code>T(N) = 5N² + 3N + 100</code>?',
+options:['O(N)','O(N + 100)','O(N²)','O(5N²)'],
+correct:2,explanation:'En Big-O solo importa el término dominante (el que crece más rápido) y se ignoran constantes. El término dominante es N² (grado 2). Las constantes multiplicativas (5) y los términos menores (3N, 100) se ignoran. Resultado: O(N²).'},
+
+{id:142,tags:['extra'],text:'¿Verdadero o Falso? "Todos los logaritmos son equivalentes en notación Big-O (log₂N = O(log₁₀N))"',
+options:['Verdadero','Falso','Solo para bases mayores que 2','Solo para N > 100'],
+correct:0,explanation:'Verdadero. El cambio de base del logaritmo es solo una constante multiplicativa: log₂N = log₁₀N / log₁₀2. Las constantes se ignoran en Big-O. Por eso se escribe O(log N) sin especificar la base.'},
+
+{id:143,tags:['extra'],text:'¿Cuántas veces divide N entre 2 el bucle <code>while(N > 1) { N = N/2; }</code> hasta parar, para N=8?',
+options:['2','3','4','8'],
+correct:1,explanation:'N=8: 8/2=4, 4/2=2, 2/2=1. Se detiene. Total de iteraciones: 3 = log₂(8). Esto demuestra por qué ese bucle es O(log N).'},
+
+{id:144,tags:['extra'],text:'¿Qué es el "peor caso" (worst case) en el análisis de algoritmos?',
+options:['El caso donde el array está ordenado','La entrada que hace que el algoritmo tarde MÁS tiempo','El caso donde hay menos elementos','El caso donde todos los elementos son iguales'],
+correct:1,explanation:'El peor caso (worst case) es la entrada que maximiza el tiempo de ejecución del algoritmo. Por ejemplo, para la búsqueda lineal, el peor caso es cuando el elemento buscado está al final o no existe (N comparaciones).'},
+
+{id:145,tags:['extra'],text:'¿Cuál es la diferencia entre <code>ArrayList</code> y <code>LinkedList</code> en Java?',
+options:['Son exactamente iguales','ArrayList usa array interno (acceso O(1), insertar al principio O(N)); LinkedList usa nodos enlazados (acceso O(N), insertar con referencia O(1))','ArrayList es más lento siempre','LinkedList no permite duplicados'],
+correct:1,explanation:'ArrayList: array dinámico → acceso por índice O(1), pero insertar/eliminar en el medio requiere desplazar elementos O(N). LinkedList: nodos enlazados → acceso por índice O(N), pero insertar/eliminar con referencia O(1).'},
+
+{id:146,tags:['extra'],text:'¿Qué operación hace el operador ternario <code>(x <= y) ? x : y</code>?',
+options:['Suma x e y','Devuelve x si x <= y, y en caso contrario','Asigna x a y','Compara x con y e imprime el resultado'],
+correct:1,explanation:'El operador ternario tiene la forma: condición ? valorSiVerdadero : valorSiFalso. Si x <= y la expresión evalúa a x; si no, evalúa a y. Es una forma compacta de escribir un if-else.'},
+
+{id:147,tags:['extra'],text:'¿Qué permite el tipo genérico <code>T</code> en una interfaz como <code>Conjunto<T></code>?',
+options:['Que la interfaz funcione solo con Integer','Que la interfaz sea reutilizable con cualquier tipo manteniendo la seguridad de tipos en compilación','Que no se puedan declarar métodos','Que la clase sea abstracta'],
+correct:1,explanation:'Los genéricos permiten crear código reutilizable y type-safe. Conjunto<T> funciona con cualquier tipo. Al instanciar Conjunto<Integer>, el compilador garantiza que solo se usen Integer. Conjunto<String> funcionaría con Strings.'},
+
+{id:148,tags:['extra'],text:'¿Cuál es la propiedad de balance del árbol AVL?',
+options:['La raíz siempre tiene exactamente dos hijos','Para cada nodo, la diferencia entre las alturas de sus subárboles izquierdo y derecho es como máximo 1','Todos los nodos hoja están al mismo nivel','El árbol es siempre completo'],
+correct:1,explanation:'Un árbol AVL satisface: para todo nodo n, |altura(n.left) - altura(n.right)| ≤ 1. Si esta propiedad se viola al insertar o eliminar, se realizan rotaciones para restablecer el balance.'},
+
+{id:149,tags:['extra'],text:'¿Qué pasa cuando se elimina un nodo con dos hijos en un ABB según el criterio del "menor del subárbol derecho"?',
+options:['Se elimina también el subárbol derecho completo','Se sustituye el valor del nodo por el menor del subárbol derecho, y luego se elimina ese menor recursivamente','Se mueve el nodo a una hoja y se elimina','Se sustituye por el hijo derecho directamente'],
+correct:1,explanation:'Algoritmo: 1) Encontrar el menor del subárbol derecho (el más a la izquierda del subárbol derecho). 2) Copiar su valor al nodo a eliminar. 3) Eliminar ese nodo mínimo recursivamente (que tiene a lo sumo un hijo, el derecho).'},
+
+{id:150,tags:['extra'],text:'¿Cuál es el número de operaciones elementales de <code>for(i=0;i<n;i++) for(j=0;j<n;j++) k++;</code>?',
+options:['n','2n','n²','n³'],
+correct:2,explanation:'El for externo itera n veces. Por cada iteración, el for interno también itera n veces ejecutando k++ (1 operación). Total: n × n = n² operaciones. La complejidad es O(N²).'},
+
+{id:151,tags:['extra'],text:'¿Qué es el "activation record" en el contexto de la recursión?',
+options:['Una variable global','Un registro creado en cada llamada a un método que guarda variables locales y el punto de retorno, almacenado en la pila de llamadas','El caso base de la recursión','El resultado final de la función recursiva'],
+correct:1,explanation:'Cada llamada a un método crea un activation record (o stack frame) que contiene: variables locales, parámetros y la dirección de retorno. En recursión, cada llamada apila su propio registro. Cuando retorna, se desapila.'},
+
+{id:152,tags:['extra'],text:'¿Cuál de estas afirmaciones sobre la interfaz Conjunto<T> es INCORRECTA?',
+options:['Los métodos son implícitamente public y abstractos','Puede contener atributos de instancia no estáticos','Una clase la implementa con implements','Puede contener constantes static final'],
+correct:1,explanation:'Una interfaz en Java NO puede tener atributos de instancia (variables de estado). Solo puede tener constantes (static final). Los métodos declarados en la interfaz son implícitamente public y abstract.'},
+
+{id:153,tags:['extra'],text:'¿Qué hace el método <code>num_elem()</code> en la interfaz Conjunto?',
+options:['Devuelve el número máximo de elementos posibles (MAX)','Devuelve el número de elementos actualmente en el conjunto','Devuelve el primer elemento','Devuelve el índice del último elemento'],
+correct:1,explanation:'num_elem() devuelve numElementos, que es el contador de elementos actualmente almacenados en el conjunto. En Conjunto_Array su implementación es simplemente: return numElementos;'},
+
+{id:154,tags:['extra'],text:'¿Por qué en el método pertenece() solo se itera hasta numElementos y no hasta datos.length?',
+options:['Por eficiencia; más allá de numElementos las posiciones son null (vacías)','Porque datos.length siempre es 0','Por un error del programador','Porque MAX no se puede usar en bucles'],
+correct:0,explanation:'El array datos[] tiene tamaño MAX=100, pero solo las posiciones 0 a numElementos-1 contienen elementos reales. Las posiciones numElementos a 99 son null. Iterar hasta datos.length haría comparaciones con null innecesariamente.'},
+
+{id:155,tags:['extra'],text:'¿Qué es la "copia defensiva" y por qué se usa en devolver_arreglo()?',
+options:['Copiar el código del programa para seguridad','Devolver una nueva copia del array para que modificaciones externas no afecten al estado interno del objeto','Duplicar el objeto completo','Una técnica de optimización de memoria'],
+correct:1,explanation:'La copia defensiva protege la encapsulación: en lugar de devolver la referencia al array interno datos[], se devuelve un array nuevo con los mismos valores. Si el llamador modifica la copia, el conjunto original no se altera.'},
+
+{id:156,tags:['extra'],text:'¿Cuál sería el output si c1={} (vacío) y c2={1,2,3} y se ejecuta c1.union(c2)?',
+options:['Union: {}','Union: {1, 2, 3}','Error: el conjunto está vacío','Union: {0, 1, 2, 3}'],
+correct:1,explanation:'union() itera sobre los elementos de c2 ([1,2,3]) y llama a this.agregar() para cada uno. Como c1 empieza vacío, los tres se añaden. Resultado en c1: {1, 2, 3}.'},
+
+{id:157,tags:['extra'],text:'¿Cuál es la complejidad del método pertenece() en Conjunto_Array?',
+options:['O(1)','O(log N)','O(N)','O(N²)'],
+correct:2,explanation:'pertenece() recorre el array de 0 a numElementos-1 buscando el elemento. En el peor caso (elemento no está o es el último), compara con todos los numElementos elementos. Complejidad: O(N).'},
+
+{id:158,tags:['extra'],text:'¿Cuál es la complejidad del método union() en Conjunto_Array si c1 tiene n elementos y c2 tiene m?',
+options:['O(m)','O(n × m)','O(n + m)','O(1)'],
+correct:1,explanation:'union() llama a agregar() una vez por cada elemento de c2 (m llamadas). Cada llamada a agregar() llama a pertenece() que es O(n) (tamaño de c1 que crece). En el peor caso: O(m × n).'},
+
+{id:159,tags:['extra'],text:'¿Qué implication tiene declarar <code>private static final int MAX = 100</code> como atributo de Conjunto_Array?',
+options:['Cada objeto tiene su propio MAX','MAX es una constante compartida por todos los objetos de la clase, con valor fijo de 100','MAX puede cambiar en tiempo de ejecución','Solo el método main puede acceder a MAX'],
+correct:1,explanation:'private: solo accesible dentro de la clase. static: pertenece a la clase (no a cada instancia; hay un solo MAX). final: valor inmutable (no puede cambiar). Es una constante de clase: todos los Conjunto_Array comparten el mismo MAX=100.'},
+
+{id:160,tags:['extra'],text:'¿Cuál es la diferencia entre <code>return</code> en un método <code>void</code> y en un método que devuelve un tipo?',
+options:['En void no hay return; en otros sí','En void, return termina el método sin devolver valor; en otros, return debe devolver un valor del tipo declarado','Son idénticos','void puede devolver cualquier tipo'],
+correct:1,explanation:'En un método void, se puede usar return; (sin valor) para salir anticipadamente, o simplemente no poner return y el método termina al final. En un método que devuelve tipo (int, boolean...), DEBE haber un return con un valor del tipo correcto.'},
+
+// ── PREGUNTAS AVANZADAS ───────────────────────────────────────────────────
+{id:161,tags:['extra'],text:'¿Cuál es el recorrido preorden del siguiente ABB: raíz 5, izquierda 3 (con hijos 1 y 4), derecha 7?',
+options:['1, 3, 4, 5, 7','5, 3, 1, 4, 7','5, 7, 3, 4, 1','1, 4, 3, 7, 5'],
+correct:1,explanation:'Preorden: raíz→izq→der. Visitar 5, luego preorden de subárbol izq (raíz 3): visitar 3, luego preorden de subárbol izq de 3 (raíz 1): visitar 1, luego preorden de subárbol der de 3: visitar 4. Luego preorden de subárbol der de 5: visitar 7. Resultado: 5, 3, 1, 4, 7.'},
+
+{id:162,tags:['extra'],text:'¿Cuál es el recorrido postorden del mismo árbol (raíz 5, izq 3 con hijos 1 y 4, der 7)?',
+options:['1, 4, 3, 7, 5','5, 3, 1, 4, 7','1, 3, 4, 5, 7','5, 7, 4, 3, 1'],
+correct:0,explanation:'Postorden: izq→der→raíz. Postorden del subárbol izq (raíz 3): postorden de 1 (hoja: 1), postorden de 4 (hoja: 4), luego 3. Postorden del subárbol der de 5: 7. Luego 5. Resultado: 1, 4, 3, 7, 5.'},
+
+{id:163,tags:['extra'],text:'¿Qué operación de la pila se usa para ver el elemento del tope SIN eliminarlo?',
+options:['push()','pop()','peek() / top()','size()'],
+correct:2,explanation:'peek() (o top() en algunos libros) devuelve el elemento del tope de la pila sin eliminarlo. pop() devuelve y elimina el tope. push() añade un elemento. Es importante la distinción: peek no modifica la pila.'},
+
+{id:164,tags:['extra'],text:'¿Cuál es la diferencia entre una pila y una cola?',
+options:['La pila tiene más capacidad','Pila es LIFO (último en entrar, primero en salir); cola es FIFO (primero en entrar, primero en salir)','Son la misma estructura con distinto nombre','La cola no permite eliminar elementos'],
+correct:1,explanation:'Pila (Stack): LIFO — push añade al tope, pop extrae del tope. El último añadido es el primero en salir. Cola (Queue): FIFO — encolar añade al final, desencolar extrae del frente. El primero añadido es el primero en salir.'},
+
+{id:165,tags:['extra'],text:'¿Cómo se puede verificar si una expresión tiene paréntesis equilibrados usando una pila?',
+options:['Contando el número total de paréntesis','Recorrer la expresión: push para cada ( y pop para cada ); si al final la pila está vacía, están equilibrados','Usando un contador que suma 1 por ( y resta 1 por )','No se puede verificar con una pila'],
+correct:1,explanation:'Algoritmo: recorrer la expresión carácter a carácter. Si es \'(\': push. Si es \')\': si la pila está vacía → desequilibrado; si no, pop. Al final, si la pila está vacía → equilibrado; si no → desequilibrado.'},
+
+{id:166,tags:['extra'],text:'¿Cuál es la complejidad de agregar() en Conjunto_Array?',
+options:['O(1)','O(log N)','O(N)','O(N²)'],
+correct:2,explanation:'agregar() llama primero a pertenece() que es O(N). Si el elemento no está, lo añade en O(1). La complejidad total es dominada por pertenece(): O(N).'},
+
+{id:167,tags:['extra'],text:'¿Cuándo se usa import en Java?',
+options:['Para heredar de otra clase','Para usar clases de otros paquetes que no son java.lang','Para declarar variables globales','Para crear nuevos tipos primitivos'],
+correct:1,explanation:'import permite usar clases de otros paquetes. Por ejemplo, import java.util.Scanner; permite usar Scanner en el código. Las clases del paquete java.lang (String, Math...) se importan automáticamente.'},
+
+{id:168,tags:['extra'],text:'¿Qué es un "subárbol" de un árbol?',
+options:['El nodo raíz solo','Cualquier nodo del árbol junto con todos sus descendientes, formando a su vez un árbol válido','Solo las hojas del árbol','El último nivel del árbol'],
+correct:1,explanation:'Un subárbol es una parte del árbol que también es un árbol válido. Está formado por un nodo cualquiera (que actúa como raíz del subárbol) y todos sus descendientes. Los árboles son estructuras recursivas: cada subárbol es un árbol.'},
+
+{id:169,tags:['extra'],text:'¿Qué hace el operador % (módulo) con números negativos? Ejemplo: <code>-7 % 3</code>',
+options:['Devuelve 2','Devuelve -1','Devuelve 1','Lanza una excepción'],
+correct:1,explanation:'En Java, el resultado del módulo tiene el mismo signo que el dividendo. -7 % 3 = -1 (porque -7 = -2 × 3 + (-1)). Esto difiere de algunos lenguajes que dan el resultado con el signo del divisor.'},
+
+{id:170,tags:['extra'],text:'¿Qué diferencia hay entre declarar <code>int[] a</code> y crear el array con <code>new int[5]</code>?',
+options:['Son lo mismo','Declarar solo crea la variable referencia (vale null); new int[5] crea el array en memoria y asigna la referencia','new int[5] crea una variable local; la declaración crea una global','No se puede separar la declaración de la creación'],
+correct:1,explanation:'int[] a; — solo declara la variable a de tipo referencia a int[]. Está a null y no se puede usar. new int[5] — crea el array en el heap con 5 posiciones. a = new int[5] asigna esa referencia a a.'},
+
+{id:171,tags:['extra'],text:'¿Qué valor tienen los elementos de un array <code>int[] a = new int[5]</code> antes de asignarles valores?',
+options:['Valores aleatorios','null','0 (valor por defecto de int)','No definido'],
+correct:2,explanation:'En Java, los arrays de tipos primitivos se inicializan automáticamente a sus valores por defecto: int[] → 0, double[] → 0.0, boolean[] → false. Los arrays de objetos (Integer[], String[]) se inicializan a null.'},
+
+{id:172,tags:['extra'],text:'¿Cuál de estas afirmaciones sobre String en Java es CORRECTA?',
+options:['String es un tipo primitivo','String es un tipo de referencia (clase)','String se declara con minúscula (string)','Los Strings no pueden concatenarse'],
+correct:1,explanation:'String es una clase en Java (java.lang.String), por tanto es un tipo de referencia. Se escribe con S mayúscula. Se pueden concatenar con + y comparar con .equals(). A diferencia de C++, los Strings en Java son inmutables.'},
+
+{id:173,tags:['extra'],text:'¿Qué sucede si se llama a pertenece() con un elemento null en Conjunto_Array?',
+options:['Devuelve true','Devuelve false siempre','Puede lanzar NullPointerException en datos[i].equals(null)','El programa continúa normalmente'],
+correct:2,explanation:'Si elemento es null y se llama datos[i].equals(null): si datos[i] no es null, equals(null) devuelve false (correcto). Pero si datos[i] es null, se lanzaría NullPointerException. Sería necesario manejar este caso.'},
+
+{id:174,tags:['extra'],text:'¿Qué es la "recursión de cola" (tail recursion)?',
+options:['Una recursión que no tiene caso base','Una recursión donde la llamada recursiva es la ÚLTIMA operación del método (ninguna operación pendiente al retornar)','Una recursión con dos llamadas recursivas','Una recursión con bucle for'],
+correct:1,explanation:'La recursión de cola (tail recursion) ocurre cuando la llamada recursiva es la última instrucción y no hay operaciones pendientes al retornar. Algunos compiladores la optimizan como iteración. El factorial recursivo simple NO es de cola porque hay una multiplicación pendiente al retornar.'},
+
+{id:175,tags:['extra'],text:'¿Cuál es la complejidad del método toString() en Conjunto_Array?',
+options:['O(1)','O(log N)','O(N)','O(N²)'],
+correct:2,explanation:'toString() construye la cadena recorriendo todos los numElementos elementos del array. Concatenar strings en un bucle también es O(N) (o más si se usa concatenación con +). La complejidad total es O(N).'},
+
+{id:176,tags:['extra'],text:'Un árbol binario completo de altura h, ¿cuántos nodos máximos puede tener?',
+options:['h','h²','2^(h+1) - 1','2h + 1'],
+correct:2,explanation:'Un árbol binario completo de altura h tiene como máximo 2^(h+1) - 1 nodos (todos los niveles llenos). Por ejemplo, h=0: 1 nodo. h=1: 3 nodos. h=2: 7 nodos = 2³-1.'},
+
+{id:177,tags:['extra'],text:'¿Qué es el "principio de sustitución de Liskov" (aunque no se nombre en los apuntes)?',
+options:['Los objetos de una subclase deben poder sustituir a objetos de su superclase sin alterar el comportamiento correcto del programa','Solo los constructores se heredan','Las interfaces no pueden tener constantes','La herencia es siempre correcta'],
+correct:0,explanation:'Si tienes Conjunto<Integer> c = new Conjunto_Array(), puedes usar c como cualquier Conjunto<Integer>. El código que usa la interfaz no necesita saber si es un array, árbol AVL, etc. Esto es lo que hace útiles las interfaces.'},
+
+{id:178,tags:['extra'],text:'¿Cuál es el comportamiento del método equals() heredado de Object vs el implementado en Integer?',
+options:['Son idénticos','Object.equals() compara referencias; Integer.equals() compara el valor numérico','Integer no tiene equals()','Object.equals() compara valores numéricos'],
+correct:1,explanation:'Object.equals() compara si dos referencias apuntan al mismo objeto (== de referencias). Integer.equals() compara el valor entero representado. Por eso datos[i].equals(elemento) funciona correctamente para comparar valores Integer.'},
+
+{id:179,tags:['extra'],text:'Si se insertan en orden los valores 1, 2, 3, 4, 5 en un ABB, ¿qué forma tiene el árbol?',
+options:['Un árbol balanceado con raíz 3','Una lista enlazada (árbol degenerado) hacia la derecha','Un árbol con raíz 1 y hijos 2 y 3','Un árbol completo'],
+correct:1,explanation:'Si se insertan en orden creciente, cada nuevo elemento es mayor que todos los anteriores y se inserta siempre como hijo derecho. El resultado es una cadena hacia la derecha: 1→2→3→4→5. Altura N-1 = 4 en lugar de log₂5 ≈ 2.3.'},
+
+{id:180,tags:['extra'],text:'¿Cuál sería la complejidad de buscar en el ABB degenerado del ejercicio anterior?',
+options:['O(log 5) = O(1)','O(5) = O(N)','O(1)','O(25)'],
+correct:1,explanation:'En el árbol degenerado (lista hacia la derecha con 5 elementos), buscar el elemento 5 (el último) requiere seguir 4 punteros: 1→2→3→4→5. En general, la búsqueda en un árbol degenerado de N elementos es O(N).'},
+
+{id:181,tags:['extra'],text:'¿Qué hace <code>teclado.nextInt()</code> si el usuario escribe texto en lugar de un número?',
+options:['Devuelve 0','Devuelve null','Lanza InputMismatchException','Lee el siguiente número ignorando el texto'],
+correct:2,explanation:'Si el usuario escribe texto donde nextInt() espera un entero, se lanza InputMismatchException en tiempo de ejecución. Para evitarlo se puede usar un try-catch o nextLine() + Integer.parseInt().'},
+
+{id:182,tags:['extra'],text:'¿Cuál es la diferencia entre la interfaz definida en los apuntes y las restricciones de la práctica? La interfaz usa <T> pero la clase implementa Conjunto<Integer>. ¿Por qué?',
+options:['Error del enunciado','<T> hace la interfaz genérica (reutilizable); al implementarla con <Integer> se especifica el tipo concreto','La interfaz solo funciona con Integer','<T> y <Integer> son lo mismo'],
+correct:1,explanation:'La interfaz Conjunto<T> es genérica: podría usarse con cualquier tipo. Al escribir class Conjunto_Array implements Conjunto<Integer>, se fija T=Integer para esta implementación concreta. Así la clase almacena solo enteros, pero la interfaz podría reutilizarse para otros tipos.'},
+
+{id:183,tags:['extra'],text:'¿Cuántas veces se ejecuta el cuerpo del for en: <code>for(int i=0; i<numElementos; i++)</code> cuando el conjunto tiene 5 elementos?',
+options:['4','5','6','Depende del contenido'],
+correct:1,explanation:'El bucle va desde i=0 hasta i=numElementos-1 (es decir, i<numElementos). Con numElementos=5, i toma los valores 0,1,2,3,4 → 5 iteraciones. El cuerpo se ejecuta exactamente numElementos veces.'},
+
+{id:184,tags:['extra'],text:'¿Qué es un "hermano" (sibling) en terminología de árboles?',
+options:['El padre de un nodo','Nodos que están al mismo nivel del árbol','Nodos que comparten el mismo padre','Los hijos de la raíz'],
+correct:2,explanation:'En un árbol, dos nodos son hermanos (siblings) si tienen el mismo padre. Por ejemplo, si 2 y 8 son hijos de 6 (raíz), entonces 2 y 8 son hermanos entre sí. No basta con estar al mismo nivel; deben compartir padre.'},
+
+{id:185,tags:['extra'],text:'¿Cuál es la complejidad de insertar un elemento al FINAL de una lista enlazada simple (sin centinela de cola)?',
+options:['O(1)','O(log N)','O(N)','O(N²)'],
+correct:2,explanation:'Sin referencia al último nodo, para insertar al final hay que recorrer toda la lista desde el principio hasta encontrar el último nodo (el que tiene siguiente = null). Esto es O(N). Con una referencia al último nodo (centinela de cola), sería O(1).'},
+
+{id:186,tags:['extra'],text:'¿Qué ventaja aporta el recorrido inorden en un ABB para ordenar datos?',
+options:['Permite obtener los datos en orden ascendente sin necesidad de un algoritmo de ordenación separado','Es más rápido que cualquier algoritmo de ordenación','Reordena el árbol','Permite buscar el elemento mínimo'],
+correct:0,explanation:'El recorrido inorden de un ABB produce los elementos en orden ascendente (propiedad del ABB). Si se tienen N datos y se insertan en un ABB, el recorrido inorden los lista ordenados en O(N). La construcción del ABB cuesta O(N log N) con un árbol balanceado.'},
+
+{id:187,tags:['extra'],text:'¿Qué es "Theta de N" (Θ(N)) en el análisis de algoritmos?',
+options:['Un límite superior','Un límite inferior','Una cota exacta: el algoritmo crece exactamente como N para entradas grandes','El número de operaciones exactas'],
+correct:2,explanation:'Θ(f(N)) (Theta) es la cota exacta: el algoritmo crece exactamente como f(N) para N grande. Implica que T(N) = O(f(N)) Y T(N) = Ω(f(N)). Es más informativo que solo O-grande.'},
+
+{id:188,tags:['extra'],text:'¿Cuál es la forma de calcular la altura de un árbol binario recursivamente?',
+options:['Contar todos los nodos','Si el árbol es vacío → -1; si no → 1 + max(altura(izquierdo), altura(derecho))','Contar solo las hojas','Contar los nodos de la mitad'],
+correct:1,explanation:'Definición recursiva de la altura: caso base (árbol vacío) → -1. Caso recursivo → 1 + max(altura(subárbol izquierdo), altura(subárbol derecho)). Esta naturaleza recursiva hace que los árboles se procesen fácilmente de forma recursiva.'},
+
+{id:189,tags:['extra'],text:'En la práctica, el main tiene: <code>Conjunto<Integer> c1 = new Conjunto_Array();</code> ¿Por qué c1 es de tipo interfaz y no de tipo Conjunto_Array?',
+options:['Por error del programador','Para aprovechar el polimorfismo: el código que usa c1 no depende de la implementación concreta','Porque Conjunto_Array no tiene constructor','Porque Conjunto<Integer> es un tipo primitivo'],
+correct:1,explanation:'Programar contra la interfaz (no la implementación) es una buena práctica: si en el futuro se cambia Conjunto_Array por una implementación con árbol AVL, el código del main no necesita modificarse, solo se cambia la línea new Conjunto_Array().'},
+
+{id:190,tags:['extra'],text:'¿Cuál es la complejidad del algoritmo para encontrar el k-ésimo menor elemento en un ABB con campo "size" en cada nodo?',
+options:['O(N²)','O(N)','O(log N) si el árbol está balanceado','O(1)'],
+correct:1,explanation:'Con un campo size en cada nodo (número de nodos en su subárbol), se puede encontrar el k-ésimo menor en O(N) en el caso general (siguiendo un camino desde la raíz). Si el árbol está balanceado, el camino es O(log N).'},
+
+{id:191,tags:['extra'],text:'¿Cuántos nodos tiene el árbol: raíz 6, hijos 2 y 8; 2 con hijos 1 y 5; 5 con hijo izquierdo 3?',
+options:['5','6','7','8'],
+correct:1,explanation:'Contando los nodos: 6 (raíz), 2, 8, 1, 5, 3. Total = 6 nodos. Por tanto el árbol tiene 6-1 = 5 arcos.'},
+
+{id:192,tags:['extra'],text:'¿Cuál es la diferencia entre la recursión de Fibonacci simple (exponencial) y la versión con memoización?',
+options:['No hay diferencia','La memoización guarda resultados ya calculados evitando recalcularlos, reduciendo de O(2ᴺ) a O(N)','La memoización es siempre más lenta','La versión simple es más precisa'],
+correct:1,explanation:'Fibonacci recursivo simple recalcula los mismos subproblemas múltiples veces → O(2ᴺ). Con memoización (guardar fib(k) en un array la primera vez), cada valor se calcula una sola vez → O(N). Es el principio de la programación dinámica.'},
+
+{id:193,tags:['extra'],text:'¿Qué ocurre en el ABB si se hace remove() del único elemento (la raíz con dos hijos nulos)?',
+options:['El árbol queda vacío (null)','La raíz queda como nodo hoja','Se lanza una excepción','El árbol no cambia'],
+correct:0,explanation:'Si se elimina el único nodo del árbol (la raíz que es una hoja, sin hijos), el árbol queda vacío. En la implementación recursiva, el método devuelve null y la raíz del árbol pasa a ser null.'},
+
+{id:194,tags:['extra'],text:'¿Cuál es el orden correcto de las instrucciones para insertar un elemento en Conjunto_Array?',
+options:['datos[numElementos] = elemento; numElementos++;','numElementos++; datos[numElementos] = elemento;','Solo datos[numElementos] = elemento;','Solo numElementos++;'],
+correct:0,explanation:'Primero se guarda el elemento en datos[numElementos] (posición actual libre), y luego se incrementa numElementos. Si fuera al revés (numElementos++ primero), se guardaría en la posición siguiente y se perdería la actual.'},
+
+{id:195,tags:['extra'],text:'¿Cuál es la altura del árbol con los nodos: raíz 6, hijos 2 y 8; 2 con hijos 1 y 5; 5 con hijo izquierdo 3?',
+options:['2','3','4','1'],
+correct:1,explanation:'La altura de la raíz (6) es el camino más largo hasta una hoja. Caminos desde la raíz: 6→8 (longitud 1), 6→2→1 (longitud 2), 6→2→5→3 (longitud 3). El más largo es 3. Altura = 3.'},
+
+{id:196,tags:['extra'],text:'¿Por qué el recorrido de un árbol se implementa naturalmente de forma recursiva?',
+options:['Por convención del lenguaje Java','Porque un árbol se define recursivamente: cada subárbol es un árbol, y el mismo algoritmo se aplica a cada subárbol','Porque los bucles no funcionan con árboles','Por razones de eficiencia'],
+correct:1,explanation:'La estructura recursiva del árbol (cada nodo tiene subárboles que son también árboles) hace que los algoritmos recursivos sean la solución natural. visitar(n) = procesar n + visitar(subárbol_izquierdo) + visitar(subárbol_derecho).'},
+
+{id:197,tags:['extra'],text:'¿Qué es la "regla 1" del análisis de algoritmos para sumar complejidades?',
+options:['T1+T2 = O(T1 × T2)','T1(N) + T2(N) = O(max(f(N), g(N))): el resultado es el orden del término dominante','T1+T2 = O(T1)','T1+T2 = O(T1+T2) siempre'],
+correct:1,explanation:'Si T1(N) = O(f(N)) y T2(N) = O(g(N)), entonces T1+T2 = O(max(f(N),g(N))). Solo importa el término de mayor crecimiento. Ejemplo: O(N²) + O(N) = O(N²).'},
+
+{id:198,tags:['extra'],text:'¿Cuál de estas expresiones es O(N²) según la jerarquía Big-O?',
+options:['1000N (es O(N))','log N (es O(log N))','N² + 100N + 50 (es O(N²))','2ᴺ (es O(2ᴺ))'],
+correct:2,explanation:'N² + 100N + 50: el término dominante es N². Los términos de menor grado (100N, 50) se ignoran en Big-O. Resultado: O(N²). Las otras opciones son O(N), O(log N) y O(2ᴺ) respectivamente.'},
+
+{id:199,tags:['extra'],text:'¿Cuál es la única operación que un método void NO puede usar?',
+options:['Llamar a otros métodos','return valor (con un valor del tipo que no es void)','Usar bucles','Declarar variables locales'],
+correct:1,explanation:'Un método void no puede devolver un valor con return expresión. Sí puede usar return; (sin valor) para terminar anticipadamente, pero no return 5; ni return x;. Intentarlo produce un error de compilación.'},
+
+{id:200,tags:['extra'],text:'Evaluamos la expresión postfija: <code>6 5 + 2 3 + 8 * * 3 +</code>. ¿Cuánto da?',
+options:['443','213','100','350'],
+correct:0,explanation:'push 6, push 5. +→11. push 2, push 3. +→5. push 8. *→40. *→11×40=440. push 3. +→440+3=443. Resultado: 443.'},
+];
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let answered = {}; // id → {correct: bool, firstTry: bool}
+let wrongIds = new Set();
+let triedOptions = {}; // id → Set of tried option indices
+let currentFilter = 'all';
+let displayOrder = QUESTIONS.map(q => q.id);
+
+function updateStats() {
+  const ok = Object.values(answered).filter(v => v && v.correct && v.firstTry).length;
+  const ko = wrongIds.size;
+  const done = Object.values(answered).filter(v => v && v.correct).length;
+  const left = QUESTIONS.length - done - (ko - done > 0 ? ko - done : 0);
+  const leftReal = QUESTIONS.length - Object.values(answered).filter(v => v && v.correct).length;
+  document.getElementById('stat-ok').textContent = ok;
+  document.getElementById('stat-ko').textContent = ko;
+  document.getElementById('stat-left').textContent = leftReal;
+  const total = QUESTIONS.length;
+  const donePct = Object.values(answered).filter(v => v && v.correct).length;
+  const pct = Math.round(donePct / total * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-txt').textContent = donePct + ' / ' + total;
+}
+
+function buildQuestion(q) {
+  const div = document.createElement('div');
+  div.className = 'q-card';
+  div.id = 'card-' + q.id;
+
+  // Header
+  const hdr = document.createElement('div');
+  hdr.className = 'q-header';
+  const num = document.createElement('span');
+  num.className = 'q-num';
+  num.textContent = '#' + q.id;
+  const txt = document.createElement('div');
+  txt.className = 'q-text';
+  txt.innerHTML = q.text;
+  hdr.appendChild(num); hdr.appendChild(txt);
+  div.appendChild(hdr);
+
+  // Tags
+  const tgWrap = document.createElement('div');
+  tgWrap.className = 'q-tags';
+  q.tags.forEach(t => {
+    const tg = document.createElement('span');
+    tg.className = 'tag tag-' + t;
+    tg.textContent = t === 'repaso' ? '🔴 Repaso' : t === 'practica' ? '🔵 Práctica Java' : '🟢 Extra';
+    tgWrap.appendChild(tg);
+  });
+  div.appendChild(tgWrap);
+
+  // Options
+  const opts = document.createElement('div');
+  opts.className = 'q-options';
+  const letters = ['A','B','C','D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'option';
+    btn.id = 'opt-' + q.id + '-' + i;
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span><span class="opt-text">${opt}</span>`;
+    btn.addEventListener('click', () => handleAnswer(q, i, btn));
+    opts.appendChild(btn);
+  });
+  div.appendChild(opts);
+
+  // Feedback
+  const fb = document.createElement('div');
+  fb.className = 'feedback';
+  fb.id = 'fb-' + q.id;
+  div.appendChild(fb);
+
+  return div;
+}
+
+function handleAnswer(q, selected, btn) {
+  // If already answered correctly → locked
+  if (answered[q.id] !== undefined && answered[q.id].correct) return;
+  // If this exact option was already tried → ignore re-click
+  if (!triedOptions[q.id]) triedOptions[q.id] = new Set();
+  if (triedOptions[q.id].has(selected)) return;
+
+  const isCorrect = selected === q.correct;
+  triedOptions[q.id].add(selected);
+
+  const card = document.getElementById('card-' + q.id);
+  const fb = document.getElementById('fb-' + q.id);
+
+  if (isCorrect) {
+    // ── CORRECT ──────────────────────────────────────────────
+    const firstTry = triedOptions[q.id].size === 1; // no wrong attempts before
+    answered[q.id] = { correct: true, firstTry };
+    if (firstTry) {
+      // Count as correct in stats only if first try
+    } else {
+      // Answered eventually — mark as wrong for stats (already added to wrongIds)
+    }
+
+    // Lock ALL options
+    const allOpts = document.querySelectorAll('[id^="opt-' + q.id + '-"]');
+    allOpts.forEach(o => o.classList.add('disabled'));
+    btn.classList.add('correct-ans');
+    card.classList.remove('answered-wrong');
+    card.classList.add(firstTry ? 'answered-correct' : 'answered-wrong');
+
+    fb.className = 'feedback ' + (firstTry ? 'correct' : 'wrong');
+    fb.innerHTML = (firstTry
+      ? '✅ <strong>¡Correcto a la primera!</strong> '
+      : '✅ <strong>Correcto, pero no a la primera.</strong> ') + q.explanation;
+
+    if (firstTry) {
+      // Remove from wrongIds if somehow there
+      wrongIds.delete(q.id);
+    }
+    updateStats();
+
+  } else {
+    // ── WRONG ────────────────────────────────────────────────
+    if (!answered[q.id]) {
+      // First wrong attempt — mark in stats
+      wrongIds.add(q.id);
+      answered[q.id] = { correct: false, firstTry: false };
+      updateStats();
+    }
+
+    // Mark THIS option as tried (dimmed) but keep others clickable
+    btn.classList.add('tried');
+    card.classList.add('answered-wrong');
+
+    // Show feedback without locking
+    const tries = triedOptions[q.id].size;
+    fb.className = 'feedback wrong';
+    fb.innerHTML = '❌ <strong>Incorrecto.</strong> Intento ' + tries + '/4 — sigue intentándolo o revisa las otras opciones.';
+  }
+}
+
+function filterQuestions(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQuestions();
+}
+
+function renderQuestions() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+
+  let toShow;
+  if (currentFilter === 'all') toShow = displayOrder.map(id => QUESTIONS.find(q => q.id === id));
+  else if (currentFilter === 'wrong') toShow = displayOrder.map(id => QUESTIONS.find(q => q.id === id)).filter(q => wrongIds.has(q.id) && !(answered[q.id] && answered[q.id].correct && answered[q.id].firstTry));
+  else toShow = displayOrder.map(id => QUESTIONS.find(q => q.id === id)).filter(q => q.tags.includes(currentFilter));
+
+  // Group by type
+  const groups = { repaso: [], practica: [], extra: [] };
+  toShow.forEach(q => {
+    const tag = q.tags[0];
+    groups[tag].push(q);
+  });
+
+  const groupLabels = { repaso: '🔴 Del Repaso Oficial & Actividades', practica: '🔵 De la Práctica Java (Prueba_Conjunto & ABB)', extra: '🟢 Preguntas Adicionales (basadas en los apuntes)' };
+
+  Object.entries(groups).forEach(([type, qs]) => {
+    if (qs.length === 0) return;
+    const sec = document.createElement('div');
+    sec.className = 'section-header';
+    sec.textContent = groupLabels[type] + ' (' + qs.length + ')';
+    main.appendChild(sec);
+    qs.forEach(q => {
+      const card = buildQuestion(q);
+      // Restore state if answered
+      if (answered[q.id] !== undefined && answered[q.id].correct) {
+        restoreState(q, card);
+      }
+      main.appendChild(card);
+    });
+  });
+
+  if (toShow.length === 0) {
+    main.innerHTML = '<p style="color:var(--text-muted);text-align:center;margin-top:60px">No hay preguntas en esta categoría aún.</p>';
+  }
+}
+
+function restoreState(q, card) {
+  const state = answered[q.id];
+  const isCorrect = state && state.correct;
+  const firstTry = state && state.firstTry;
+  const allOpts = card.querySelectorAll('.option');
+  allOpts.forEach(o => o.classList.add('disabled'));
+
+  const correctOpt = card.querySelector('#opt-' + q.id + '-' + q.correct);
+  if (correctOpt) correctOpt.classList.add('correct-ans');
+  card.classList.add((isCorrect && firstTry) ? 'answered-correct' : 'answered-wrong');
+
+  const fb = card.querySelector('.feedback');
+  if (fb) {
+    const cls = (isCorrect && firstTry) ? 'correct' : 'wrong';
+    fb.className = 'feedback ' + cls;
+    fb.innerHTML = (isCorrect && firstTry
+      ? '✅ <strong>¡Correcto a la primera!</strong> '
+      : isCorrect
+        ? '✅ <strong>Correcto, pero no a la primera.</strong> '
+        : '❌ <strong>Incorrecto.</strong> ') + q.explanation;
+  }
+}
+
+function shuffleAll() {
+  for (let i = displayOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [displayOrder[i], displayOrder[j]] = [displayOrder[j], displayOrder[i]];
+  }
+  renderQuestions();
+}
+
+function resetAll() {
+  if (!confirm('¿Reiniciar todo el test? Se perderá el progreso actual.')) return;
+  answered = {};
+  wrongIds = new Set();
+  triedOptions = {};
+  displayOrder = QUESTIONS.map(q => q.id);
+  updateStats();
+  renderQuestions();
+}
+
+// Init
+renderQuestions();
+updateStats();
+</script>
+</body>
+</html>

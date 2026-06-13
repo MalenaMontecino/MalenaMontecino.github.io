@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interactivo de Redes de Comunicaciones</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --primary: #3498db;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .score-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-box {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .score-box.correct { color: #4ade80; }
+        .score-box.incorrect { color: #f87171; }
+
+        main {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+        }
+
+        .tema-section {
+            margin-top: 40px;
+        }
+
+        .tema-title {
+            background-color: #334155;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .option-item:hover:not(.disabled) {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .option-item.correct {
+            background-color: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #166534 !important;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #991b1b !important;
+        }
+
+        .option-item.disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="score-container">
+            <div class="score-box">Preguntas: <span id="total-answered">0</span> / 20</div>
+            <div class="score-box correct">Correctas: <span id="correct-count">0</span></div>
+            <div class="score-box incorrect">Incorrectas: <span id="incorrect-count">0</span></div>
+        </div>
+    </header>
+
+    <main>
+        <h1>Evaluación de Redes de Comunicaciones</h1>
+        <div id="quiz-container"></div>
+    </main>
+
+    <script>
+        const quizData = [
+           
+            {
+                tema: "TEMA 2: Arquitectura de red y capa de enlace de datos",
+                preguntas: [
+                    { q: "1. ¿Qué define la arquitectura de red?", a: ["La marca de los cables utilizados.", "Cómo se organiza lógicamente una red y la relación entre dispositivos.", "Únicamente la ubicación física de los servidores.", "La velocidad máxima de la tarjeta de red."], correct: 1 },
+                    { q: "2. ¿Cómo se produce la comunicación 'End-to-End'?", a: ["Los dispositivos intermedios procesan toda la aplicación.", "Es una conexión directa lógica entre dos hosts de origen y destino.", "Solo ocurre entre dispositivos del mismo fabricante.", "Es exclusiva para redes locales pequeñas."], correct: 1 },
+                    { q: "3. ¿Cuál es la unidad de datos (PDU) de la Capa 2?", a: ["Paquete.", "Segmento.", "Trama (Frame).", "Bits."], correct: 2 },
+                    { q: "4. ¿Qué indica la MAC origen en una trama Ethernet?", a: ["El router de salida.", "El dispositivo que envía la trama en la red local.", "El destino final en Internet.", "La dirección IP del servidor."], correct: 1 },
+                    { q: "5. ¿Qué tipo de comunicación se envía a todos los dispositivos de la red local?", a: ["Unicast.", "Multicast.", "Anycast.", "Broadcast."], correct: 3 },
+                    { q: "6. ¿Para qué sirve el protocolo ARP?", a: ["Para cifrar los datos de usuario.", "Para relacionar direcciones lógicas (IP) con direcciones físicas (MAC).", "Para evitar bucles de red.", "Para asignar nombres de dominio."], correct: 1 },
+                    { q: "7. ¿Qué protocolo evita los bucles en redes con switches desactivando enlaces redundantes?", a: ["ARP.", "IP.", "STP (Spanning Tree Protocol).", "OSPF."], correct: 2 },
+                    { q: "8. ¿Cuál es una ventaja principal de usar VLANs?", a: ["Permiten que el cable funcione más rápido.", "Separan dominios de broadcast y aumentan la seguridad.", "Eliminan la necesidad de tener direcciones IP.", "Conentan físicamente edificios lejanos."], correct: 1 },
+                    { q: "9. ¿Qué estándar internacional se utiliza para el etiquetado de VLANs?", a: ["802.11ac.", "RFC 1918.", "802.1Q.", "IEEE 802.3."], correct: 2 },
+                    { q: "10. ¿Cuántos bytes añade el identificador de VLAN (tag) a la trama Ethernet?", a: ["2 bytes.", "4 bytes.", "6 bytes.", "8 bytes."], correct: 1 },
+                    { q: "11. ¿En qué modo se configura un puerto de switch que solo pertenece a una VLAN y conecta a un PC?", a: ["Modo Trunk.", "Modo Mixto.", "Modo Access.", "Modo Gateway."], correct: 2 },
+                    { q: "12. ¿Qué caracteriza a un puerto en modo 'Trunk'?", a: ["Solo puede llevar tráfico sin etiqueta (untagged).", "Se le asocia más de una VLAN y transporta tráfico etiquetado.", "No permite el paso de tráfico de broadcast.", "Es exclusivo para conectar impresoras."], correct: 1 },
+                    { q: "13. ¿Qué ocurre en un switch cuando desconoce la ubicación de una MAC destino?", a: ["Descarta la trama inmediatamente.", "Aplica inundación (flooding) por todos los puertos excepto el de origen.", "Envía la trama al router por defecto.", "Pide la dirección al servidor DNS."], correct: 1 },
+                    { q: "14. ¿Cuál es el ámbito de uso de las direcciones MAC?", a: ["Son enrutables en todo Internet.", "Se utilizan solo dentro de la red local.", "Cambian cada vez que el host se reinicia.", "Identifican procesos de software."], correct: 1 },
+                    { q: "15. ¿Qué protocolo de capa 2 es esencial para que un host inicie comunicación local tras conocer una IP?", a: ["DHCP.", "ARP.", "HTTP.", "DNS."], correct: 1 },
+                    { q: "16. ¿Qué sucede si dos switches se conectan formando un círculo sin STP?", a: ["La velocidad se duplica.", "Se genera un bucle de red que puede colapsar la infraestructura.", "Los datos se cifran automáticamente.", "El router bloquea el acceso a Internet."], correct: 1 },
+                    { q: "17. En una red empresarial, ¿para qué se suele usar una VLAN separada?", a: ["Para que todos los empleados vean el tráfico de los demás.", "Para separar el tráfico de VoIP o la red de gestión.", "Para evitar usar cables de fibra óptica.", "Para eliminar el uso de direcciones MAC."], correct: 1 },
+                    { q: "18. ¿Cómo se denomina a una VLAN que viaja sin etiqueta por un puerto Trunk?", a: ["VLAN dinámica.", "VLAN de gestión.", "VLAN nativa.", "VLAN de datos."], correct: 2 },
+                    { q: "19. ¿Qué dispositivo actúa como frontera de broadcast?", a: ["Switch L2.", "Hub.", "Router.", "Bridge."], correct: 2 },
+                    { q: "20. ¿Qué capa del modelo OSI entrega datos localmente sin tomar decisiones de ruta?", a: ["Capa 1.", "Capa 2.", "Capa 3.", "Capa 4."], correct: 1 }
+                ]
+            }
+        ];
+
+        let answeredCount = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        quizData.forEach((block, blockIdx) => {
+            const section = document.createElement('section');
+            section.className = 'tema-section';
+
+            const title = document.createElement('h2');
+            title.className = 'tema-title';
+            title.innerText = block.tema;
+            section.appendChild(title);
+
+            block.preguntas.forEach((p, pIdx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+
+                const qText = document.createElement('div');
+                qText.className = 'question-text';
+                qText.innerText = p.q;
+                card.appendChild(qText);
+
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options-list';
+
+                const optionLetters = ['A', 'B', 'C', 'D'];
+
+                p.a.forEach((opt, optIdx) => {
+                    const li = document.createElement('li');
+                    li.className = 'option-item';
+                    li.innerText = `${optionLetters[optIdx]}) ${opt}`;
+
+                    li.addEventListener('click', function() {
+                        if (li.classList.contains('disabled')) return;
+
+                        answeredCount++;
+                        document.getElementById('total-answered').innerText = answeredCount;
+
+                        const allOptions = optionsList.querySelectorAll('.option-item');
+                        allOptions.forEach(item => item.classList.add('disabled'));
+
+                        if (optIdx === p.correct) {
+                            li.classList.add('correct');
+                            correctCount++;
+                            document.getElementById('correct-count').innerText = correctCount;
+                        } else {
+                            li.classList.add('incorrect');
+                            allOptions[p.correct].classList.add('correct');
+                            incorrectCount++;
+                            document.getElementById('incorrect-count').innerText = incorrectCount;
+                        }
+                    });
+
+                    optionsList.appendChild(li);
+                });
+
+                card.appendChild(optionsList);
+                section.appendChild(card);
+            });
+
+            quizContainer.appendChild(section);
+        });
+    </script>
+</body>
+</html>

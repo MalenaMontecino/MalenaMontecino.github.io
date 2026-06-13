@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interactivo - Repaso Final Redes y Seguridad</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-light: #eff6ff;
+            --success-color: #16a34a;
+            --success-bg: #f0fdf4;
+            --error-color: #dc2626;
+            --error-bg: #fef2f2;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --border-color: #e5e7eb;
+            --bg-body: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: #93c5fd;
+            font-size: 1rem;
+        }
+
+        /* Marcador Fijo Superior */
+        .scoreboard-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: white;
+            border-bottom: 2px solid var(--border-color);
+            padding: 0.8rem 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .scoreboard {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .score-box {
+            padding: 0.4rem 1rem;
+            border-radius: 0.375rem;
+            text-align: center;
+        }
+
+        .score-total { background-color: var(--primary-light); color: var(--primary-color); }
+        .score-correct { background-color: var(--success-bg); color: var(--success-color); }
+        .score-incorrect { background-color: var(--error-bg); color: var(--error-color); }
+
+        /* Contenedor del Test */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .question-card {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .question-number {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .question-difficulty {
+            font-size: 0.85rem;
+            background-color: #f3f4f6;
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+        }
+
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-item {
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .option-item:hover {
+            background-color: var(--primary-light);
+            border-color: #bfdbfe;
+        }
+
+        /* Estados de respuesta */
+        .question-card.answered .option-item {
+            pointer-events: none; /* Deshabilita clicks posteriores */
+        }
+
+        .option-item.correct {
+            background-color: var(--success-bg) !important;
+            border-color: var(--success-color) !important;
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .option-item.incorrect {
+            background-color: var(--error-bg) !important;
+            border-color: var(--error-color) !important;
+            color: var(--error-color);
+        }
+
+        /* Justificación */
+        .rationale {
+            display: none;
+            margin-top: 1.2rem;
+            padding: 1rem;
+            border-left: 4px solid var(--primary-color);
+            background-color: #f8fafc;
+            border-radius: 0 0.375rem 0.375rem 0;
+            font-size: 0.95rem;
+        }
+
+        .rationale-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .question-card.answered .rationale {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Repaso Final</h1>
+        <p>Fundamentos de Redes y Seguridad Informática</p>
+    </header>
+
+    <div class="scoreboard-container">
+        <div class="scoreboard">
+            <div class="score-box score-total">Progreso: <span id="answered-count">0</span> / 20</div>
+            <div class="score-box score-correct">Bien: <span id="correct-count">0</span></div>
+            <div class="score-box score-incorrect">Mal: <span id="incorrect-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="quiz-container" id="quiz-container"></div>
+
+    <script>
+        // Estructura de datos idéntica extraída fielmente del PDF proporcionado
+        const quizData = [
+            {
+                id: 1,
+                difficulty: "Fácil - 15%",
+                question: "Los dispositivos intermedios en una red, como routers y switches:",
+                options: [
+                    { text: "A) Permiten la comunicación pero no generan información propia", isCorrect: true },
+                    { text: "B) Son el origen y destino final de los datos", isCorrect: false },
+                    { text: "C) Solo se utilizan en redes WAN de gran extensión", isCorrect: false },
+                    { text: "D) Generan información propia para garantizar la conectividad", isCorrect: false }
+                ],
+                justification: "Los dispositivos intermedios (routers, switches) facilitan el transporte de datos pero no los generan: el origen y destino siempre son los hosts finales."
+            },
+            {
+                id: 2,
+                difficulty: "Fácil - 15%",
+                question: "Una LAN (Local Area Network) se define principalmente por:",
+                options: [
+                    { text: "A) Requerir siempre una conexión directa a Internet", isCorrect: false },
+                    { text: "B) El uso exclusivo de tecnología inalámbrica", isCorrect: false },
+                    { text: "C) Conectar únicamente dispositivos del mismo fabricante", isCorrect: false },
+                    { text: "D) Su ámbito geográfico reducido, típicamente un edificio u oficina", isCorrect: true }
+                ],
+                justification: "El criterio definitorio de una LAN es su alcance geográfico limitado. No depende del medio (cableado o inalámbrico) ni del fabricante."
+            },
+            {
+                id: 3,
+                difficulty: "Fácil - 15%",
+                question: "Una dirección IPv4 se compone de:",
+                options: [
+                    { text: "A) 48 bits divididos en 6 grupos hexadecimales separados por dos puntos", isCorrect: false },
+                    { text: "B) 32 bits divididos en 4 octetos, representados en decimal punteado", isCorrect: true },
+                    { text: "C) 64 bits divididos en 8 grupos de 16 bits en notación hexadecimal", isCorrect: false },
+                    { text: "D) 16 bits representados directamente en formato decimal", isCorrect: false }
+                ],
+                justification: "IPv4 usa 32 bits agrupados en 4 octetos (cada uno 0-255). La notación hexadecimal con grupos de 16 bits corresponde a IPv6."
+            },
+            {
+                id: 4,
+                difficulty: "Asequible - 40%",
+                question: "¿Cuál es la función de un protocolo de comunicación en una red?",
+                options: [
+                    { text: "A) Define reglas comunes de formato, orden y control para la interoperabilidad", isCorrect: true },
+                    { text: "B) Proporciona la energía necesaria para transmitir datos por el medio físico", isCorrect: false },
+                    { text: "C) Determina el tipo de cable que debe usarse en cada segmento de red", isCorrect: false },
+                    { text: "D) Gestiona las cuentas de usuario y sus permisos de acceso", isCorrect: false }
+                ],
+                justification: "Los protocolos son el 'lenguaje común de la red': definen cómo se codifican, envían y verifican los datos, sin importar el fabricante."
+            },
+            {
+                id: 5,
+                difficulty: "Asequible - 40%",
+                question: "¿Cuál es la ventaja principal de los modelos por capas en el diseño de redes?",
+                options: [
+                    { text: "A) Eliminan la necesidad de protocolos estandarizados", isCorrect: false },
+                    { text: "B) Obligan a todos los fabricantes a usar el mismo hardware", isCorrect: false },
+                    { text: "C) Permiten la evolución independiente de tecnologías y facilitan la interoperabilidad", isCorrect: true },
+                    { text: "D) Garantizan que la comunicación siempre sea cifrada", isCorrect: false }
+                ],
+                justification: "La separación en capas permite cambiar la tecnología de una capa (p. ej., fibra por cobre) sin afectar al resto, y que equipos distintos se entiendan."
+            },
+            {
+                id: 6,
+                difficulty: "Asequible - 40%",
+                question: "¿Cuál es la función principal de una VLAN en una red corporativa?",
+                options: [
+                    { text: "A) Aumentar el ancho de banda disponible duplicando las conexiones físicas", isCorrect: false },
+                    { text: "B) Segmentar lógicamente la red en dominios de broadcast independientes sin hardware separado", isCorrect: true },
+                    { text: "C) Cifrar todo el tráfico que circula entre departamentos", isCorrect: false },
+                    { text: "D) Reemplazar al router para conectar redes de distintas subredes IP", isCorrect: false }
+                ],
+                justification: "Las VLANs dividen lógicamente una red física en segmentos aislados, reduciendo el dominio de broadcast y limitando el movimiento lateral de ataques."
+            },
+            {
+                id: 7,
+                difficulty: "Asequible - 40%",
+                question: "Para una subred que debe albergar 400 hosts, ¿cuál es el prefijo CIDR mínimo necesario?",
+                options: [
+                    { text: "A) /25, que proporciona 126 hosts utilizables", isCorrect: false },
+                    { text: "B) /24, que proporciona 254 hosts utilizables", isCorrect: false },
+                    { text: "C) /22, que proporciona 1022 hosts (mayor de lo mínimo necesario)", isCorrect: false },
+                    { text: "D) /23, que proporciona 510 hosts utilizables", isCorrect: true }
+                ],
+                justification: "Con /24 solo hay 254 hosts, insuficiente. El /23 tiene 9 bits para host: 2^9 - 2 = 510 hosts, el mínimo que supera 400."
+            },
+            {
+                id: 8,
+                difficulty: "Asequible - 40%",
+                question: "¿Qué es la ruta por defecto (default route) y cuándo se utiliza?",
+                options: [
+                    { text: "A) Es la ruta 0.0.0.0/0 que se usa cuando ningún prefijo más específico coincide con el destino", isCorrect: true },
+                    { text: "B) Es la primera ruta configurada manualmente y tiene máxima prioridad", isCorrect: false },
+                    { text: "C) Es la ruta hacia la subred de gestión, solo para el administrador", isCorrect: false },
+                    { text: "D) Es una ruta automática creada cuando el router no puede alcanzar el destino", isCorrect: false }
+                ],
+                justification: "La ruta por defecto es el 'cajón de sastre' del routing: captura todo el tráfico cuyo destino no encaja en ninguna entrada más específica de la tabla."
+            },
+            {
+                id: 9,
+                difficulty: "Asequible - 40%",
+                question: "¿Qué es NAT (Network Address Translation) y qué problema resuelve?",
+                options: [
+                    { text: "A) Traduce IPs privadas a una IP pública para que redes privadas puedan comunicarse con Internet", isCorrect: true },
+                    { text: "B) Cifra el tráfico entre la red privada e Internet para proteger la privacidad", isCorrect: false },
+                    { text: "C) Asigna automáticamente direcciones IP a los dispositivos de la red local", isCorrect: false },
+                    { text: "D) Divide la red en subredes para optimizar el uso del espacio de direcciones", isCorrect: false }
+                ],
+                justification: "NAT permite que múltiples dispositivos con IPs privadas salgan a Internet compartiendo una sola IP pública, resolviendo el agotamiento de direcciones IPv4."
+            },
+            {
+                id: 10,
+                difficulty: "Asequible - 40%",
+                question: "¿Qué característica principal distingue TCP de UDP?",
+                options: [
+                    { text: "A) TCP es más rápido que UDP porque usa cabeceras más pequeñas", isCorrect: false },
+                    { text: "B) TCP solo funciona con IPv4 mientras que UDP es compatible con IPv6", isCorrect: false },
+                    { text: "C) TCP es orientado a conexión y garantiza entrega fiable y ordenada; UDP no establece conexión", isCorrect: true },
+                    { text: "D) UDP establece una conexión persistente mientras TCP usa conexiones temporales", isCorrect: false }
+                ],
+                justification: "TCP establece conexión (3-Way Handshake), garantiza entrega y orden con numeración de secuencia y ACKs. UDP envía sin garantías pero con menor latencia."
+            },
+            {
+                id: 11,
+                difficulty: "Asequible - 40%",
+                question: "¿Cuál es la diferencia principal entre SNMP y NetFlow?",
+                options: [
+                    { text: "A) SNMP es más moderno y ha reemplazado a NetFlow en entornos empresas", isCorrect: false },
+                    { text: "B) SNMP mide el tráfico total de una interfaz; NetFlow registra flujos individuales con origen, destino y protocolo", isCorrect: true },
+                    { text: "C) NetFlow solo funciona en redes IPv6 mientras que SNMP es exclusivo de IPv4", isCorrect: false },
+                    { text: "D) SNMP analiza el contenido de los paquetes; NetFlow solo cuenta bytes totales", isCorrect: false }
+                ],
+                justification: "SNMP responde a '¿cuánto tráfico hay?' NetFlow responde a '¿quién habla con quién?'. Combinados dan una visión completa de la red."
+            },
+            {
+                id: 12,
+                difficulty: "Estudio - 25%",
+                question: "¿Por qué una MAN tiene mayor complejidad que una LAN?",
+                options: [
+                    { text: "A) Porque requiere siempre fibra óptica y no permite cables de cobre", isCorrect: false },
+                    { text: "B) Porque solo puede transmitir datos de voz y no datos de texto", isCorrect: false },
+                    { text: "C) Por su mayor alcance geográfico, que implica mayor diversidad tecnológica y mayor coste", isCorrect: true },
+                    { text: "D) Porque no puede integrarse con redes LAN de menor escala", isCorrect: false }
+                ],
+                justification: "A mayor alcance, más heterogeneidad de medios, tecnologías y operadores involucrados, más puntos de fallo posibles y mayor coste de operación."
+            },
+            {
+                id: 13,
+                difficulty: "Estudio - 25%",
+                question: "¿Qué problema de seguridad implica que un switch inunde tramas por todos sus puertos?",
+                options: [
+                    { text: "A) Un atacante conectado puede capturar tráfico destinado a otros (MAC flooding / sniffing)", isCorrect: true },
+                    { text: "B) El flooding aumenta la latencia pero no tiene implicaciones de seguridad", isCorrect: false },
+                    { text: "C) Solo es un problema en redes inalámbricas, no en redes cableadas", isCorrect: false },
+                    { text: "D) El cifrado de capa de aplicación hace irrelevante este comportamiento", isCorrect: false }
+                ],
+                justification: "El flooding por desconocimiento de MAC (o forzado con MAC flooding attack) permite a un atacante en el segmento capturar tráfico que no le pertenece."
+            },
+            {
+                id: 14,
+                difficulty: "Estudio - 25%",
+                question: "Una empresa necesita 5 subredes a partir de 192.168.1.0/24, con al menos 20 hosts cada una. ¿Qué prefijo es el más adecuado?",
+                options: [
+                    { text: "A) /27 da 30 hosts utilizables y permite al menos 8 subredes dentro del /24", isCorrect: true },
+                    { text: "B) /28: da 14 hosts utilizables, insuficiente para 20 hosts", isCorrect: false },
+                    { text: "C) /26: da 62 hosts pero solo permite 4 subredes en el /24", isCorrect: false },
+                    { text: "D) /24 no permite subdividir en varias subredes independientes", isCorrect: false }
+                ],
+                justification: "/27 = 2^5 - 2 = 30 hosts; 2^3 = 8 subredes /27 en un /24. Cumple el mínimo de 20 hosts y deja margen para crecer."
+            },
+            {
+                id: 15,
+                difficulty: "Estudio - 25%",
+                question: "En Source NAT con masquerade, ¿qué ocurre con la IP de origen de los paquetes que salen por la WAN?",
+                options: [
+                    { text: "A) Se añade un prefijo especial para indicar que proceden de una red privada", isCorrect: false },
+                    { text: "B) Se sustituye por la IP pública de la interfaz WAN, ocultando las IPs privadas internas", isCorrect: true },
+                    { text: "C) Se elimina y el paquete sale sin IP de origen para mayor privacidad", isCorrect: false },
+                    { text: "D) Se convierte a formato IPv6 para compatibilidad con Internet", isCorrect: false }
+                ],
+                justification: "El masquerade es un tipo de SNAT dinámico: reemplaza la IP privada de origen con la IP pública del router, permitiendo la respuesta de vuelta."
+            },
+            {
+                id: 16,
+                difficulty: "Estudio - 25%",
+                question: "¿Cómo resuelve TCP el problema de la pérdida de paquetes en una red no fiable?",
+                options: [
+                    { text: "A) Mediante números de secuencia y ACKs: si un segmento no es confirmado, se retransmite", isCorrect: true },
+                    { text: "B) Enviando cada segmento dos veces por caminos distintos y quedándose con el primero", isCorrect: false },
+                    { text: "C) Dividiendo los datos en segmentos tan pequeños que la probabilidad de pérdida es mínima", isCorrect: false },
+                    { text: "D) Usando QoS para que los segmentos TCP no sean descartados por routers", isCorrect: false }
+                ],
+                justification: "TCP numera cada byte enviado. El receptor confirma con ACK. Si el temporizador de retransmisión expira sin ACK, el emisor reenvía el segmento perdido."
+            },
+            {
+                id: 17,
+                difficulty: "Difícil - 10%",
+                question: "Un analista ve en los logs tráfico con IP origen 10.0.0.5 entrando por la interfaz WAN. ¿Qué indica esto?",
+                options: [
+                    { text: "A) Indica que el proveedor de Internet está asignando IPs privadas en lugar de públicas", isCorrect: false },
+                    { text: "B) Indica que el firewall tiene NAT mal configurado y está traduciendo IPs públicas a privadas", isCorrect: false },
+                    { text: "C) Es tráfico legítimo de un cliente VPN corporativo conectado a la red interna", isCorrect: false },
+                    { text: "D) Es IP privada RFC 1918 entrando desde Internet: indica spoofing o mala configuración de NAT", isCorrect: true }
+                ],
+                justification: "Las IPs RFC 1918 (10.x, 172.16-31.x, 192.168.x) no deben enrutarse en Internet. Su presencia como origen en la WAN es señal de ataque de spoofing o misconfiguration."
+            },
+            {
+                id: 18,
+                difficulty: "Difícil - 10%",
+                question: "En un escaneo SYN scan (semi-abierto), ¿por qué el atacante envía RST tras el SYN-ACK?",
+                options: [
+                    { text: "A) Para informar al servidor de que el puerto escaneado está cerrado en el cliente", isCorrect: false },
+                    { text: "B) Porque el RST es obligatorio en TCP después de cada SYN-ACK recibido", isCorrect: false },
+                    { text: "C) Para evitar la conexión completa y no aparecer en los logs del servidor de muchas aplicaciones", isCorrect: true },
+                    { text: "D) Porque el half-open scan usa UDP y el RST es el equivalente en ese protocolo", isCorrect: false }
+                ],
+                justification: "El SYN scan no completa el handshake: envía RST antes del ACK final. Muchos servicios solo registran sesiones establecidas, por lo que el escaneo queda sin rastro en logs de aplicación."
+            },
+            {
+                id: 19,
+                difficulty: "Actividades - 15%",
+                question: "En TechNova (Act. 1), ¿por qué el servidor de ticketing solo es accesible desde Sistemas?",
+                options: [
+                    { text: "A) Porque los demás departamentos no tienen licencia de acceso a herramientas de ticketing", isCorrect: false },
+                    { text: "B) Porque contiene información técnica sensible de infraestructura, limitarlo reduce la superficie de ataque", isCorrect: true },
+                    { text: "C) Por razones de ancho de banda: el ticketing generaría demasiado tráfico en otras VLANs", isCorrect: false },
+                    { text: "D) Porque el protocolo de ticketing es incompatible con los SO de otros departamentos", isCorrect: false }
+                ],
+                justification: "Principio de mínimo privilegio: el ticketing expone detalles de vulnerabilidades, incidentes y configuraciones. Si un equipo de otro departamento es comprometido, no podrá acceder."
+            },
+            {
+                id: 20,
+                difficulty: "Actividades - 15%",
+                question: "¿Por qué la VLAN de gestión (VLAN 99) debe ser accesible solo desde el departamento de Sistemas?",
+                options: [
+                    { text: "A) Porque contiene interfaces de administración de todos los dispositivos de red, acceso no autorizado comprometería toda la infraestructura", isCorrect: true },
+                    { text: "B) Por un requisito legal de la LOPD que obliga a segregar la gestión en subredes aisladas", isCorrect: false },
+                    { text: "C) Porque los switches solo permiten configurar una VLAN por departamento y la 99 está ocupada", isCorrect: false }
+                ],
+                justification: "La red de gestión da acceso a la CLI/GUI de switches y routers. Un atacante que la alcance puede reconfigurar VLANs, cambiar rutas o deshabilitar toda la red."
+            }
+        ];
+
+        let answeredCount = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const container = document.getElementById('quiz-container');
+
+        // Generar dinámicamente las preguntas en HTML
+        quizData.forEach((q) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-${q.id}`;
+
+            const header = document.createElement('div');
+            header.className = 'question-header';
+            header.innerHTML = `
+                <span class="question-number">Pregunta ${q.id}</span>
+                <span class="question-difficulty">${q.difficulty}</span>
+            `;
+            card.appendChild(header);
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.innerText = q.question;
+            card.appendChild(qText);
+
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+
+            q.options.forEach((opt, idx) => {
+                const optItem = document.createElement('li');
+                optItem.className = 'option-item';
+                optItem.innerText = opt.text;
+                
+                // Evento al seleccionar respuesta
+                optItem.addEventListener('click', () => handleAnswer(q.id, idx, opt.isCorrect, card));
+                optionsList.appendChild(optItem);
+            });
+
+            card.appendChild(optionsList);
+
+            // Bloque de Justificación oculto inicialmente
+            const rationale = document.createElement('div');
+            rationale.className = 'rationale';
+            rationale.innerHTML = `
+                <div class="rationale-title">Justificación:</div>
+                <div>${q.justification}</div>
+            `;
+            card.appendChild(rationale);
+
+            container.appendChild(card);
+        });
+
+        // Lógica de validación
+        function handleAnswer(questionId, optionIndex, isCorrect, cardElement) {
+            // Evitar doble respuesta sobre la misma tarjeta
+            if (cardElement.classList.contains('answered')) return;
+
+            cardElement.classList.add('answered');
+            answeredCount++;
+
+            const options = cardElement.querySelectorAll('.option-item');
+            
+            if (isCorrect) {
+                correctCount++;
+                options[optionIndex].classList.add('correct');
+            } else {
+                incorrectCount++;
+                options[optionIndex].classList.add('incorrect');
+                // Revelar también cuál era la correcta para ayudar en el aprendizaje
+                const dataQuestion = quizData.find(q => q.id === questionId);
+                const correctIdx = dataQuestion.options.findIndex(o => o.isCorrect);
+                options[correctIdx].classList.add('correct');
+            }
+
+            // Actualizar el marcador superior
+            document.getElementById('answered-count').innerText = answeredCount;
+            document.getElementById('correct-count').innerText = correctCount;
+            document.getElementById('incorrect-count').innerText = incorrectCount;
+        }
+    </script>
+</body>
+</html>

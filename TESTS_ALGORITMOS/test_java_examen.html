@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Java — Examen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F4F8;
+    --bg2: #FFFFFF;
+    --bg3: #EFEFF5;
+    --border: rgba(100,90,180,0.12);
+    --border2: rgba(100,90,180,0.2);
+    --text: #1E1B33;
+    --text2: #6B6880;
+    --text3: #A9A6BB;
+    --accent: #6C5CE7;
+    --accent2: #8B7CF8;
+    --accent-bg: rgba(108,92,231,0.08);
+    --green: #059669;
+    --green-bg: rgba(5,150,105,0.08);
+    --green-border: rgba(5,150,105,0.25);
+    --red: #DC2626;
+    --red-bg: rgba(220,38,38,0.07);
+    --red-border: rgba(220,38,38,0.2);
+    --amber: #D97706;
+    --amber-bg: rgba(217,119,6,0.08);
+    --radius: 10px;
+    --radius-lg: 14px;
+    --shadow: 0 1px 3px rgba(100,90,180,0.08), 0 0 0 0.5px rgba(100,90,180,0.1);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 1rem 4rem;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    width: 100%;
+  }
+  .header-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 0.5px solid rgba(108,92,231,0.25);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .header p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+  .progress-wrap { width: 100%; max-width: 600px; margin-bottom: 1.25rem; }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 7px;
+  }
+  .progress-bar { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .card {
+    background: var(--bg2);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 1.75rem;
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 1rem;
+  }
+
+  .q-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .q-num { font-size: 12px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+  .pill {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .p-mult { background: rgba(108,92,231,0.08); color: #5B4FCF; border: 0.5px solid rgba(108,92,231,0.2); }
+  .p-comp { background: rgba(5,150,105,0.08); color: #047857; border: 0.5px solid rgba(5,150,105,0.2); }
+  .p-err  { background: rgba(220,38,38,0.07); color: #B91C1C; border: 0.5px solid rgba(220,38,38,0.18); }
+  .p-vf   { background: rgba(217,119,6,0.08); color: #B45309; border: 0.5px solid rgba(217,119,6,0.2); }
+
+  .q-text { font-size: 15px; line-height: 1.65; color: var(--text); margin-bottom: 16px; }
+
+  .code-block {
+    background: #F0EFF8;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: #2D2A4A;
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.65;
+    margin-bottom: 16px;
+  }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin: 6px 0;
+    font-size: 14px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .option:hover:not(:disabled) {
+    background: rgba(108,92,231,0.06);
+    border-color: rgba(108,92,231,0.25);
+    color: var(--text);
+  }
+  .option-letter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    min-width: 18px;
+    margin-top: 1px;
+  }
+  .option.correct {
+    background: var(--green-bg);
+    border-color: var(--green-border);
+    color: var(--green);
+  }
+  .option.correct .option-letter { color: var(--green); }
+  .option.wrong {
+    background: var(--red-bg);
+    border-color: var(--red-border);
+    color: var(--red);
+  }
+  .option.wrong .option-letter { color: var(--red); }
+  .option:disabled { cursor: default; }
+
+  .fill-wrap { display: flex; gap: 8px; margin-bottom: 8px; }
+  .fill-input {
+    flex: 1;
+    background: var(--bg3);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .fill-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,92,231,0.1); }
+  .fill-input.correct { border-color: var(--green-border); background: var(--green-bg); color: var(--green); }
+  .fill-input.wrong { border-color: var(--red-border); background: var(--red-bg); color: var(--red); }
+
+  .btn-check {
+    background: var(--accent-bg);
+    border: 0.5px solid rgba(108,92,231,0.25);
+    border-radius: var(--radius);
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+  .btn-check:hover { background: rgba(108,92,231,0.14); }
+
+  .btn-reveal {
+    background: var(--bg3);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+  .btn-reveal:hover { background: var(--border); color: var(--text); }
+
+  .feedback {
+    font-size: 13px;
+    line-height: 1.65;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    margin-top: 12px;
+  }
+  .feedback.ok { background: var(--green-bg); color: #065F46; border: 0.5px solid var(--green-border); }
+  .feedback.fail { background: var(--red-bg); color: #991B1B; border: 0.5px solid var(--red-border); }
+  .feedback.info { background: #F0EFF8; color: var(--text2); border: 0.5px solid var(--border2); }
+
+  .nav-row {
+    display: flex;
+    justify-content: flex-end;
+    max-width: 600px;
+    width: 100%;
+  }
+  .btn-next {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: opacity 0.15s, transform 0.1s;
+    display: none;
+    box-shadow: 0 2px 8px rgba(108,92,231,0.25);
+  }
+  .btn-next:hover { opacity: 0.9; }
+  .btn-next:active { transform: scale(0.97); }
+
+  .score-wrap {
+    text-align: center;
+    padding: 3rem 2rem;
+    max-width: 600px;
+    width: 100%;
+  }
+  .score-ring { width: 130px; height: 130px; margin: 0 auto 1.5rem; position: relative; }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring .track { fill: none; stroke: var(--bg3); stroke-width: 8; }
+  .score-ring .fill { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+  .score-num {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .score-label { font-size: 15px; color: var(--text2); margin-bottom: 2rem; line-height: 1.6; }
+  .score-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn-restart {
+    background: var(--bg3);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+  .btn-restart:hover { color: var(--text); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    background: #ECEAF5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #4A3FA0;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">Algoritmos y Estructuras de Datos</div>
+  <h1>Test tipo examen — Java</h1>
+  <p>15 preguntas · opción múltiple · completar · detectar errores</p>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-info">
+    <span id="prog-label">Pregunta 1 de 15</span>
+    <span id="prog-score">0 correctas</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div id="qbody"></div>
+
+<div class="nav-row">
+  <button class="btn-next" id="btn-next">Siguiente →</button>
+</div>
+
+<script>
+const qs=[
+  {tipo:"opción múltiple",pill:"p-mult",
+   q:"¿Cuál de estas opciones declara correctamente una clase abstracta en Java?",
+   options:["class abstract Animal {}","abstract class Animal {}","Abstract class Animal {}","class Animal abstract {}"],
+   answer:1,
+   explain:"La palabra clave <code>abstract</code> va siempre ANTES de <code>class</code>. Java distingue mayúsculas — <code>Abstract</code> con A mayúscula da error de compilación."},
+
+  {tipo:"opción múltiple",pill:"p-mult",
+   code:`public class Animal {\n    private String nombre;\n    public Animal(String nombre) {\n        this.nombre = nombre;\n    }\n}\nAnimal a = new Animal("Rex");\nSystem.out.println(a.nombre);`,
+   q:"¿Qué ocurre al ejecutar este código?",
+   options:["Imprime: Rex","Imprime: null","Error de compilación — nombre es private","Error en tiempo de ejecución"],
+   answer:2,
+   explain:"<code>nombre</code> es <code>private</code> — no se puede acceder desde fuera de la clase. Para leerlo hace falta un getter: <code>getNombre()</code>."},
+
+  {tipo:"completar",pill:"p-comp",
+   q:"Completa la firma del método abstracto dentro de una clase abstracta:",
+   pre:"public ________ double calcularArea();",
+   answer:"abstract",
+   explain:"La palabra clave <code>abstract</code> indica que el método no tiene cuerpo y las subclases están obligadas a implementarlo."},
+
+  {tipo:"opción múltiple",pill:"p-mult",
+   code:`public abstract class Figura {\n    public abstract double area();\n    public void imprimir() {\n        System.out.println("Área: " + area());\n    }\n}\npublic class Cuadrado extends Figura {\n    double lado;\n    public Cuadrado(double lado) { this.lado = lado; }\n    @Override\n    public double area() { return lado * lado; }\n}`,
+   q:"¿Qué imprime new Cuadrado(4).imprimir()?",
+   options:["Área: 8.0","Área: 16.0","Error — imprimir() no está en Cuadrado","Error de compilación"],
+   answer:1,
+   explain:"<code>Cuadrado</code> hereda <code>imprimir()</code> de <code>Figura</code>. Dentro llama a <code>area()</code> que devuelve 4×4=16.0. Resultado: <em>Área: 16.0</em>"},
+
+  {tipo:"detectar error",pill:"p-err",
+   code:`public interface Volador {\n    void volar();\n}\npublic class Pajaro implements Volador {\n    String nombre;\n    public Pajaro(String nombre) {\n        this.nombre = nombre;\n    }\n}`,
+   q:"Detecta y explica el error en este código.",
+   reveal:"<strong>Error:</strong> <code>Pajaro</code> implementa la interfaz <code>Volador</code> pero no define el método <code>volar()</code> → error de compilación.<br><br><strong>Solución:</strong><br><code>@Override<br>public void volar() {<br>&nbsp;&nbsp;&nbsp;&nbsp;System.out.println(nombre + \" vuela\");<br>}</code>"},
+
+  {tipo:"opción múltiple",pill:"p-mult",
+   code:`public class Vehiculo {\n    String marca;\n    public Vehiculo(String marca) { this.marca = marca; }\n    public void info() { System.out.println("Marca: " + marca); }\n}\npublic class Moto extends Vehiculo {\n    int cilindrada;\n    public Moto(String marca, int cilindrada) {\n        super(marca);\n        this.cilindrada = cilindrada;\n    }\n    @Override\n    public void info() {\n        System.out.println("Moto: " + marca + " " + cilindrada + "cc");\n    }\n}`,
+   q:"¿Qué imprime new Moto(\"Honda\", 600).info()?",
+   options:["Marca: Honda","Moto: Honda 600cc","Error — info() ya existe en Vehiculo","Error de compilación"],
+   answer:1,
+   explain:"<code>Moto</code> sobreescribe <code>info()</code> con <code>@Override</code>. Java usa dynamic dispatch — ejecuta la versión de <code>Moto</code>. Resultado: <em>Moto: Honda 600cc</em>"},
+
+  {tipo:"completar",pill:"p-comp",
+   q:"Completa el compareTo para ordenar productos de menor a mayor precio:",
+   pre:`public int compareTo(Producto otro) {\n    if (this.precio < otro.precio) return ____;\n    if (this.precio > otro.precio) return 1;\n    return 0;\n}`,
+   answer:"-1",
+   explain:"Devolver <code>-1</code> cuando <code>this.precio &lt; otro.precio</code> coloca el producto más barato primero. <code>Collections.sort()</code> ordena de menor a mayor."},
+
+  {tipo:"verdadero/falso",pill:"p-vf",
+   q:"Una clase puede extender varias clases abstractas a la vez en Java.",
+   options:["Verdadero","Falso"],
+   answer:1,
+   explain:"Falso. En Java solo se puede extender <strong>una</strong> clase (herencia simple). Sin embargo, sí se pueden implementar varias interfaces a la vez."},
+
+  {tipo:"detectar error",pill:"p-err",
+   code:`public abstract class Animal {\n    public abstract String sonido();\n}\npublic class Perro extends Animal {\n    @Override\n    public String Sonido() {\n        return "Guau";\n    }\n}`,
+   q:"Detecta y explica el error en este código.",
+   reveal:"<strong>Error:</strong> el método en <code>Perro</code> se llama <code>Sonido()</code> con S mayúscula, pero en <code>Animal</code> es <code>sonido()</code> con s minúscula. Java distingue mayúsculas — no está sobreescribiendo el método abstracto → error de compilación.<br><br><strong>Solución:</strong> cambiar a <code>public String sonido()</code>"},
+
+  {tipo:"opción múltiple",pill:"p-mult",
+   code:`int[] arr = {3, -1, 4, -1, 5, -9, 2, 6};`,
+   q:"Usando el algoritmo de Kadane, ¿cuál es la subsecuencia de mayor suma?",
+   options:["9","10","11","15"],
+   answer:1,
+   explain:"Paso a paso: maxActual → 3, 2, 6, 5, <strong>10</strong>, 1, 3, 9. La subsecuencia <code>[3,-1,4,-1,5]</code> suma 10. maxGlobal = 10."},
+
+  {tipo:"opción múltiple",pill:"p-mult",
+   code:`public abstract class Empleado {\n    String nombre;\n    public Empleado(String nombre) { this.nombre = nombre; }\n    public abstract double salario();\n    public void mostrar() {\n        System.out.println(nombre + ": " + salario() + "€");\n    }\n}\npublic class Fijo extends Empleado {\n    public Fijo(String nombre) { super(nombre); }\n    @Override\n    public double salario() { return 1800.0; }\n}\n\nEmpleado e = new Fijo("Ana");\ne.mostrar();`,
+   q:"¿Qué imprime este código?",
+   options:["Ana: 500.0€","Ana: 1800.0€","Error — Empleado no puede instanciarse","Error de compilación"],
+   answer:1,
+   explain:"<code>e</code> es tipo <code>Empleado</code> pero el objeto real es <code>Fijo</code>. <code>mostrar()</code> llama a <code>salario()</code> → Java lo busca en <code>Fijo</code> → 1800.0. Resultado: <em>Ana: 1800.0€</em>"},
+
+  {tipo:"detectar error",pill:"p-err",
+   code:`public class Main {\n    public static void main(String[] args) {\n        int[] numeros = new int[3];\n        numeros[0] = 10;\n        numeros[1] = 20;\n        numeros[2] = 30;\n        System.out.println(numeros[3]);\n    }\n}`,
+   q:"Detecta y explica el error en este código.",
+   reveal:"<strong>Error:</strong> el array tiene tamaño 3, con índices válidos <code>0, 1, 2</code>. Acceder a <code>numeros[3]</code> produce <code>ArrayIndexOutOfBoundsException</code> en tiempo de ejecución.<br><br><strong>Solución:</strong> cambiar <code>numeros[3]</code> por <code>numeros[2]</code>."},
+
+  {tipo:"verdadero/falso",pill:"p-vf",
+   q:"En Java, una interfaz puede tener métodos con implementación usando la palabra clave <code>default</code>.",
+   options:["Verdadero","Falso"],
+   answer:0,
+   explain:"Verdadero. Desde Java 8, las interfaces pueden tener métodos <code>default</code> con cuerpo. Las clases que los implementen los heredan automáticamente."},
+
+  {tipo:"completar",pill:"p-comp",
+   q:"Completa para llamar al constructor del padre desde la clase hija:",
+   pre:`public class Perro extends Animal {\n    public Perro(String nombre) {\n        ________(nombre);\n    }\n}`,
+   answer:"super",
+   explain:"<code>super(nombre)</code> llama al constructor de la clase padre (<code>Animal</code>). Debe ser siempre la primera línea del constructor hijo."},
+
+  {tipo:"opción múltiple",pill:"p-mult",
+   q:"¿Cuál es la complejidad Big O de MergeSort?",
+   options:["O(n)","O(n²)","O(n log n)","O(log n)"],
+   answer:2,
+   explain:"MergeSort divide el array en <code>log n</code> niveles y en cada nivel procesa <code>n</code> elementos. Total: <code>O(n log n)</code>. Más eficiente que Bubble/Selection/Insertion Sort que son O(n²)."},
+];
+
+let cur=0,score=0,answered=false;
+
+function renderQ(){
+  answered=false;
+  const q=qs[cur];
+  document.getElementById('prog-label').textContent=`Pregunta ${cur+1} de ${qs.length}`;
+  document.getElementById('prog-score').textContent=`${score} correctas`;
+  document.getElementById('prog-fill').style.width=((cur/qs.length)*100)+'%';
+  document.getElementById('btn-next').style.display='none';
+
+  const code=q.code?`<div class="code-block">${q.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`:'';
+  const pre=q.pre?`<div class="code-block">${q.pre.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`:'';
+
+  let body='';
+  if(q.tipo==='completar'){
+    body=`${pre}<div class="fill-wrap"><input class="fill-input" id="fill-inp" type="text" placeholder="Escribe tu respuesta..."><button class="btn-check" onclick="checkFill()">Comprobar</button></div><div id="fb"></div>`;
+  } else if(q.tipo==='detectar error'){
+    body=`${code}<button class="btn-reveal" id="rev-btn" onclick="revealErr()">Ver respuesta</button><div id="fb"></div>`;
+  } else {
+    body=`${code}<div id="opts">${q.options.map((o,i)=>`<button class="option" onclick="pick(${i})"><span class="option-letter">${String.fromCharCode(65+i)}</span><span>${o}</span></button>`).join('')}</div><div id="fb"></div>`;
+  }
+
+  document.getElementById('qbody').innerHTML=`
+    <div class="card">
+      <div class="q-meta">
+        <span class="q-num">P${cur+1}</span>
+        <span class="pill ${q.pill}">${q.tipo}</span>
+      </div>
+      <p class="q-text">${q.q}</p>
+      ${body}
+    </div>`;
+
+  if(q.tipo==='completar'){
+    document.getElementById('fill-inp').addEventListener('keydown',e=>{ if(e.key==='Enter') checkFill(); });
+  }
+}
+
+function pick(i){
+  if(answered)return;
+  answered=true;
+  const q=qs[cur];
+  document.querySelectorAll('.option').forEach(b=>b.disabled=true);
+  document.querySelectorAll('.option')[i].classList.add(i===q.answer?'correct':'wrong');
+  if(i!==q.answer) document.querySelectorAll('.option')[q.answer].classList.add('correct');
+  if(i===q.answer) score++;
+  document.getElementById('fb').innerHTML=`<div class="feedback ${i===q.answer?'ok':'fail'}"><strong>${i===q.answer?'✓ Correcto':'✗ Incorrecto'}</strong> — ${q.explain}</div>`;
+  showNext();
+}
+
+function checkFill(){
+  if(answered)return;
+  answered=true;
+  const q=qs[cur];
+  const inp=document.getElementById('fill-inp');
+  const val=inp.value.trim().toLowerCase();
+  const ok=val===q.answer.toLowerCase();
+  inp.disabled=true;
+  inp.classList.add(ok?'correct':'wrong');
+  if(ok) score++;
+  document.getElementById('fb').innerHTML=`<div class="feedback ${ok?'ok':'fail'}"><strong>${ok?'✓ Correcto':'✗ Incorrecto'}</strong>${!ok?' — Respuesta correcta: <code>'+q.answer+'</code>.':''} ${q.explain}</div>`;
+  showNext();
+}
+
+function revealErr(){
+  if(answered)return;
+  answered=true;
+  document.getElementById('rev-btn').style.display='none';
+  document.getElementById('fb').innerHTML=`<div class="feedback info">${qs[cur].reveal}</div>`;
+  showNext();
+}
+
+function showNext(){
+  const btn=document.getElementById('btn-next');
+  btn.style.display='block';
+  btn.textContent=cur===qs.length-1?'Ver resultado':'Siguiente →';
+}
+
+document.getElementById('btn-next').addEventListener('click',()=>{
+  cur++;
+  if(cur>=qs.length) renderScore();
+  else renderQ();
+});
+
+function renderScore(){
+  const pct=Math.round(score/qs.length*100);
+  const msg=pct>=80?'¡Estás listo para el examen!':pct>=60?'Buen trabajo — repasa los que fallaste.':'Sigue practicando, cada intento cuenta.';
+  const circ=2*Math.PI*51;
+  const offset=circ*(1-pct/100);
+  document.getElementById('prog-fill').style.width='100%';
+  document.getElementById('qbody').innerHTML=`
+    <div class="score-wrap">
+      <div class="score-ring">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle class="track" cx="65" cy="65" r="51"/>
+          <circle class="fill" cx="65" cy="65" r="51" stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"/>
+        </svg>
+        <div class="score-num">${score}/${qs.length}</div>
+      </div>
+      <p class="score-label">${pct}% — ${msg}</p>
+      <div class="score-actions">
+        <button class="btn-restart" onclick="restart()">↺ Repetir test</button>
+      </div>
+    </div>`;
+  document.getElementById('btn-next').style.display='none';
+}
+
+function restart(){cur=0;score=0;renderQ();}
+renderQ();
+</script>
+</body>
+</html>

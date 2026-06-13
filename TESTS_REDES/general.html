@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Plataforma de Tests - 6 Módulos Integrados</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Encabezado fijo */
+        .main-header {
+            background: #1e3a5f;
+            color: white;
+            padding: 0.8rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .main-header h1 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .main-header h1::before {
+            content: "📚";
+            font-size: 1.8rem;
+        }
+        .main-header p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        /* Contenedor de pestañas */
+        .tabs-container {
+            background: white;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 0 1.5rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .tabs-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #2c4c6e;
+            border-radius: 0.8rem 0.8rem 0 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+        .tab-btn:hover {
+            background: #eef2fa;
+            color: #0f2b3f;
+        }
+        .tab-btn.active {
+            background: #f8fafc;
+            color: #1e4668;
+            border-bottom: 3px solid #ff8c42;
+            box-shadow: 0 -1px 5px rgba(0,0,0,0.02);
+        }
+
+        /* Área donde se muestran los iframes */
+        .iframe-area {
+            flex: 1;
+            background: #eef2f7;
+            position: relative;
+            overflow: auto;
+            padding: 0;
+        }
+        .iframe-pane {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .iframe-pane.active-pane {
+            display: block;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        /* Mensaje de carga elegante */
+        .loading-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.9);
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-weight: 500;
+            color: #1e4668;
+            pointer-events: none;
+            z-index: 5;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Footer opcional */
+        .footer-bar {
+            background: #e2e8f0;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.7rem;
+            color: #2c5a7a;
+            border-top: 1px solid #cbd5e6;
+            flex-shrink: 0;
+        }
+
+        /* Scroll personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8ba0bc;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 750px) {
+            .tab-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
+            .main-header h1 {
+                font-size: 1.3rem;
+            }
+            .main-header {
+                padding: 0.5rem 1rem;
+            }
+            .tabs-container {
+                padding: 0 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-header">
+        <h1>📖 Plataforma Unificada de Tests</h1>
+        <p>Selecciona cada prueba</p>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tabs-nav" id="tabsNav">
+            <!-- Los botones se generan dinámicamente con JS para facilitar la edición -->
+        </div>
+    </div>
+
+    <div class="iframe-area" id="iframeArea">
+        <!-- Aquí se insertarán los paneles con los iframes -->
+        <div class="loading-placeholder" id="globalLoader" style="display: none;">⏳ Cargando test...</div>
+    </div>
+
+    <div class="footer-bar">
+        ⚡ Los tests se abren en su formato original | Si algún archivo no se encuentra, verifica la ruta y los nombres
+    </div>
+
+    <script>
+        // ---------------------------------------------------------------
+        // CONFIGURACIÓN DE LOS 6 TESTS: edita aquí los nombres de los archivos
+        // y las etiquetas que quieras mostrar.
+        // Por defecto asume: test1.html, test2.html ... test6.html en el mismo directorio.
+        // Si están en subcarpetas, escribe la ruta ej: "tests/test1.html"
+        // ---------------------------------------------------------------
+        const TESTS_CONFIG = [
+            { id: "test0", label: "📘 Test 0 · REPASO clase", file: "REPASO.html" },
+            { id: "test1", label: "📗 Test 1 ", file: "Notebook_T1.html" },
+            { id: "test2", label: "📙 Test 2 ", file: "Notebook_T2.html" },
+            { id: "test3", label: "📕 Test 3 ", file: "Notebook_T3.html" },
+            { id: "test4", label: "📔 Test 4 ", file: "Notebook_T4.html" },
+            { id: "test5", label: "📒 Test 5 ", file: "Notebook_T5.html" },
+            { id: "test6", label: "📒 Test 6 ", file: "Notebook_T6.html" }
+
+        ];
+
+        // Opcional: si algunos de tus tests se llaman diferente, simplemente edita la propiedad 'file'
+        // EJEMPLO: Si el segundo test se llama "examen_2.html", cambia file: "examen_2.html"
+        // También admite rutas relativas: "subcarpeta/miTest.html"
+
+        // ---------------------------------------------------------------
+        // 1. Generar dinámicamente las pestañas según configuración
+        // ---------------------------------------------------------------
+        const tabsNav = document.getElementById("tabsNav");
+        const iframeArea = document.getElementById("iframeArea");
+        const globalLoader = document.getElementById("globalLoader");
+
+        // Limpiar y construir pestañas y paneles
+        tabsNav.innerHTML = "";
+        iframeArea.innerHTML = "";
+
+        // Variable para almacenar el test activo actualmente
+        let activeTestId = TESTS_CONFIG[0]?.id || null;
+
+        // Función para mostrar/ocultar loader global (opcional)
+        function showLoader(show) {
+            if (show) {
+                globalLoader.style.display = "block";
+            } else {
+                globalLoader.style.display = "none";
+            }
+        }
+
+        // Crear cada pestaña y su respectivo panel contenedor del iframe
+        TESTS_CONFIG.forEach((test, index) => {
+            // Botón de pestaña
+            const btn = document.createElement("button");
+            btn.className = "tab-btn";
+            if (index === 0) btn.classList.add("active");
+            btn.setAttribute("data-test-id", test.id);
+            btn.innerHTML = test.label;
+            btn.addEventListener("click", () => {
+                switchToTest(test.id);
+            });
+            tabsNav.appendChild(btn);
+
+            // Crear contenedor del iframe (pane)
+            const pane = document.createElement("div");
+            pane.className = "iframe-pane";
+            pane.id = `pane_${test.id}`;
+            if (index === 0) pane.classList.add("active-pane");
+
+            // Crear el iframe que cargará el archivo correspondiente
+            const iframe = document.createElement("iframe");
+            iframe.id = `iframe_${test.id}`;
+            iframe.title = `Test: ${test.label}`;
+            iframe.src = test.file;  // Ruta del archivo HTML individual
+            iframe.setAttribute("loading", "eager");
+            // Manejo de errores de carga del iframe (archivo no encontrado)
+            iframe.onerror = () => {
+                console.warn(`No se pudo cargar ${test.file}`);
+                // Mostrar mensaje amigable dentro del iframe? mejor mostrar fallback en el contenedor
+                const fallbackMsg = document.createElement("div");
+                fallbackMsg.className = "loading-placeholder";
+                fallbackMsg.style.position = "relative";
+                fallbackMsg.style.margin = "2rem";
+                fallbackMsg.style.backgroundColor = "#fff0e0";
+                fallbackMsg.style.borderLeft = "5px solid #dc3545";
+                fallbackMsg.innerHTML = `<strong>⚠️ Error al cargar ${test.file}</strong><br>Verifica que el archivo exista en la ruta especificada.<br>Ruta esperada: "${test.file}"`;
+                iframe.style.display = "none";
+                pane.appendChild(fallbackMsg);
+            };
+            // Evento load: si se carga correctamente, removemos posibles mensajes de error previos
+            iframe.onload = () => {
+                // Si existe algún mensaje de fallback en el pane, lo eliminamos
+                const existingError = pane.querySelector(".loading-placeholder");
+                if (existingError && existingError !== globalLoader) existingError.remove();
+                iframe.style.display = "block";
+            };
+            pane.appendChild(iframe);
+            iframeArea.appendChild(pane);
+        });
+
+        // Función para cambiar de test activo
+        function switchToTest(testId) {
+            if (activeTestId === testId) return;
+            activeTestId = testId;
+
+            // Actualizar clases de pestañas
+            const allBtns = document.querySelectorAll(".tab-btn");
+            allBtns.forEach(btn => {
+                if (btn.getAttribute("data-test-id") === testId) {
+                    btn.classList.add("active");
+                } else {
+                    btn.classList.remove("active");
+                }
+            });
+
+            // Mostrar panel correspondiente
+            const allPanes = document.querySelectorAll(".iframe-pane");
+            allPanes.forEach(pane => {
+                if (pane.id === `pane_${testId}`) {
+                    pane.classList.add("active-pane");
+                } else {
+                    pane.classList.remove("active-pane");
+                }
+            });
+
+            // Opcional: Si deseas recargar el iframe cada vez que cambias para resetear el test? 
+            // Por defecto se mantiene el estado. Si prefieres recargar automáticamente para que cada test empiece 
+            // desde cero al seleccionarlo, descomenta las siguientes líneas:
+            /*
+            const activeIframe = document.getElementById(`iframe_${testId}`);
+            if (activeIframe && activeIframe.src) {
+                // recargar el iframe forzando recarga (opcional)
+                const currentSrc = activeIframe.src;
+                activeIframe.src = currentSrc;
+            }
+            */
+            // Nota: al recargar pierdes respuestas no guardadas, pero puede ser útil. Lo dejamos comentado.
+        }
+
+        // Si quieres que al iniciar se cargue el primer test correctamente (ya lo hace)
+        // Además, manejar posibles errores 404 de manera elegante en todos los iframes después de creados
+        // También podemos añadir un pequeño helper para reintentar mostrar fallback si el iframe no carga contenido.
+        // Esto ya se maneja con onerror.
+
+        // Extra: Verificar si los archivos existen mediante fetch suave (sin afectar rendimiento)
+        // Solo advertencia en consola, no rompe la experiencia.
+        async function checkTestFiles() {
+            for (const test of TESTS_CONFIG) {
+                try {
+                    const response = await fetch(test.file, { method: 'HEAD', cache: 'no-cache' });
+                    if (!response.ok) {
+                        console.warn(`⚠️ Archivo no encontrado: ${test.file} (código ${response.status}). Revisa la ruta.`);
+                    } else {
+                        console.log(`✅ ${test.file} accesible.`);
+                    }
+                } catch (err) {
+                    console.warn(`❌ No se pudo verificar ${test.file}:`, err);
+                }
+            }
+        }
+        // Ejecutar verificación silenciosa en segundo plano (no afecta interfaz)
+        setTimeout(() => checkTestFiles(), 500);
+    </script>
+</body>
+</html>

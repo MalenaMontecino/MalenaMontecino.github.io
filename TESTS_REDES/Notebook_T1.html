@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interactivo de Redes de Comunicaciones</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --primary: #3498db;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .score-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-box {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .score-box.correct { color: #4ade80; }
+        .score-box.incorrect { color: #f87171; }
+
+        main {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+        }
+
+        .tema-section {
+            margin-top: 40px;
+        }
+
+        .tema-title {
+            background-color: #334155;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .option-item:hover:not(.disabled) {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .option-item.correct {
+            background-color: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #166534 !important;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #991b1b !important;
+        }
+
+        .option-item.disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="score-container">
+            <div class="score-box">Preguntas: <span id="total-answered">0</span> / 20</div>
+            <div class="score-box correct">Correctas: <span id="correct-count">0</span></div>
+            <div class="score-box incorrect">Incorrectas: <span id="incorrect-count">0</span></div>
+        </div>
+    </header>
+
+    <main>
+        <h1>Evaluación de Redes de Comunicaciones</h1>
+        <div id="quiz-container"></div>
+    </main>
+
+    <script>
+        const quizData = [
+            {
+                tema: "TEMA 1: Introducción a las Redes de Comunicaciones",
+                preguntas: [
+                    { q: "1. ¿Qué consecuencia directa tiene una caída de la red en los sistemas actuales?", a: ["Un aumento en la latencia.", "Una caída del servicio.", "La necesidad de cambiar de protocolo.", "La desconexión de los medios inalámbricos."], correct: 1 },
+                    { q: "2. ¿Cuál de los siguientes no es un componente necesario para la comunicación según el modelo general?", a: ["Dispositivos finales (hosts).", "Medios de transmisión.", "Servicios que se apoyan en la red.", "Unidades de procesamiento gráfico (GPU)."], correct: 3 },
+                    { q: "3. ¿Qué definen los protocolos de comunicación?", a: ["El precio del hardware de red.", "El formato, orden y control del envío de datos.", "Únicamente la velocidad física del cable.", "La marca de los dispositivos conectados."], correct: 1 },
+                    { q: "4. ¿Qué característica es propia de los servicios de 'Videollamada' en la red?", a: ["Requieren un ancho de banda bajo.", "La latencia debe ser muy baja (crítica).", "Priorizan la fiabilidad absoluta sobre la velocidad.", "No les afecta la pérdida de paquetes."], correct: 1 },
+                    { q: "5. ¿Cuál es el modelo de referencia más utilizado en la práctica real de redes?", a: ["Modelo OSI de 7 capas.", "Modelo ISO.", "Modelo TCP/IP de 4 capas.", "Modelo de capas distribuidas."], correct: 2 },
+                    { q: "6. ¿De qué se encarga específicamente la Capa 1 (Física) del modelo OSI?", a: ["Del direccionamiento físico (MAC).", "De la representación de datos y encriptación.", "De la señalización y transmisión binaria.", "De la determinación de rutas."], correct: 2 },
+                    { q: "7. ¿Qué unidad de datos (PDU) se maneja en la Capa de Transporte?", a: ["Trama.", "Paquete.", "Segmento.", "Bits."], correct: 2 },
+                    { q: "8. ¿Cuál es la función principal de la Capa 4 (Transporte)?", a: ["Definir voltajes y conectores.", "Gestionar la entrega de datos extremo a extremo entre aplicaciones.", "Identificar interfaces mediante direcciones MAC.", "Controlar el acceso al medio físico."], correct: 1 },
+                    { q: "9. ¿Qué capas del modelo OSI se encargan de la interacción con las aplicaciones y el formato de datos?", a: ["Capas 1, 2 y 3.", "Capas 4 y 5.", "Capas 5, 6 y 7.", "Únicamente la capa 4."], correct: 2 },
+                    { q: "10. ¿Qué protocolo define el funcionamiento de cables de cobre, fibra óptica y WiFi?", a: ["IP.", "TCP.", "Ethernet.", "HTTP."], correct: 2 },
+                    { q: "11. ¿Qué factor afecta negativamente a la comunicación por radiofrecuencia?", a: ["Una frecuencia demasiado baja.", "Una distancia muy corta entre equipos.", "La alta atenuación y las interferencias.", "El uso de cables UTP Cat6."], correct: 2 },
+                    { q: "12. ¿Cómo actúa un Hub en la red (Capa 1)?", a: ["Aprende direcciones MAC.", "Replica la señal recibida a todos sus puertos.", "Filtra el tráfico según el destino.", "Divide los dominios de broadcast."], correct: 1 },
+                    { q: "13. ¿Cuál es la función de los hosts en una red?", a: ["Interconectar subredes distintas.", "Generar y consuming información en los extremos.", "Solo actuar como servidores DNS.", "Filtrar el tráfico de capa 3."], correct: 1 },
+                    { q: "14. ¿En qué capa opera principalmente un Switch Ethernet?", a: ["Capa 1.", "Capa 2 (Enlace).", "Capa 3.", "Capa 4."], correct: 1 },
+                    { q: "15. ¿Qué dispositivo integra múltiples funciones de seguridad y puede operar hasta en capa 7?", a: ["Router doméstico.", "Switch L3.", "UTM (Unified Threat Management).", "Conversor de medios."], correct: 2 },
+                    { q: "16. ¿Qué arquitectura permite compartir una única fibra óptica entre varios clientes?", a: ["Arquitectura Ethernet UTP.", "Arquitectura PON (Passive Optical Network).", "Arquitectura P2P.", "Arquitectura de radioenlace."], correct: 1 },
+                    { q: "17. En la arquitectura PON, ¿qué equipo se sitúa en las instalaciones del usuario?", a: ["OLT.", "Switch Core.", "ONT.", "Firewall."], correct: 2 },
+                    { q: "18. ¿Qué modelo divide la comunicación en siete capas teóricas?", a: ["TCP/IP.", "OSI.", "IEEE 802.3.", "Modelo de servicios."], correct: 1 },
+                    { q: "19. ¿Cuál es un ejemplo de dispositivo intermedio de red?", a: ["Impresora IP.", "Router.", "Cámara IP.", "Teléfono IP."], correct: 1 },
+                    { q: "20. ¿Qué servicio de red requiere una fiabilidad alta (crítica) y admite una latencia media?", a: ["Videollamada.", "Streaming de vídeo.", "Navegación Web.", "Transferencia de bits pura."], correct: 2 }
+                ]
+            }
+        ];
+
+        let answeredCount = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        quizData.forEach((block, blockIdx) => {
+            const section = document.createElement('section');
+            section.className = 'tema-section';
+
+            const title = document.createElement('h2');
+            title.className = 'tema-title';
+            title.innerText = block.tema;
+            section.appendChild(title);
+
+            block.preguntas.forEach((p, pIdx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+
+                const qText = document.createElement('div');
+                qText.className = 'question-text';
+                qText.innerText = p.q;
+                card.appendChild(qText);
+
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options-list';
+
+                const optionLetters = ['A', 'B', 'C', 'D'];
+
+                p.a.forEach((opt, optIdx) => {
+                    const li = document.createElement('li');
+                    li.className = 'option-item';
+                    li.innerText = `${optionLetters[optIdx]}) ${opt}`;
+
+                    li.addEventListener('click', function() {
+                        if (li.classList.contains('disabled')) return;
+
+                        answeredCount++;
+                        document.getElementById('total-answered').innerText = answeredCount;
+
+                        const allOptions = optionsList.querySelectorAll('.option-item');
+                        allOptions.forEach(item => item.classList.add('disabled'));
+
+                        if (optIdx === p.correct) {
+                            li.classList.add('correct');
+                            correctCount++;
+                            document.getElementById('correct-count').innerText = correctCount;
+                        } else {
+                            li.classList.add('incorrect');
+                            allOptions[p.correct].classList.add('correct');
+                            incorrectCount++;
+                            document.getElementById('incorrect-count').innerText = incorrectCount;
+                        }
+                    });
+
+                    optionsList.appendChild(li);
+                });
+
+                card.appendChild(optionsList);
+                section.appendChild(card);
+            });
+
+            quizContainer.appendChild(section);
+        });
+    </script>
+</body>
+</html>
