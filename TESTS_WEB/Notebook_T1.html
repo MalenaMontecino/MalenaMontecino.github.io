@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Evaluación Completa: Seguridad Web</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #2c3e50;
+            --primary-color: #2980b9;
+            --accent-color: #34495e;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-top: 90px;
+        }
+
+        /* Marcador Superior Fijo */
+        .scoreboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-number {
+            font-size: 1.5rem;
+        }
+
+        .score-blue { color: #3498db; }
+        .score-green { color: #2ecc71; }
+        .score-red { color: #e74c3c; }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .theme-title {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 40px 0 20px 0;
+            font-size: 1.3rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .question-card.answered .option-item {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: var(--success-color) !important;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: var(--error-color) !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scoreboard">
+        <div class="score-item">
+            <span>Respondidas</span>
+            <span class="score-number score-blue" id="total-answered">0 / 20</span>
+        </div>
+        <div class="score-item">
+            <span>Correctas (Bien)</span>
+            <span class="score-number score-green" id="correct-score">0</span>
+        </div>
+        <div class="score-item">
+            <span>Incorrectas (Mal)</span>
+            <span class="score-number score-red" id="incorrect-score">0</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>EXAMEN DE EVALUACIÓN COMPLETA: SEGURIDAD WEB</h1>
+
+        <div class="theme-title">TEMA 1: Arquitectura, Lenguajes, Fundamentos de Red y Virtualización</div>
+        
+        <div class="question-card" data-correct="B">
+            <div class="question-text">1. En el modelo cliente-servidor, ¿quién se encarga habitualmente de realizar la petición (Request)?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) El servidor web.</li>
+                <li class="option-item" data-opt="B">B) El navegador web (Cliente).</li>
+                <li class="option-item" data-opt="C">C) La base de datos.</li>
+                <li class="option-item" data-opt="D">D) El orquestador de microservicios.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">2. ¿Cuál es una característica fundamental de la arquitectura de microservicios?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Todos los servicios comparten obligatoriamente el mismo lenguaje de programación.</li>
+                <li class="option-item" data-opt="B">B) La aplicación se despliega como una única unidad lógica indivisible.</li>
+                <li class="option-item" data-opt="C">C) Divide la aplicación en servicios pequeños e independientes que se comunican vía APIs.</li>
+                <li class="option-item" data-opt="D">D) No permite el escalado independiente de sus partes.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">3. ¿Qué parte de la arquitectura web se encarga de validar las reglas de seguridad más críticas?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) El Frontend.</li>
+                <li class="option-item" data-opt="B">B) El almacenamiento local del navegador.</li>
+                <li class="option-item" data-opt="C">C) El Backend (Lado del servidor).</li>
+                <li class="option-item" data-opt="D">D) La interfaz visual (UI).</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">4. Según el ranking RedMonk de 2025, ¿cuál es el segundo lenguaje más relevante en el entorno web?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) JavaScript.</li>
+                <li class="option-item" data-opt="B">B) Python.</li>
+                <li class="option-item" data-opt="C">C) PHP.</li>
+                <li class="option-item" data-opt="D">D) Java.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">5. ¿Qué lenguaje de programación es conocido por su versatilidad en IA, análisis de datos y web?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) C#.</li>
+                <li class="option-item" data-opt="B">B) PHP.</li>
+                <li class="option-item" data-opt="C">C) Python.</li>
+                <li class="option-item" data-opt="D">D) HTML.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">6. ¿Qué componente facilita el desarrollo web proporcionando una estructura predefinida y seguridad integrada?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Una librería de estilos.</li>
+                <li class="option-item" data-opt="B">B) Un Framework.</li>
+                <li class="option-item" data-opt="C">C) Un navegador web.</li>
+                <li class="option-item" data-opt="D">D) Un protocolo de transporte.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">7. ¿Cómo mitiga el framework Laravel las inyecciones SQL?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Cifrando la base de datos completa.</li>
+                <li class="option-item" data-opt="B">B) Ocultando las tablas al usuario.</li>
+                <li class="option-item" data-opt="C">C) Mediante el uso de consultas parametrizadas a través de su ORM Eloquent.</li>
+                <li class="option-item" data-opt="D">D) Deshabilitando el acceso a la base de datos desde el backend.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">8. En el patrón MVC, ¿qué componente gestiona la lógica, los datos y las restricciones de la aplicación?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) La Vista.</li>
+                <li class="option-item" data-opt="B">B) El Controlador.</li>
+                <li class="option-item" data-opt="C">C) El Modelo.</li>
+                <li class="option-item" data-opt="D">D) El Template.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="A">
+            <div class="question-text">9. ¿Cuál es la principal diferencia entre el patrón MVC y el MVT (usado por Django)?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) En MVT el controlador es asumido automáticamente por el framework.</li>
+                <li class="option-item" data-opt="B">B) El MVT no utiliza modelos de datos.</li>
+                <li class="option-item" data-opt="C">C) El MVC no permite el uso de HTML.</li>
+                <li class="option-item" data-opt="D">D) El MVT es exclusivo para lenguajes compilados.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">10. ¿Cuántas capas componen el modelo OSI?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) 4 capas.</li>
+                <li class="option-item" data-opt="B">B) 5 capas.</li>
+                <li class="option-item" data-opt="C">C) 7 capas.</li>
+                <li class="option-item" data-opt="D">D) 10 capas.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">11. ¿En qué capa del modelo OSI operan los routers y el direccionamiento IP?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Capa 2 - Enlace de datos.</li>
+                <li class="option-item" data-opt="B">B) Capa 3 - Red.</li>
+                <li class="option-item" data-opt="C">C) Capa 4 - Transporte.</li>
+                <li class="option-item" data-opt="D">D) Capa 1 - Física.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">12. ¿Qué unidad de datos se maneja en la Capa 4 (Transporte) del modelo OSI?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Tramas.</li>
+                <li class="option-item" data-opt="B">B) Paquetes.</li>
+                <li class="option-item" data-opt="C">C) Segmentos.</li>
+                <li class="option-item" data-opt="D">D) Bits.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">13. ¿Qué modelo de capas es el que utiliza el internet real y funcional?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Modelo OSI.</li>
+                <li class="option-item" data-opt="B">B) Modelo TCP/IP.</li>
+                <li class="option-item" data-opt="C">C) Modelo MVC.</li>
+                <li class="option-item" data-opt="D">D) Modelo Peer-to-Peer.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">14. ¿Qué tecnología permite distribuir las funciones de una máquina física entre varios entornos virtuales?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Microservicios.</li>
+                <li class="option-item" data-opt="B">B) Virtualización.</li>
+                <li class="option-item" data-opt="C">C) Contenedores de Docker.</li>
+                <li class="option-item" data-opt="D">D) Git.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">15. Un hipervisor de Tipo 1 (Bare Metal) se caracteriza por:</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Instalarse sobre un sistema operativo anfitrión.</li>
+                <li class="option-item" data-opt="B">B) Requerir VirtualBox para funcionar.</li>
+                <li class="option-item" data-opt="C">C) Instalarse directamente sobre el hardware físico.</li>
+                <li class="option-item" data-opt="D">D) Ser menos eficiente que el de Tipo 2.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">16. ¿Cuál es una ventaja clave de los contenedores frente a las Máquinas Virtuales (VMs)?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Incluyen un sistema operativo invitado completo.</li>
+                <li class="option-item" data-opt="B">B) Comparten el kernel del host, lo que los hace más ligeros.</li>
+                <li class="option-item" data-opt="C">C) Tienen un aislamiento de hardware total.</li>
+                <li class="option-item" data-opt="D">D) Tardan minutos en arrancar.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">17. En Docker, ¿qué es una "Imagen"?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Una instancia en ejecución.</li>
+                <li class="option-item" data-opt="B) B) Una plantilla inmutable que define el contenido del contenedor.</li>
+                <li class="option-item" data-opt="C">C) Un registro público de aplicaciones.</li>
+                <li class="option-item" data-opt="D">D) Una red virtual interna.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">18. ¿Qué sistema permite registrar y gestionar los cambios en el código a lo largo del tiempo?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Docker.</li>
+                <li class="option-item" data-opt="B">B) Control de versiones (Git).</li>
+                <li class="option-item" data-opt="C">C) PHPMyAdmin.</li>
+                <li class="option-item" data-opt="D">D) Un servidor Apache.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">19. En Git, ¿qué significa hacer un "Merge"?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Crear una nueva rama de trabajo.</li>
+                <li class="option-item" data-opt="B">B) Borrar el historial de cambios.</li>
+                <li class="option-item" data-opt="C">C) Unir dos ramas diferentes si las ideas funcionan.</li>
+                <li class="option-item" data-opt="D">D) Subir el código al servidor remoto.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="A">
+            <div class="question-text">20. ¿Qué regla de .gitignore se usa para ignorar todas las carpetas llamadas "build" en cualquier nivel?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) /build/</li>
+                <li class="option-item" data-opt="B">B) build/.</li>
+                <li class="option-item" data-opt="C">C) *.build</li>
+                <li class="option-item" data-opt="D">D) !build</li>
+            </ul>
+        </div>
+
+
+     
+
+    </div>
+
+    <script>
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let answeredCount = 0;
+        const totalQuestions = 20;
+
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const card = this.closest('.question-card');
+                
+                // Si ya ha sido respondida, ignorar clics adicionales
+                if (card.classList.contains('answered')) return;
+
+                const selectedOption = this.getAttribute('data-opt');
+                const correctAnswer = card.getAttribute('data-correct');
+
+                card.classList.add('answered');
+                answeredCount++;
+
+                if (selectedOption === correctAnswer) {
+                    this.classList.add('correct');
+                    correctCount++;
+                } else {
+                    this.classList.add('incorrect');
+                    incorrectCount++;
+                    // Resaltar también la opción que era correcta para facilitar el aprendizaje
+                    card.querySelectorAll('.option-item').forEach(opt => {
+                        if (opt.getAttribute('data-opt') === correctAnswer) {
+                            opt.classList.add('correct');
+                        }
+                    });
+                }
+
+                // Actualizar marcador superior dinámicamente
+                document.getElementById('total-answered').innerText = `${answeredCount} / ${totalQuestions}`;
+                document.getElementById('correct-score').innerText = correctCount;
+                document.getElementById('incorrect-score').innerText = incorrectCount;
+            });
+        });
+    </script>
+</body>
+</html>

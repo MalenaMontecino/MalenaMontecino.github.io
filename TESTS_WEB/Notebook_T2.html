@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Evaluación Completa: Seguridad Web</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #2c3e50;
+            --primary-color: #2980b9;
+            --accent-color: #34495e;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-top: 90px;
+        }
+
+        /* Marcador Superior Fijo */
+        .scoreboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-number {
+            font-size: 1.5rem;
+        }
+
+        .score-blue { color: #3498db; }
+        .score-green { color: #2ecc71; }
+        .score-red { color: #e74c3c; }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .theme-title {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 40px 0 20px 0;
+            font-size: 1.3rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .question-card.answered .option-item {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: var(--success-color) !important;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: var(--error-color) !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scoreboard">
+        <div class="score-item">
+            <span>Respondidas</span>
+            <span class="score-number score-blue" id="total-answered">0 / 20</span>
+        </div>
+        <div class="score-item">
+            <span>Correctas (Bien)</span>
+            <span class="score-number score-green" id="correct-score">0</span>
+        </div>
+        <div class="score-item">
+            <span>Incorrectas (Mal)</span>
+            <span class="score-number score-red" id="incorrect-score">0</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>EXAMEN DE EVALUACIÓN COMPLETA: SEGURIDAD WEB</h1>
+
+      
+
+        <div class="theme-title">TEMA 2: Fundamentos de Seguridad Web y Hacking Ético</div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">21. ¿Cómo se define la Integridad dentro de la tríada CIA?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Solo las personas autorizadas acceden a la información.</li>
+                <li class="option-item" data-opt="B">B) Garantiza que los datos no han sido modificados sin autorización.</li>
+                <li class="option-item" data-opt="C">C) Asegura el acceso permanente al servicio.</li>
+                <li class="option-item" data-opt="D">D) Obliga a cifrar todas las comunicaciones.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">22. ¿Cuál es el objetivo principal de la Seguridad Web?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Ser totalmente inexpugnable.</li>
+                <li class="option-item" data-opt="B">B) Gestionar riesgos para mantener niveles aceptables.</li>
+                <li class="option-item" data-opt="C">C) Prohibir el acceso a usuarios externos.</li>
+                <li class="option-item" data-opt="D">D) Eliminar todos los protocolos antiguos.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="D">
+            <div class="question-text">23. ¿Qué factor NO forma parte del análisis de riesgo en seguridad?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Elementos del sistema.</li>
+                <li class="option-item" data-opt="B">B) Peligros accidentales o provocados.</li>
+                <li class="option-item" data-opt="C">C) Vulnerabilidades ante peligros.</li>
+                <li class="option-item" data-opt="D">D) El ranking de lenguajes de programación.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">24. ¿Qué es una vulnerabilidad CVE?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Un sistema de puntuación de fallos.</li>
+                <li class="option-item" data-opt="B">B) Un registro público de vulnerabilidades y exposiciones conocidas.</li>
+                <li class="option-item" data-opt="C">C) Una herramienta de hacking ético.</li>
+                <li class="option-item" data-opt="D">D) Una organización de normalización española.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">25. ¿Qué entidad española potencia la industria de la ciberseguridad e impulsa la I+D+i?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) OWASP.</li>
+                <li class="option-item" data-opt="B">B) INCIBE.</li>
+                <li class="option-item" data-opt="C">C) MITRE.</li>
+                <li class="option-item" data-opt="D">D) RedIRIS.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">26. ¿Qué comunidad abierta se dedica a analizar y detectar riesgos en aplicaciones web?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) INCIBE.</li>
+                <li class="option-item" data-opt="B">B) OWASP.</li>
+                <li class="option-item" data-opt="C">C) ISECOM.</li>
+                <li class="option-item" data-opt="D">D) Microsoft.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">27. ¿Para qué sirve el estándar OWASP ASVS?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Para medir la velocidad de carga de una web.</li>
+                <li class="option-item" data-opt="B">B) Proporciona una lista verificable de requisitos de seguridad para el diseño y prueba de apps.</li>
+                <li class="option-item" data-opt="C">C) Es un ranking de los ataques más comunes.</li>
+                <li class="option-item" data-opt="D">D) Sirve para configurar firewalls automáticamente.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">28. ¿Qué nivel de verificación ASVS es el adecuado para aplicaciones de banca o infraestructuras críticas?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) L1.</li>
+                <li class="option-item" data-opt="B">B) L2.</li>
+                <li class="option-item" data-opt="C">C) L3.</li>
+                <li class="option-item" data-opt="D">D) L4.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">29. En el sistema CVSS, ¿qué puntuación indica una severidad "Media"?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) 0.1 – 3.9.</li>
+                <li class="option-item" data-opt="B">B) 4.0 – 6.9.</li>
+                <li class="option-item" data-opt="C">C) 7.0 – 8.9.</li>
+                <li class="option-item" data-opt="D">D) 9.0 – 10.0.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">30. ¿Qué registro mantenido por MITRE cataloga el "tipo de debilidad" o causa raíz de un fallo?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) CVE.</li>
+                <li class="option-item" data-opt="B">B) CVSS.</li>
+                <li class="option-item" data-opt="C">C) CWE.</li>
+                <li class="option-item" data-opt="D">D) ASVS.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="A">
+            <div class="question-text">31. ¿Cuál es la base de la defensa de cualquier sistema informático?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) La tríada CIA (Confidencialidad, Integridad y Disponibilidad).</li>
+                <li class="option-item" data-opt="B">B) El uso de Windows Defender.</li>
+                <li class="option-item" data-opt="C">C) Tener un backup semanal.</li>
+                <li class="option-item" data-opt="D">D) El protocolo HTTP/1.1.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">32. ¿Qué medida se considera Seguridad Pasiva?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Implementación de un Firewall.</li>
+                <li class="option-item" data-opt="B) B) Copias de seguridad (Backups).</li>
+                <li class="option-item" data-opt="C">C) Autenticación de doble factor.</li>
+                <li class="option-item" data-opt="D">D) Cifrado de discos.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">33. ¿Qué diferencia al Hacking Ético de un ciberataque común?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Las herramientas utilizadas.</li>
+                <li class="option-item" data-opt="B">B) El conocimiento técnico.</li>
+                <li class="option-item" data-opt="C">C) El consentimiento expreso y acuerdo previo del cliente.</li>
+                <li class="option-item" data-opt="D">D) Que no se encuentran vulnerabilidades reales.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">34. ¿Qué metodología mide científicamente la superficie de ataque real centrándose en procesos técnicos?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) OWASP Top 10.</li>
+                <li class="option-item" data-opt="B">B) OSSTMM.</li>
+                <li class="option-item" data-opt="C">C) Agile.</li>
+                <li class="option-item" data-opt="D">D) Waterfall.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">35. ¿En qué fase de la auditoría se buscan subdominios, tecnologías y metadatos?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Alcance (Scope).</li>
+                <li class="option-item" data-opt="B">B) Reconocimiento.</li>
+                <li class="option-item" data-opt="C">C) Explotación.</li>
+                <li class="option-item" data-opt="D">D) Reporte.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">36. ¿Qué ocurre en la fase de "Explotación" de una auditoría?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Se entregan las soluciones al cliente.</li>
+                <li class="option-item" data-opt="B">B) Se establecen los límites legales.</li>
+                <li class="option-item" data-opt="C">C) Se intenta confirmar el fallo irrumpiendo en el sistema.</li>
+                <li class="option-item" data-opt="D">D) Se instalan los parches de seguridad.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">37. Kali Linux es una distribución basada en:</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Ubuntu.</li>
+                <li class="option-item" data-opt="B">B) Debian.</li>
+                <li class="option-item" data-opt="C">C) Red Hat.</li>
+                <li class="option-item" data-opt="D">D) Arch Linux.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">38. ¿Cuál es la función principal de Metasploit?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Analizar logs de servidor.</li>
+                <li class="option-item" data-opt="B">B) Capturar paquetes de red.</li>
+                <li class="option-item" data-opt="C">C) Confirmar vulnerabilidades mediante módulos de explotación y payloads.</li>
+                <li class="option-item" data-opt="D">D) Escanear puertos abiertos.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">39. ¿Qué herramienta profesional funciona como un proxy de interceptación HTTP/S?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Wireshark.</li>
+                <li class="option-item" data-opt="B">B) Nmap.</li>
+                <li class="option-item" data-opt="C">C) Burp Suite.</li>
+                <li class="option-item" data-opt="D">D) SQLMap.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">40. ¿Qué diferencia a Burp Suite de Wireshark?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Burp es para redes y Wireshark para web.</li>
+                <li class="option-item" data-opt="B">B) Burp se enfoca exclusivamente en el tráfico web (HTTP/S) entre navegador y aplicación.</li>
+                <li class="option-item" data-opt="C">C) Wireshark permite modificar las peticiones en tiempo real.</li>
+                <li class="option-item" data-opt="D">D) No hay diferencias, son herramientas idénticas.</li>
+            </ul>
+        </div>
+
+
+    </div>
+
+    <script>
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let answeredCount = 0;
+        const totalQuestions = 20;
+
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const card = this.closest('.question-card');
+                
+                // Si ya ha sido respondida, ignorar clics adicionales
+                if (card.classList.contains('answered')) return;
+
+                const selectedOption = this.getAttribute('data-opt');
+                const correctAnswer = card.getAttribute('data-correct');
+
+                card.classList.add('answered');
+                answeredCount++;
+
+                if (selectedOption === correctAnswer) {
+                    this.classList.add('correct');
+                    correctCount++;
+                } else {
+                    this.classList.add('incorrect');
+                    incorrectCount++;
+                    // Resaltar también la opción que era correcta para facilitar el aprendizaje
+                    card.querySelectorAll('.option-item').forEach(opt => {
+                        if (opt.getAttribute('data-opt') === correctAnswer) {
+                            opt.classList.add('correct');
+                        }
+                    });
+                }
+
+                // Actualizar marcador superior dinámicamente
+                document.getElementById('total-answered').innerText = `${answeredCount} / ${totalQuestions}`;
+                document.getElementById('correct-score').innerText = correctCount;
+                document.getElementById('incorrect-score').innerText = incorrectCount;
+            });
+        });
+    </script>
+</body>
+</html>

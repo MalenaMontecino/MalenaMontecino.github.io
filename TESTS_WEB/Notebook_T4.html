@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Evaluación Completa: Seguridad Web</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #2c3e50;
+            --primary-color: #2980b9;
+            --accent-color: #34495e;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-top: 90px;
+        }
+
+        /* Marcador Superior Fijo */
+        .scoreboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-number {
+            font-size: 1.5rem;
+        }
+
+        .score-blue { color: #3498db; }
+        .score-green { color: #2ecc71; }
+        .score-red { color: #e74c3c; }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .theme-title {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 40px 0 20px 0;
+            font-size: 1.3rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .question-card.answered .option-item {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: var(--success-color) !important;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: var(--error-color) !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scoreboard">
+        <div class="score-item">
+            <span>Respondidas</span>
+            <span class="score-number score-blue" id="total-answered">0 / 20</span>
+        </div>
+        <div class="score-item">
+            <span>Correctas (Bien)</span>
+            <span class="score-number score-green" id="correct-score">0</span>
+        </div>
+        <div class="score-item">
+            <span>Incorrectas (Mal)</span>
+            <span class="score-number score-red" id="incorrect-score">0</span>
+        </div>
+    </div>
+
+    <div class="container">
+       
+        <h1>EXAMEN DE EVALUACIÓN COMPLETA: SEGURIDAD WEB</h1>
+        <div class="theme-title">TEMA 4: Seguridad en el Servidor</div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">61. ¿Qué permite un ataque SSRF (Server-Side Request Forgery)?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Robar contraseñas de la base de datos directamente.</li>
+                <li class="option-item" data-opt="B">B) Provocar que el servidor realice solicitudes HTTP a ubicaciones no deseadas.</li>
+                <li class="option-item" data-opt="C">C) Inyectar scripts en el navegador del cliente.</li>
+                <li class="option-item" data-opt="D">D) Bloquear el puerto 443 del servidor.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">62. En un ataque SSRF contra el propio servidor, ¿a qué dirección IP suele apuntar el atacante?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) 8.8.8.8.</li>
+                <li class="option-item" data-opt="B">B) 127.0.0.1 (Localhost).</li>
+                <li class="option-item" data-opt="C">C) 192.168.1.1.</li>
+                <li class="option-item" data-opt="D">D) A la IP pública del cliente.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="A">
+            <div class="question-text">63. ¿Por qué es peligroso el SSRF contra sistemas back-end internos?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Porque los sistemas internos suelen tener una seguridad más débil al no ser accesibles desde internet.</li>
+                <li class="option-item" data-opt="B">B) Porque cifra los datos del servidor.</li>
+                <li class="option-item" data-opt="C">C) Porque permite borrar los logs del sistema.</li>
+                <li class="option-item" data-opt="D">D) No es peligroso si se usa HTTPS.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">64. ¿Cómo puede un atacante evadir una "lista negra" en un ataque SSRF?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Usando el nombre de dominio real.</li>
+                <li class="option-item" data-opt="B">B) Usando representaciones decimales o hexadecimales de la dirección IP.</li>
+                <li class="option-item" data-opt="C">C) Cambiando su dirección MAC.</li>
+                <li class="option-item" data-opt="D">D) Desconectando el proxy.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">65. ¿Qué caracteriza a una vulnerabilidad "Blind SSRF"?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) El atacante no puede realizar ninguna petición.</li>
+                <li class="option-item" data-opt="B">B) El servidor se apaga tras el ataque.</li>
+                <li class="option-item" data-opt="C">C) El atacante logra que el servidor haga la petición pero no puede ver la respuesta directamente.</li>
+                <li class="option-item" data-opt="D">D) Los logs no registran la actividad.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">66. ¿Qué técnica se usa para detectar vulnerabilidades Blind SSRF?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Analizar el código fuente en GitHub.</li>
+                <li class="option-item" data-opt="B">B) Interacciones fuera de banda (OAST).</li>
+                <li class="option-item" data-opt="C">C) Escaneo de puertos con Nmap.</li>
+                <li class="option-item" data-opt="D">D) Fuerza bruta al panel de administración.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">67. ¿Qué framework de Python es ideal para construir servicios backend de APIs REST?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Laravel.</li>
+                <li class="option-item" data-opt="B">B) React.</li>
+                <li class="option-item" data-opt="C">C) FastAPI.</li>
+                <li class="option-item" data-opt="D">D) Vue.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">68. ¿Cuál es el impacto principal de una Inyección SQL (SQLi)?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Ralentización del tráfico web.</li>
+                <li class="option-item" data-opt="B">B) Interferencia en las consultas a la base de datos permitiendo ver o modificar datos.</li>
+                <li class="option-item" data-opt="C">C) Infección de virus en el equipo del usuario.</li>
+                <li class="option-item" data-opt="D">D) Cambio del diseño visual de la página.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">69. ¿Qué aplicación se utiliza habitualmente en laboratorios para practicar inyecciones SQL de forma legal?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) WordPress.</li>
+                <li class="option-item" data-opt="B">B) DVWA (Damn Vulnerable Web Application).</li>
+                <li class="option-item" data-opt="C">C) Facebook.</li>
+                <li class="option-item" data-opt="D">D) GitHub.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">70. ¿Qué técnica SQLi usa el comando UNION para anexar resultados de una consulta maliciosa?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Blind SQLi.</li>
+                <li class="option-item" data-opt="B">B) Time-based SQLi.</li>
+                <li class="option-item" data-opt="C">C) Union-based SQLi.</li>
+                <li class="option-item" data-opt="D">D) Error-based SQLi.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">71. Para que un ataque UNION SQLi tenga éxito, las dos consultas deben:</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Ser sobre la misma tabla.</li>
+                <li class="option-item" data-opt="B">B) Devolver el mismo número de columnas y tipos de datos compatibles.</li>
+                <li class="option-item" data-opt="C">C) Ejecutarse en servidores distintos.</li>
+                <li class="option-item" data-opt="D">D) Estar escritas en lenguajes distintos.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">72. ¿Qué medida de prevención divide la estructura SQL de los datos, evitando que se interpreten como código?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Cifrado AES.</li>
+                <li class="option-item" data-opt="B">B) Sentencias Preparadas (Prepared Statements).</li>
+                <li class="option-item" data-opt="C">C) Firewalls de red.</li>
+                <li class="option-item" data-opt="D">D) Uso de contraseñas de 20 caracteres.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">73. ¿Qué es la herramienta de mapeo objeto-relacional (ORM) es nativa de Laravel?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) SQLModel.</li>
+                <li class="option-item" data-opt="B">B) Eloquent.</li>
+                <li class="option-item" data-opt="C">C) SQLAlchemy.</li>
+                <li class="option-item" data-opt="D">D) Hibernate.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">74. ¿Qué es la base de datos "information_schema" en sistemas SQL?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Un repositorio de contraseñas de usuarios.</li>
+                <li class="option-item" data-opt="B">B) Una base de datos que contiene metadatos sobre la estructura (tablas, columnas) del servidor.</li>
+                <li class="option-item" data-opt="C">C) El log de errores de MySQL.</li>
+                <li class="option-item" data-opt="D">D) La base de datos donde se guardan las imágenes.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">75. ¿Qué módulo de Burp Suite permite automatizar ataques de fuerza bruta por ensayo y error?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Proxy.</li>
+                <li class="option-item" data-opt="B">B) Intruder.</li>
+                <li class="option-item" data-opt="C">C) Repeater.</li>
+                <li class="option-item" data-opt="D">D) Decoder.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="A">
+            <div class="question-text">76. ¿Qué extensión de navegador facilita la gestión de proxies para redirigir tráfico a Burp Suite?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) FoxyProxy.</li>
+                <li class="option-item" data-opt="B">B) AdBlock.</li>
+                <li class="option-item" data-opt="C">C) React DevTools.</li>
+                <li class="option-item" data-opt="D">D) Bitwarden.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">77. ¿Qué herramienta Open Source es la alternativa principal a Burp Suite?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Wireshark.</li>
+                <li class="option-item" data-opt="B">B) OWASP ZAP.</li>
+                <li class="option-item" data-opt="C">C) Nessus.</li>
+                <li class="option-item" data-opt="D">D) Metasploit.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">78. ¿Qué parámetro de SQLMap se usa para pasarle la URL que queremos testear?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) --dbs</li>
+                <li class="option-item" data-opt="B">B) -u.</li>
+                <li class="option-item" data-opt="C">C) --dump</li>
+                <li class="option-item" data-opt="D">D) --sql-shell</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">79. ¿Qué permite hacer el parámetro --dump en SQLMap?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Borrar la base de datos completa.</li>
+                <li class="option-item" data-opt="B">B) Volcar o exfiltrar los datos reales de las tablas.</li>
+                <li class="option-item" data-opt="C">C) Reiniciar el servidor web.</li>
+                <li class="option-item" data-opt="D">D) Ver solo los nombres de las columnas.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">80. ¿Qué escáner profesional detecta sistemas obsoletos (End of Life) y fallos críticos como Log4j?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) OWASP ZAP.</li>
+                <li class="option-item" data-opt="B">B) Zenmap.</li>
+                <li class="option-item" data-opt="C">C) Nessus.</li>
+                <li class="option-item" data-opt="D">D) FoxyProxy.</li>
+            </ul>
+        </div>
+
+
+        
+
+    </div>
+
+    <script>
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let answeredCount = 0;
+        const totalQuestions = 20;
+
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const card = this.closest('.question-card');
+                
+                // Si ya ha sido respondida, ignorar clics adicionales
+                if (card.classList.contains('answered')) return;
+
+                const selectedOption = this.getAttribute('data-opt');
+                const correctAnswer = card.getAttribute('data-correct');
+
+                card.classList.add('answered');
+                answeredCount++;
+
+                if (selectedOption === correctAnswer) {
+                    this.classList.add('correct');
+                    correctCount++;
+                } else {
+                    this.classList.add('incorrect');
+                    incorrectCount++;
+                    // Resaltar también la opción que era correcta para facilitar el aprendizaje
+                    card.querySelectorAll('.option-item').forEach(opt => {
+                        if (opt.getAttribute('data-opt') === correctAnswer) {
+                            opt.classList.add('correct');
+                        }
+                    });
+                }
+
+                // Actualizar marcador superior dinámicamente
+                document.getElementById('total-answered').innerText = `${answeredCount} / ${totalQuestions}`;
+                document.getElementById('correct-score').innerText = correctCount;
+                document.getElementById('incorrect-score').innerText = incorrectCount;
+            });
+        });
+    </script>
+</body>
+</html>

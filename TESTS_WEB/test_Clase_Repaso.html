@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Repaso Final: Seguridad en Web | Test Interactivo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f4f8;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 2rem 1rem;
+            color: #1e2a3e;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* header */
+        .exam-header {
+            background: linear-gradient(135deg, #0b2b3b, #1a4a6f);
+            color: white;
+            border-radius: 2rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .exam-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .exam-header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        .stats-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            gap: 1rem;
+        }
+        .progress-info {
+            background: rgba(255,255,255,0.2);
+            border-radius: 2rem;
+            padding: 0.5rem 1.2rem;
+            font-weight: bold;
+        }
+        .reset-btn {
+            background: #ffb347;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #2d2f36;
+            font-family: inherit;
+        }
+        .reset-btn:hover {
+            background: #ff9f1c;
+            transform: scale(1.02);
+        }
+
+        /* filter & legend */
+        .legend-panel {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 0.9rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #1e293b;
+        }
+        .filter-btn.active {
+            background: #1e4a76;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .question-counter {
+            font-weight: 600;
+            background: #eef2ff;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+        }
+
+        /* tarjetas de preguntas */
+        .questions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .question-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.2s;
+            border-left: 8px solid #2c7da0;
+        }
+        .question-card.answered-correct {
+            border-left-color: #2ecc71;
+            background: #f6fff2;
+        }
+        .question-card.answered-wrong {
+            border-left-color: #e74c3c;
+            background: #fff8f6;
+        }
+        .question-header {
+            padding: 1.2rem 1.5rem 0.6rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 1px solid #e9edf2;
+        }
+        .q-num {
+            font-weight: 700;
+            background: #eef2ff;
+            border-radius: 2rem;
+            padding: 0.2rem 1rem;
+            font-size: 0.8rem;
+            color: #0c4a6e;
+        }
+        .q-status {
+            font-size: 0.75rem;
+            background: #f1f5f9;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            color: #0f172a;
+            line-height: 1.4;
+        }
+        .options-list {
+            padding: 0.5rem 1.5rem 1rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            padding: 0.6rem 0.8rem;
+            background: #fafcff;
+            border-radius: 1rem;
+            border: 1px solid #e2edf7;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .option:hover {
+            background: #eef4ff;
+        }
+        .option input {
+            margin-top: 0.2rem;
+            accent-color: #2c7da0;
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+        .option label {
+            font-weight: 500;
+            color: #1e2f3e;
+            cursor: pointer;
+            flex: 1;
+            line-height: 1.4;
+        }
+        .feedback {
+            margin: 0 1.5rem 1.2rem 1.5rem;
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            font-size: 0.85rem;
+            border-left: 4px solid #94a3b8;
+            color: #2c3e50;
+        }
+        .feedback.correct-feedback {
+            background: #e6f7e6;
+            border-left-color: #2ecc71;
+        }
+        .feedback.wrong-feedback {
+            background: #ffe9e9;
+            border-left-color: #e74c3c;
+        }
+        .justification-text {
+            font-weight: 500;
+            margin-top: 0.3rem;
+            color: #2c5282;
+        }
+        hr {
+            margin: 0 1.5rem 0.2rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2.5rem;
+            font-size: 0.8rem;
+            color: #4a627a;
+        }
+        @media (max-width: 650px) {
+            body {
+                padding: 1rem;
+            }
+            .question-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="exam-header">
+        <h1>📘 Repaso Final · Seguridad en Web</h1>
+        <p>20 preguntas tipo test | Basado en banco de 100 preguntas | Temario + Actividades prácticas</p>
+        <div class="stats-bar">
+            <div class="progress-info" id="progressDisplay">✅ 0 / 20 respondidas</div>
+            <button class="reset-btn" id="resetAllBtn">⟳ Reiniciar respuestas</button>
+        </div>
+    </div>
+
+    <div class="legend-panel">
+        <div class="filter-buttons">
+            <button data-filter="all" class="filter-btn active">📋 Todas</button>
+            <button data-filter="pending" class="filter-btn">⏳ Pendientes</button>
+            <button data-filter="correct" class="filter-btn">✅ Correctas</button>
+            <button data-filter="wrong" class="filter-btn">❌ Incorrectas</button>
+        </div>
+        <div class="question-counter" id="visibleCount">Mostrando todas</div>
+    </div>
+
+    <div id="questionsContainer" class="questions-grid"></div>
+    <footer>
+        🧠 Basado en el PDF "TFinal (Sesión13). Repaso" · Universidad Internacional de Valencia · Grado Ciberseguridad
+    </footer>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // BASE DE DATOS DE PREGUNTAS (extraídas fielmente del PDF)
+    // Cada pregunta: id, texto, opciones (array), correcta (letra A/B/C/D), justificación adicional (si existe)
+    // --------------------------------------------------------------
+    const QUESTIONS_DATA = [
+        { id: 1, text: "¿Qué diferencia principal existe entre HTTP y HTTPS?", options: ["A) HTTPS añade una capa TLS que cifra los datos transmitidos, protegiendo su confidencialidad e integridad", "B) HTTPS usa el puerto 80 mientras que HTTP usa el 443", "C) HTTPS elimina las cabeceras HTTP para mejorar el rendimiento", "D) HTTPS solo funciona con certificados autofirmados"], correct: "A", justification: "HTTPS = HTTP + TLS, cifra los datos y protege confidencialidad e integridad. HTTP usa puerto 80, HTTPS el 443." },
+        { id: 2, text: "¿Qué atributo de cookie impide que JavaScript pueda leer su valor?", options: ["A) Secure", "B) HttpOnly", "C) SameSite", "D) Expires"], correct: "B", justification: "HttpOnly impide acceso mediante document.cookie, mitigando robo de sesión por XSS." },
+        { id: 3, text: "¿Cuál es la diferencia entre autenticación y autorización?", options: ["A) La autenticación cifra los datos; la autorización los firma digitalmente", "B) La autenticación determina qué puedes hacer; la autorización verifica quién eres", "C) Son sinónimos que describen el mismo proceso de control de acceso", "D) La autenticación verifica quién eres; la autorización determina qué puedes hacer"], correct: "D", justification: "Autenticación = identidad (¿quién eres?). Autorización = permisos (¿qué puedes hacer?)." },
+        { id: 4, text: "¿Qué proporciona un ORM como Eloquent en términos de seguridad frente a las inyecciones SQL?", options: ["A) Usa consultas parametrizadas automáticamente, separando los datos del código SQL", "B) Cifra todas las consultas antes de enviarlas a la base de datos", "C) Bloquea cualquier carácter especial en los formularios del lado del cliente", "D) Añade un firewall de aplicación entre el framework y la base de datos"], correct: "A", justification: "Los ORM modernos usan parámetros o consultas preparadas previniendo inyección SQL al separar datos de la estructura." },
+        { id: 5, text: "¿Qué novedad principal introdujo HTTP/2 respecto a HTTP/1.1 en términos de rendimiento?", options: ["A) La multiplexación, que permite enviar múltiples peticiones y respuestas simultáneamente por una sola conexión TCP", "B) La eliminación del protocolo TCP a favor de QUIC basado en UDP", "C) La compresión del cuerpo de los mensajes mediante gzip obligatorio", "D) La eliminación de las cabeceras HTTP para reducir la latencia"], correct: "A", justification: "Multiplexación evita Head-of-Line blocking a nivel de aplicación, mejora rendimiento." },
+        { id: 6, text: "¿Qué diferencia existe entre SQL Injection in-band y Blind SQL Injection?", options: ["A) La in-band requiere acceso físico al servidor; la ciega se realiza de forma remota", "B) In-band solo funciona contra MySQL; la ciega funciona contra cualquier DBMS", "C) En in-band el atacante recibe los datos directamente en la respuesta; en la ciega infiere información del comportamiento sin ver los datos", "D) La in-band explota errores del servidor; la ciega solo explota vulnerabilidades de red"], correct: "C", justification: "In-band = datos visibles en respuesta; Blind = inferencia mediante cambios de comportamiento o tiempo." },
+        { id: 7, text: "¿En qué se diferencia Wireshark de Burp Suite como herramientas de análisis?", options: ["A) Wireshark captura y analiza tráfico a nivel de red (paquetes), mientras que Burp Suite actúa como proxy a nivel de aplicación centrándose en tráfico HTTP/HTTPS", "B) Wireshark solo funciona en entornos Linux; Burp Suite es multiplataforma", "C) Wireshark descifra el tráfico TLS automáticamente; Burp Suite solo analiza HTTP en claro", "D) Wireshark es una herramienta de ataque activo; Burp Suite es exclusivamente para análisis pasivo"], correct: "A", justification: "Wireshark = sniffer nivel red/paquetes; Burp = proxy HTTP/HTTPS, análisis aplicación web." },
+        { id: 8, text: "¿Qué tipo de ataque XSS almacena el código malicioso en la base de datos y lo ejecuta en todos los usuarios que visitan la página?", options: ["A) Reflected XSS (XSS reflejado)", "B) Stored XSS (XSS almacenado o persistente)", "C) DOM-based XSS (XSS basado en DOM)", "D) Blind XSS (XSS ciego)"], correct: "B", justification: "Stored XSS persiste en BD y afecta a múltiples usuarios." },
+        { id: 9, text: "¿Qué ventaja tiene usar bcrypt o Argon2 frente a SHA-256 para almacenar contraseñas?", options: ["A) SHA-256 no genera hashes de longitud fija, dificultando su almacenamiento en bases de datos", "B) bcrypt y Argon2 están diseñados para contraseñas: son lentos por diseño y soportan 'salt', dificultando ataques de diccionario y tablas arcoíris", "C) bcrypt y Argon2 son algoritmos asimétricos que requieren par de claves y son más seguros por ello", "D) SHA-256 no puede usarse con contraseñas porque su uso es comercialmente restringido"], correct: "B", justification: "bcrypt/Argon2 incorporan salt y factor de coste (lentos), resistentes a fuerza bruta." },
+        { id: 10, text: "¿Qué diferencia existe entre un Gate y una Policy en Laravel?", options: ["A) Los Gates definen reglas de autorización simples no ligadas a un modelo; las Policies definen permisos sobre instancias concretas de un modelo", "B) Los Gates se usan para autenticación; las Policies para autorización de usuarios externos", "C) Los Gates son más seguros porque no requieren acceso a la base de datos durante la validación", "D) Los Gates se evalúan antes del middleware; las Policies se evalúan después de la respuesta del servidor"], correct: "A", justification: "Gates: acciones generales; Policies: organizadas por modelo Eloquent." },
+        { id: 11, text: "¿Por qué la Autenticación Básica (HTTP Basic Auth) puede ser insegura?", options: ["A) Las credenciales se codifican en Base64 (no se cifran) y se envían en cada petición; sin HTTPS pueden ser interceptadas en claro", "B) Base64 es un algoritmo de cifrado débil que puede romperse con ataques de fuerza bruta en segundos", "C) El servidor almacena las contraseñas sin hash, exponiéndolas si la base de datos es comprometida", "D) Solo funciona en navegadores y no puede usarse para autenticar aplicaciones móviles o APIs"], correct: "A", justification: "Basic Auth envía credenciales en Base64 (código, no cifrado). Sin TLS queda expuesto." },
+        { id: 12, text: "¿Cómo puede un atacante eludir un filtro de lista negra que bloquea '127.0.0.1' y 'localhost' en un ataque SSRF?", options: ["A) Usando representaciones alternativas como el valor decimal 2130706433, la notación 127.1, o el hexadecimal 0x7f000001", "B) Usando la dirección IPv6 ::1 que todos los parsers de URL resuelven igual que 127.0.0.1 sin excepción", "C) Cambiando el protocolo de http:// a ftp:// para eludir la validación de la URL completa", "D) Añadiendo un subdirectorio al final de la URL como http://localhost.com/admin que evita el filtro"], correct: "A", justification: "Existen múltiples formatos decimales, octales o hexadecimales para representar 127.0.0.1 y evadir blacklist." },
+        { id: 13, text: "¿Por qué las sentencias preparadas (prepared statements) previenen la inyección SQL?", options: ["A) Separan estructuralmente el código SQL de los datos: la consulta se compila antes de recibir los datos, tratando un payload malicioso siempre como valor literal", "B) Cifran el contenido de la consulta antes de enviarlo al motor de base de datos", "C) Validan automáticamente el tipo de dato y rechazan cualquier entrada no numérica", "D) Almacenan las consultas en caché del servidor, evitando recompilarlas con datos del usuario"], correct: "A", justification: "Separación de código y datos, los parámetros no se interpretan como SQL." },
+        { id: 14, text: "¿Qué vulnerabilidad específica explota un ataque CSRF y qué condiciones deben darse?", options: ["A) Explota inyecciones XSS previas para modificar el token CSRF y forjar peticiones autenticadas", "B) Explota que las cookies tienen el flag Secure desactivado, permitiendo su envío en HTTP no cifrado", "C) Explota que el navegador envía automáticamente las cookies de sesión en peticiones al dominio correspondiente. Necesita que el usuario esté autenticado y que la aplicación no verifique el origen", "D) Explota que el servidor no valida el User-Agent del navegador, confiando en cualquier cliente externo"], correct: "C", justification: "CSRF aprovecha cookies enviadas automáticamente y falta de tokens anti-CSRF o verificación de origen." },
+        { id: 15, text: "¿Qué mecanismo usa Laravel para proteger contraseñas y cómo se realiza la verificación en el login?", options: ["A) Laravel cifra las contraseñas con AES-256 y en el login las descifra usando la clave APP_KEY", "B) Laravel almacena las contraseñas en SHA-256 y en el login hashea la entrada y compara los hashes directamente", "C) Laravel usa bcrypt a través de Hash::make(). En el login, Hash::check() compara la contraseña en texto plano con el hash almacenado sin necesidad de revertirlo", "D) Laravel delega el almacenamiento de contraseñas en Sanctum; el hash se genera durante la emisión del token"], correct: "C", justification: "Hash::make() con bcrypt, Hash::check() verifica sin necesidad de descifrar." },
+        { id: 16, text: "¿Cuáles son los cuatro pasos del flujo OAuth 2.0 para que una aplicación acceda a recursos de un usuario?", options: ["A) 1) La aplicación solicita autorización, 2) el usuario la concede, 3) la aplicación valida con el servidor de autorización, 4) el servidor emite un token de acceso", "B) 1) El servidor genera un par de claves RSA, 2) el cliente se registra con la clave pública, 3) el servidor firma el token, 4) el cliente usa el token firmado", "C) 1) El usuario introduce credenciales en la aplicación, 2) la aplicación las valida en el proveedor OAuth, 3) el proveedor emite cookies, 4) el usuario accede al recurso", "D) 1) La aplicación cifra la petición con TLS, 2) el servidor la descifra, 3) verifica el certificado del cliente, 4) autoriza el acceso"], correct: "A", justification: "Flujo estándar OAuth 2.0: solicitud autorización, consentimiento, canje por token, acceso." },
+        { id: 17, text: "Una aplicación usa HTTPS correctamente pero sus cookies de sesión no tienen HttpOnly. ¿Qué vector de ataque combina ambas situaciones de forma especialmente peligrosa?", options: ["A) Un ataque XSS que inyecta JavaScript puede leer y exfiltrar la cookie de sesión con document.cookie, secuestrando la sesión aunque TLS cifre la conexión", "B) Un ataque CSRF puede modificar el valor de la cookie de sesión directamente desde otro dominio gracias a la ausencia de HttpOnly", "C) Un ataque SSRF puede interceptar la cookie en tránsito aprovechando que TLS no protege el contenido de las cookies", "D) Un ataque de inyección SQL puede extraer las cookies de sesión activas de la tabla de sesiones usando UNION SELECT"], correct: "A", justification: "HttpOnly evita acceso JS, sin él XSS roba cookies aunque HTTPS cifre el canal." },
+        { id: 18, text: "Un desarrollador usa {!! $variable !!} en lugar de {{ $variable }} en una vista Blade de Laravel. ¿Qué consecuencia de seguridad tiene?", options: ["A) La variable se serializa como JSON en lugar de HTML, causando errores pero no vulnerabilidades XSS", "B) El contenido se renderiza como HTML sin escapar, permitiendo que valores del usuario introduzcan código JavaScript o HTML malicioso (XSS)", "C) El contenido se envía sin cifrar aunque la conexión use HTTPS, exponiendo datos sensibles en capa de aplicación", "D) Laravel lanza una excepción de seguridad si {!! !!} se usa con datos de usuario, previniendo automáticamente el XSS"], correct: "B", justification: "{{ }} escapa automáticamente; {!! !!} renderiza HTML sin filtrar → vulnerable a XSS." },
+        { id: 19, text: "En la Actividad 1, ¿qué payload se usa para determinar el número de columnas antes de un ataque UNION SELECT?", options: ["A) Se inyecta 'AND 1=1-- vs 'AND 1=2-- comparando las respuestas para determinar si la inyección booleana es posible", "B) Se usa ' DROP TABLE users-- para eliminar la tabla y observar el mensaje de error con la estructura de la base de datos", "C) Se inyecta ' ORDER BY N-- incrementando N hasta obtener un error, o ' UNION SELECT NULL,NULL...-- añadiendo NULLs hasta que no haya error", "D) Se usa el parámetro --columns de SQLMap apuntando a la tabla users para obtener automáticamente todas las columnas"], correct: "C", justification: "ORDER BY o UNION SELECT con NULLs permiten determinar número de columnas (en actividades prácticas)." },
+        { id: 20, text: "En la Actividad 2, ¿qué directiva Blade debe usarse siempre en formularios POST y por qué?", options: ["A) @csrf, porque genera un token oculto que el middleware VerifyCsrfToken de Laravel valida en cada POST, impidiendo falsificaciones", "B) @auth, porque verifica que el usuario esté autenticado antes de procesar el formulario", "C) @once, porque evita que el formulario se procese más de una vez si el usuario recarga la página tras enviarla", "D) @inject, porque inyecta los datos del usuario autenticado para que el servidor los pueda verificar"], correct: "A", justification: "@csrf genera token anti-CSRF; Laravel valida en peticiones POST para evitar ataques de falsificación." }
+    ];
+
+    // Guardar respuestas del usuario: { qId: selectedOptionLetter (A/B/C/D) , isCorrect? }
+    let userAnswers = JSON.parse(localStorage.getItem('websec_test_answers')) || {};
+    let currentFilter = "all"; // all, pending, correct, wrong
+
+    // Helper: determinar si una pregunta está respondida y si es correcta
+    function getAnswerState(qId, correctLetter) {
+        const ans = userAnswers[qId];
+        if (!ans) return { answered: false, isCorrect: false };
+        const isCorrect = (ans === correctLetter);
+        return { answered: true, isCorrect: isCorrect };
+    }
+
+    // Guardar respuesta y persistir
+    function saveAnswer(qId, selectedLetter, correctLetter) {
+        const isCorrect = (selectedLetter === correctLetter);
+        userAnswers[qId] = selectedLetter;
+        localStorage.setItem('websec_test_answers', JSON.stringify(userAnswers));
+        renderQuestions(); // refrescar vista
+    }
+
+    function resetAllAnswers() {
+        userAnswers = {};
+        localStorage.removeItem('websec_test_answers');
+        renderQuestions();
+    }
+
+    // Renderizado dinámico con filtros
+    function renderQuestions() {
+        const container = document.getElementById('questionsContainer');
+        const totalAnswered = Object.keys(userAnswers).length;
+        const totalQuestions = QUESTIONS_DATA.length;
+        document.getElementById('progressDisplay').innerHTML = `✅ ${totalAnswered} / ${totalQuestions} respondidas`;
+        
+        // Aplicar filtro
+        let filteredIds = [];
+        for (let q of QUESTIONS_DATA) {
+            const state = getAnswerState(q.id, q.correct);
+            if (currentFilter === "all") filteredIds.push(q.id);
+            else if (currentFilter === "pending" && !state.answered) filteredIds.push(q.id);
+            else if (currentFilter === "correct" && state.answered && state.isCorrect) filteredIds.push(q.id);
+            else if (currentFilter === "wrong" && state.answered && !state.isCorrect) filteredIds.push(q.id);
+        }
+        document.getElementById('visibleCount').innerHTML = `📌 Mostrando ${filteredIds.length} preguntas`;
+
+        let html = '';
+        for (let q of QUESTIONS_DATA) {
+            if (!filteredIds.includes(q.id)) continue;
+            const state = getAnswerState(q.id, q.correct);
+            const selectedVal = userAnswers[q.id] || null;
+            const cardClass = state.answered ? (state.isCorrect ? 'answered-correct' : 'answered-wrong') : '';
+            let feedbackHtml = '';
+            if (state.answered) {
+                const isUserCorrect = state.isCorrect;
+                const userLetter = userAnswers[q.id];
+                const correctLetterDisplay = q.correct;
+                const correctText = q.options.find(opt => opt.startsWith(q.correct+")"))?.substring(3) || "";
+                feedbackHtml = `
+                    <div class="feedback ${isUserCorrect ? 'correct-feedback' : 'wrong-feedback'}">
+                        <strong>${isUserCorrect ? '✔ Correcto' : '❌ Incorrecto'}</strong><br>
+                        Tu respuesta: ${userLetter}) ${q.options.find(opt => opt.startsWith(userLetter+")"))?.substring(3) || ''}<br>
+                        <span class="justification-text">🔍 Respuesta correcta: ${q.correct}) ${correctText}</span><br>
+                        ${q.justification ? `<span class="justification-text">📘 ${q.justification}</span>` : ''}
+                    </div>
+                `;
+            } else {
+                feedbackHtml = `<div class="feedback" style="background:#f8fafc;">⚡ Selecciona una opción para comprobar</div>`;
+            }
+
+            let optionsHtml = '';
+            for (let opt of q.options) {
+                const letter = opt.charAt(0);
+                const isChecked = (selectedVal === letter);
+                optionsHtml += `
+                    <div class="option" data-qid="${q.id}" data-letter="${letter}">
+                        <input type="radio" name="q${q.id}" value="${letter}" id="q${q.id}_${letter}" ${isChecked ? 'checked' : ''}>
+                        <label for="q${q.id}_${letter}">${opt}</label>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="question-card ${cardClass}" data-qid="${q.id}">
+                    <div class="question-header">
+                        <span class="q-num">Pregunta ${q.id}</span>
+                        <span class="q-status">${state.answered ? (state.isCorrect ? '✅ Resuelta' : '❌ Fallo') : '⏳ Sin responder'}</span>
+                    </div>
+                    <div class="question-text">${q.text}</div>
+                    <div class="options-list" id="options-${q.id}">
+                        ${optionsHtml}
+                    </div>
+                    ${feedbackHtml}
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+
+        // añadir event listeners a cada opción (radio button)
+        for (let q of QUESTIONS_DATA) {
+            if (!filteredIds.includes(q.id)) continue;
+            const radios = document.querySelectorAll(`input[name="q${q.id}"]`);
+            radios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const selectedLetter = e.target.value;
+                    saveAnswer(q.id, selectedLetter, q.correct);
+                });
+            });
+        }
+    }
+
+    // filtros click
+    function initFilters() {
+        const btns = document.querySelectorAll('.filter-btn');
+        btns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                btns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.getAttribute('data-filter');
+                renderQuestions();
+            });
+        });
+        document.getElementById('resetAllBtn').addEventListener('click', () => {
+            if(confirm('¿Reiniciar todas las respuestas del test?')) resetAllAnswers();
+        });
+    }
+
+    // inicializar
+    renderQuestions();
+    initFilters();
+</script>
+</body>
+</html>

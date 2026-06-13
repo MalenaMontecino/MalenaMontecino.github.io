@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Evaluación Completa: Seguridad Web</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #2c3e50;
+            --primary-color: #2980b9;
+            --accent-color: #34495e;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-top: 90px;
+        }
+
+        /* Marcador Superior Fijo */
+        .scoreboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-number {
+            font-size: 1.5rem;
+        }
+
+        .score-blue { color: #3498db; }
+        .score-green { color: #2ecc71; }
+        .score-red { color: #e74c3c; }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .theme-title {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 40px 0 20px 0;
+            font-size: 1.3rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .question-card.answered .option-item {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: var(--success-color) !important;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: var(--error-color) !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scoreboard">
+        <div class="score-item">
+            <span>Respondidas</span>
+            <span class="score-number score-blue" id="total-answered">0 / 20</span>
+        </div>
+        <div class="score-item">
+            <span>Correctas (Bien)</span>
+            <span class="score-number score-green" id="correct-score">0</span>
+        </div>
+        <div class="score-item">
+            <span>Incorrectas (Mal)</span>
+            <span class="score-number score-red" id="incorrect-score">0</span>
+        </div>
+    </div>
+
+    <div class="container">
+       
+    <h1>EXAMEN DE EVALUACIÓN COMPLETA: SEGURIDAD WEB</h1>
+
+        <div class="theme-title">TEMA 5: Seguridad en el Cliente</div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">81. ¿Qué es el Smishing?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Un ataque de inyección de código SQL in móviles.</li>
+                <li class="option-item" data-opt="B">B) Una estafa que utiliza SMS suplantando entidades para enviar enlaces maliciosos.</li>
+                <li class="option-item" data-opt="C">C) El robo de sesiones mediante redes Wi-Fi públicas.</li>
+                <li class="option-item" data-opt="D">D) Un tipo de virus que cifra archivos del móvil.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="A">
+            <div class="question-text">82. ¿Por qué las cookies son necesarias en la web?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Porque el protocolo HTTP es stateless y las cookies permiten mantener el estado (stateful).</li>
+                <li class="option-item" data-opt="B">B) Porque aceleran la carga de las imágenes.</li>
+                <li class="option-item" data-opt="C">C) Porque cifran la conexión entre el cliente y el servidor.</li>
+                <li class="option-item" data-opt="D">D) Porque evitan que se necesite una base de datos.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">83. ¿Cuál es el primer paso del funcionamiento de las cookies?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) El navegador guarda la información localmente.</li>
+                <li class="option-item" data-opt="B">B) El servidor genera el paquete de datos.</li>
+                <li class="option-item" data-opt="C">C) El navegador envía una petición al servidor para acceder al sitio.</li>
+                <li class="option-item" data-opt="D">D) El usuario pulsa "Aceptar" en el banner.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">84. ¿Qué tipo de cookie desaparece automáticamente al cerrar el navegador?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Cookie Persistente.</li>
+                <li class="option-item" data-opt="B">B) Cookie de Terceros.</li>
+                <li class="option-item" data-opt="C">C) Cookie de Sesión.</li>
+                <li class="option-item" data-opt="D">D) Cookie Segura.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">85. ¿Para qué se utilizan las cookies de seguimiento y análisis?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Para recordar los productos del carrito.</li>
+                <li class="option-item" data-opt="B">B) Para registrar el comportamiento del usuario (páginas visitadas, duración) y optimizar el sitio.</li>
+                <li class="option-item" data-opt="C">C) Para evitar ataques XSS.</li>
+                <li class="option-item" data-opt="D">D) Para autenticar al administrador del servidor.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">86. ¿Qué flag de cookie ordena al navegador enviarla solo a través de conexiones cifradas?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) HttpOnly.</li>
+                <li class="option-item" data-opt="B">B) SameSite.</li>
+                <li class="option-item" data-opt="C">C) Secure.</li>
+                <li class="option-item" data-opt="D">D) Expires.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">87. ¿Cuál es el propósito del flag HttpOnly en una cookie?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Forzar el uso de HTTPS.</li>
+                <li class="option-item" data-opt="B">B) Impedir que el código JavaScript acceda a la cookie, mitigando robos de sesión.</li>
+                <li class="option-item" data-opt="C">C) Evitar que la cookie se envíe a otros dominios.</li>
+                <li class="option-item" data-opt="D">D) Establecer la fecha de caducidad.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">88. En criptografía simétrica, ¿qué clave se usa para cifrar y descifrar?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Dos claves distintas (pública y privada).</li>
+                <li class="option-item" data-opt="B">B) Una única clave secreta compartida entre emisor y receptor.</li>
+                <li class="option-item" data-opt="C">C) Una clave pública y un hash.</li>
+                <li class="option-item" data-opt="D">D) Ninguna, el cifrado simétrico no usa claves.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">89. ¿Cuál es el estándar actual de cifrado simétrico por su robustez y velocidad?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) DES.</li>
+                <li class="option-item" data-opt="B">B) 3DES.</li>
+                <li class="option-item" data-opt="C">C) AES.</li>
+                <li class="option-item" data-opt="D">D) RSA.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">90. En la criptografía asimétrica, si el emisor cifra con la clave pública del receptor...</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) El emisor puede descifrarlo con su propia clave privada.</li>
+                <li class="option-item" data-opt="B">B) Solo el receptor puede descifrarlo con su clave privada.</li>
+                <li class="option-item" data-opt="C">C) Cualquier persona con acceso a internet puede leerlo.</li>
+                <li class="option-item" data-opt="D">D) El mensaje se destruye tras ser leído.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">91. ¿Qué longitud de clave RSA se considera segura actualmente?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) 128 bits.</li>
+                <li class="option-item" data-opt="B">B) 512 bits.</li>
+                <li class="option-item" data-opt="C">C) Mínimo 2048 bits (preferible 4096).</li>
+                <li class="option-item" data-opt="D">D) No importa la longitud mientras sea RSA.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">92. ¿Cuál es la propiedad fundamental de una función Hash?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Es fácilmente reversible.</li>
+                <li class="option-item" data-opt="B">B) Requiere una clave simétrica para funcionar.</li>
+                <li class="option-item" data-opt="C">C) Transforma datos en un resumen único y no es reversible.</li>
+                <li class="option-item" data-opt="D">D) Solo funciona con archivos de gran tamaño.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">93. ¿Qué algoritmo de hashing es el más recomendado para guardar contraseñas al incluir un "salt"?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) MD5.</li>
+                <li class="option-item" data-opt="B">B) Bcrypt.</li>
+                <li class="option-item" data-opt="C">C) SHA-1.</li>
+                <li class="option-item" data-opt="D">D) DES.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">94. ¿Qué componente de la Web Cryptography API permite realizar operaciones de hash y cifrado?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) crypto.getRandomValues().</li>
+                <li class="option-item" data-opt="B">B) crypto.subtle.</li>
+                <li class="option-item" data-opt="C">C) document.cookie.</li>
+                <li class="option-item" data-opt="D">D) window.session.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">95. ¿Dónde se almacenan las sesiones, a diferencia de las cookies?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) En el navegador del usuario.</li>
+                <li class="option-item" data-opt="B">B) En el lado del servidor.</li>
+                <li class="option-item" data-opt="C">C) En el proxy de la empresa.</li>
+                <li class="option-item" data-opt="D">D) En una memoria USB externa.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">96. ¿Qué nombre tiene la cookie que PHP usa por defecto para identificar la sesión de un cliente?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) PHP_TOKEN.</li>
+                <li class="option-item" data-opt="B">B) SESSION_USER.</li>
+                <li class="option-item" data-opt="C">C) PHPSESSID.</li>
+                <li class="option-item" data-opt="D">D) CSRF_VAL.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">97. Un ataque CSRF consiste en:</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Robar la contraseña del usuario mediante fuerza bruta.</li>
+                <li class="option-item" data-opt="B">B) Conseguir que un usuario autenticado ejecute acciones no deseadas sin saberlo.</li>
+                <li class="option-item" data-opt="C">C) Inyectar código malicioso en la base de datos.</li>
+                <li class="option-item" data-opt="D">D) Denegar el acceso al servidor web.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">98. ¿Qué medida es la más eficaz para prevenir ataques CSRF?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Usar HTTPS en todo el sitio.</li>
+                <li class="option-item" data-opt="B">B) Implementar un Token CSRF único, secreto e impredecible por sesión.</li>
+                <li class="option-item" data-opt="C">C) Cifrar la base de datos con AES-256.</li>
+                <li class="option-item" data-opt="D">D) Borrar los logs del servidor a diario.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">99. El XSS (Cross-Site Scripting) permite a un atacante:</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Realizar peticiones a servidores internos.</li>
+                <li class="option-item" data-opt="B">B) Inyectar código JavaScript malicioso que se ejecuta en el navegador de otros usuarios.</li>
+                <li class="option-item" data-opt="C">C) Cambiar la IP del servidor web.</li>
+                <li class="option-item" data-opt="D">D) Acceder físicamente al centro de datos.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">100. ¿Qué tipo de XSS se guarda permanentemente en la base de datos (ej. en un comentario)?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) XSS Reflejado.</li>
+                <li class="option-item" data-opt="B">B) XSS Almacenado (Persistent).</li>
+                <li class="option-item" data-opt="C">C) XSS basado en DOM.</li>
+                <li class="option-item" data-opt="D">D) XSS dinámico.</li>
+            </ul>
+        </div>
+
+
+       
+    </div>
+
+    <script>
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let answeredCount = 0;
+        const totalQuestions = 20;
+
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const card = this.closest('.question-card');
+                
+                // Si ya ha sido respondida, ignorar clics adicionales
+                if (card.classList.contains('answered')) return;
+
+                const selectedOption = this.getAttribute('data-opt');
+                const correctAnswer = card.getAttribute('data-correct');
+
+                card.classList.add('answered');
+                answeredCount++;
+
+                if (selectedOption === correctAnswer) {
+                    this.classList.add('correct');
+                    correctCount++;
+                } else {
+                    this.classList.add('incorrect');
+                    incorrectCount++;
+                    // Resaltar también la opción que era correcta para facilitar el aprendizaje
+                    card.querySelectorAll('.option-item').forEach(opt => {
+                        if (opt.getAttribute('data-opt') === correctAnswer) {
+                            opt.classList.add('correct');
+                        }
+                    });
+                }
+
+                // Actualizar marcador superior dinámicamente
+                document.getElementById('total-answered').innerText = `${answeredCount} / ${totalQuestions}`;
+                document.getElementById('correct-score').innerText = correctCount;
+                document.getElementById('incorrect-score').innerText = incorrectCount;
+            });
+        });
+    </script>
+</body>
+</html>

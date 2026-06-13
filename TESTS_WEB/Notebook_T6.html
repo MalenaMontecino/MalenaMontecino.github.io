@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Evaluación Completa: Seguridad Web</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #2c3e50;
+            --primary-color: #2980b9;
+            --accent-color: #34495e;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-top: 90px;
+        }
+
+        /* Marcador Superior Fijo */
+        .scoreboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-number {
+            font-size: 1.5rem;
+        }
+
+        .score-blue { color: #3498db; }
+        .score-green { color: #2ecc71; }
+        .score-red { color: #e74c3c; }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .theme-title {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 40px 0 20px 0;
+            font-size: 1.3rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .question-card.answered .option-item {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: var(--success-color) !important;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: var(--error-color) !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scoreboard">
+        <div class="score-item">
+            <span>Respondidas</span>
+            <span class="score-number score-blue" id="total-answered">0 / 20</span>
+        </div>
+        <div class="score-item">
+            <span>Correctas (Bien)</span>
+            <span class="score-number score-green" id="correct-score">0</span>
+        </div>
+        <div class="score-item">
+            <span>Incorrectas (Mal)</span>
+            <span class="score-number score-red" id="incorrect-score">0</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>EXAMEN DE EVALUACIÓN COMPLETA: SEGURIDAD WEB</h1>
+        
+        <div class="theme-title">TEMA 6: Autenticación, Autorización y Control de Acceso</div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">101. ¿Qué es la Autenticación?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) El proceso de decidir qué puede hacer un usuario.</li>
+                <li class="option-item" data-opt="B">B) El proceso de verificar que alguien es realmente quien dice ser (confirmar identidad).</li>
+                <li class="option-item" data-opt="C">C) La creación de una cuenta de correo electrónico.</li>
+                <li class="option-item" data-opt="D">D) El registro de actividades en un log.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">102. ¿Cuál de estos es un tipo de autenticación biométrica?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Código enviado al móvil.</li>
+                <li class="option-item" data-opt="B">B) Huella digital o reconocimiento de voz.</li>
+                <li class="option-item" data-opt="C">C) Tarjeta de acceso magnética.</li>
+                <li class="option-item" data-opt="D">D) Pregunta secreta sobre el nombre de la mascota.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">103. ¿Qué proceso determina qué acciones puede realizar un usuario ya identificado?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Autenticación.</li>
+                <li class="option-item" data-opt="B">B) Autorización.</li>
+                <li class="option-item" data-opt="C">C) Cifrado.</li>
+                <li class="option-item" data-opt="D">D) Fingerprinting.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">104. En un blog, si un usuario solo puede leer y comentar, pero no borrar posts, se está aplicando:</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Una regla de autenticación.</li>
+                <li class="option-item" data-opt="B">B) Una regla de autorización.</li>
+                <li class="option-item" data-opt="C">C) Un protocolo TLS.</li>
+                <li class="option-item" data-opt="D">D) Una política de contraseñas.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">105. ¿Qué ventaja ofrece una API al ocultar la complejidad interna del sistema?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Interoperabilidad.</li>
+                <li class="option-item" data-opt="B">B) Abstracción.</li>
+                <li class="option-item" data-opt="C">C) Estandarización.</li>
+                <li class="option-item" data-opt="D">D) Sin estado.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">106. ¿Cuál es el principio de una API RESTful que indica que cada petición es independiente?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Uso de verbos HTTP.</li>
+                <li class="option-item" data-opt="B">B) Recursos por URL.</li>
+                <li class="option-item" data-opt="C">C) Sin estado (Stateless).</li>
+                <li class="option-item" data-opt="D">D) Formato JSON.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">107. ¿Qué método de autenticación en APIs envía las credenciales en Base64 en cada petición?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) JWT.</li>
+                <li class="option-item" data-opt="B">B) OAuth 2.0.</li>
+                <li class="option-item" data-opt="C">C) HTTP Basic Auth.</li>
+                <li class="option-item" data-opt="D">D) API Keys.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">108. ¿En qué consiste fundamentalmente OAuth 2.0?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) En crear una red social nueva.</li>
+                <li class="option-item" data-opt="B">B) En delegar el permiso de autenticación a un servicio de terceros (ej. Google) para ahorrar tiempo.</li>
+                <li class="option-item" data-opt="C">C) En cifrar los tokens con algoritmos cuánticos.</li>
+                <li class="option-item" data-opt="D">D) En prohibir el acceso a usuarios anónimos.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">109. En el flujo de OAuth 2.0, ¿quién es el "Cliente"?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) El propietario de los datos.</li>
+                <li class="option-item" data-opt="B">B) El servidor de Facebook/Google.</li>
+                <li class="option-item" data-opt="C">C) La aplicación que quiere acceder a la cuenta de usuario.</li>
+                <li class="option-item" data-opt="D">D) El hacker que intercepta la señal.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">110. ¿Qué paquete oficial de Laravel genera un sistema tradicional de login con Bootstrap/Vue/React?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Laravel Sanctum.</li>
+                <li class="option-item" data-opt="B">B) Laravel UI.</li>
+                <li class="option-item" data-opt="C">C) Laravel Fortify.</li>
+                <li class="option-item" data-opt="D">D) Laravel Breeze.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">111. ¿Por qué el Logout debe realizarse mediante el método POST?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Porque es más rápido que el GET.</li>
+                <li class="option-item" data-opt="B">B) Por principios REST (modifica estado) y para aplicar protección automática contra CSRF.</li>
+                <li class="option-item" data-opt="C">C) Porque el método GET está prohibido en PHP.</li>
+                <li class="option-item" data-opt="D">D) Para que el navegador guarde la contraseña.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">112. ¿Cuál es la longitud mínima recomendada para una contraseña segura para evitar fuerza bruta?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) 6 caracteres.</li>
+                <li class="option-item" data-opt="B">B) 8 caracteres.</li>
+                <li class="option-item" data-opt="C">C) Al menos 10 caracteres.</li>
+                <li class="option-item" data-opt="D">D) 12 caracteres solo numéricos.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">113. En Laravel, ¿qué pieza responde a la pregunta "¿Quién eres?" (Autenticación)?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Gate.</li>
+                <li class="option-item" data-opt="B">B) Guard.</li>
+                <li class="option-item" data-opt="C">C) Policy.</li>
+                <li class="option-item" data-opt="D">D) Middleware.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">114. ¿Qué es un "Gate" en Laravel?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Una clase ligada a un modelo para gestionar el CRUD.</li>
+                <li class="option-item" data-opt="B">B) Una regla simple de autorización (ej. is-admin) no ligada necesariamente a un modelo.</li>
+                <li class="option-item" data-opt="C">C) El proceso de cerrar la sesión del usuario.</li>
+                <li class="option-item" data-opt="D">D) Una herramienta para cifrar cookies.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">115. ¿Cuándo es preferible usar una "Policy" en lugar de un "Gate"?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Cuando la regla de permiso es muy simple.</li>
+                <li class="option-item" data-opt="B">B) Cuando la autorización está directamente relacionada con un modelo específico de datos.</li>
+                <li class="option-item" data-opt="C">C) Cuando no se usa base de datos.</li>
+                <li class="option-item" data-opt="D">D) Cuando el usuario es administrador global.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">116. Al usar Basic Auth en Laravel, ¿qué código HTTP se devuelve si las credenciales son incorrectas?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) 200 OK.</li>
+                <li class="option-item" data-opt="B">B) 403 Forbidden.</li>
+                <li class="option-item" data-opt="C">C) 401 Unauthorized.</li>
+                <li class="option-item" data-opt="D">D) 500 Internal Error.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">117. Para implementar una API Key personalizada en Laravel, el primer paso es:</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Instalar Laravel UI.</li>
+                <li class="option-item" data-opt="B">B) Definir la clave en el archivo de entorno .env.</li>
+                <li class="option-item" data-opt="C">C) Borrar el modelo User.</li>
+                <li class="option-item" data-opt="D">D) Configurar el servidor DNS.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">118. ¿Qué sistema de Laravel está diseñado para autenticar SPAs y aplicaciones móviles con tokens sencillos?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Passport.</li>
+                <li class="option-item" data-opt="B) UI.</li>
+                <li class="option-item" data-opt="C">C) Sanctum.</li>
+                <li class="option-item" data-opt="D">D) Fortify.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">119. En Sanctum, ¿qué son las "Abilities"?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Las contraseñas de los usuarios.</li>
+                <li class="option-item" data-opt="B) Ámbitos o capacidades que especifican qué acciones puede realizar un token específico.</li>
+                <li class="option-item" data-opt="C">C) El tiempo que tarda el servidor en responder.</li>
+                <li class="option-item" data-opt="D">D) Los lenguajes que soporta la API.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">120. ¿Qué middleware de Sanctum verifica que el token tenga AL MENOS UNA de las habilidades listadas?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) abilities.</li>
+                <li class="option-item" data-opt="B) auth:sanctum.</li>
+                <li class="option-item" data-opt="C">C) ability.</li>
+                <li class="option-item" data-opt="D">D) can:update.</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let answeredCount = 0;
+        const totalQuestions = 20;
+
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const card = this.closest('.question-card');
+                
+                // Si ya ha sido respondida, ignorar clics adicionales
+                if (card.classList.contains('answered')) return;
+
+                const selectedOption = this.getAttribute('data-opt');
+                const correctAnswer = card.getAttribute('data-correct');
+
+                card.classList.add('answered');
+                answeredCount++;
+
+                if (selectedOption === correctAnswer) {
+                    this.classList.add('correct');
+                    correctCount++;
+                } else {
+                    this.classList.add('incorrect');
+                    incorrectCount++;
+                    // Resaltar también la opción que era correcta para facilitar el aprendizaje
+                    card.querySelectorAll('.option-item').forEach(opt => {
+                        if (opt.getAttribute('data-opt') === correctAnswer) {
+                            opt.classList.add('correct');
+                        }
+                    });
+                }
+
+                // Actualizar marcador superior dinámicamente
+                document.getElementById('total-answered').innerText = `${answeredCount} / ${totalQuestions}`;
+                document.getElementById('correct-score').innerText = correctCount;
+                document.getElementById('incorrect-score').innerText = incorrectCount;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Evaluación Completa: Seguridad Web</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #2c3e50;
+            --primary-color: #2980b9;
+            --accent-color: #34495e;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-top: 90px;
+        }
+
+        /* Marcador Superior Fijo */
+        .scoreboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-number {
+            font-size: 1.5rem;
+        }
+
+        .score-blue { color: #3498db; }
+        .score-green { color: #2ecc71; }
+        .score-red { color: #e74c3c; }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .theme-title {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 40px 0 20px 0;
+            font-size: 1.3rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        /* Estados de respuesta */
+        .question-card.answered .option-item {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: var(--success-color) !important;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: var(--error-color) !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scoreboard">
+        <div class="score-item">
+            <span>Respondidas</span>
+            <span class="score-number score-blue" id="total-answered">0 / 20</span>
+        </div>
+        <div class="score-item">
+            <span>Correctas (Bien)</span>
+            <span class="score-number score-green" id="correct-score">0</span>
+        </div>
+        <div class="score-item">
+            <span>Incorrectas (Mal)</span>
+            <span class="score-number score-red" id="incorrect-score">0</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>EXAMEN DE EVALUACIÓN COMPLETA: SEGURIDAD WEB</h1>
+
+        <div class="theme-title">TEMA 3: El protocolo HTTP y la seguridad en el transporte</div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">41. ¿En qué capa del modelo TCP/IP se ubica el protocolo HTTP?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Capa de Internet.</li>
+                <li class="option-item" data-opt="B">B) Capa de Aplicación.</li>
+                <li class="option-item" data-opt="C">C) Capa de Transporte.</li>
+                <li class="option-item" data-opt="D">D) Capa de Acceso a la Red.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">42. ¿Qué significa que el protocolo HTTP sea "stateless"?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Que no puede transmitir imágenes.</li>
+                <li class="option-item" data-opt="B">B) Que cada solicitud y respuesta son operaciones independientes sin memoria.</li>
+                <li class="option-item" data-opt="C">C) Que requiere una conexión permanente con el servidor.</li>
+                <li class="option-item" data-opt="D">D) Que siempre viaja cifrado.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">43. ¿Qué versión de HTTP permitió por primera vez el Virtual Hosting mediante la cabecera Host?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) HTTP/0.9.</li>
+                <li class="option-item" data-opt="B">B) HTTP/1.0.</li>
+                <li class="option-item" data-opt="C">C) HTTP/1.1.</li>
+                <li class="option-item" data-opt="D">D) HTTP/2.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">44. ¿Cuál es la principal mejora de rendimiento de HTTP/2?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Obligatoriedad de TLS.</li>
+                <li class="option-item" data-opt="B">B) Multiplexación de peticiones en una sola conexión TCP.</li>
+                <li class="option-item" data-opt="C">C) Uso de UDP en lugar de TCP.</li>
+                <li class="option-item" data-opt="D">D) Eliminación de las cookies.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">45. ¿En qué protocolo de transporte se basa HTTP/3?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) TCP.</li>
+                <li class="option-item" data-opt="B">B) ICMP.</li>
+                <li class="option-item" data-opt="C">C) QUIC (sobre UDP).</li>
+                <li class="option-item" data-opt="D">D) ARP.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">46. ¿Cuál de estos servidores es conocido por su arquitectura asíncrona orientada a eventos para alta carga?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Apache.</li>
+                <li class="option-item" data-opt="B">B) Nginx.</li>
+                <li class="option-item" data-opt="C">C) Microsoft IIS.</li>
+                <li class="option-item" data-opt="D">D) json-server.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">47. ¿Qué servidor destaca por automatizar la gestión de certificados de Let's Encrypt por defecto?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Nginx.</li>
+                <li class="option-item" data-opt="B">B) Apache.</li>
+                <li class="option-item" data-opt="C">C) Caddy.</li>
+                <li class="option-item" data-opt="D">D) Cloudflare.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">48. ¿Cómo actúa un Proxy Inverso?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Se sitúa del lado del cliente para anonimizarlo.</li>
+                <li class="option-item" data-opt="B">B) Se sitúa del lado del servidor para balanceo de carga y protección.</li>
+                <li class="option-item" data-opt="C">C) Filtra el contenido que el usuario puede ver en su hogar.</li>
+                <li class="option-item" data-opt="D">D) Bloquea el acceso a redes sociales en empresas.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">49. ¿Qué formato de datos es el estándar de facto en las respuestas de APIs REST?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) XML.</li>
+                <li class="option-item" data-opt="B">B) CSV.</li>
+                <li class="option-item" data-opt="C">C) JSON.</li>
+                <li class="option-item" data-opt="D">D) HTML.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">50. ¿Para qué se utiliza habitualmente la herramienta Postman?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Para interceptar tráfico Wi-Fi.</li>
+                <li class="option-item" data-opt="B">B) Para construir, enviar y analizar peticiones HTTP a APIs de forma visual.</li>
+                <li class="option-item" data-opt="C">C) Para descifrar contraseñas por fuerza bruta.</li>
+                <li class="option-item" data-opt="D">D) Para analizar logs de acceso.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">51. En un mensaje HTTP, ¿cómo se separa la cabecera del cuerpo?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Mediante un carácter especial $.</li>
+                <li class="option-item" data-opt="B">B) Con una línea vacía.</li>
+                <li class="option-item" data-opt="C">C) No se separan, van juntos.</li>
+                <li class="option-item" data-opt="D">D) Mediante un comando POST.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">52. ¿Qué método HTTP se usa para borrar un recurso del servidor?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) GET.</li>
+                <li class="option-item" data-opt="B">B) PUT.</li>
+                <li class="option-item" data-opt="C">C) DELETE.</li>
+                <li class="option-item" data-opt="D">D) OPTIONS.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">53. ¿Qué método HTTP permite obtener solo los metadatos de una página sin descargar el contenido?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) GET.</li>
+                <li class="option-item" data-opt="B">B) POST.</li>
+                <li class="option-item" data-opt="C">C) HEAD.</li>
+                <li class="option-item" data-opt="D">D) PATCH.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">54. ¿Qué podría sospechar un analista si ve muchos métodos OPTIONS en los logs?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Un error en el navegador del usuario.</li>
+                <li class="option-item" data-opt="B">B) Un atacante intentando enumerar los métodos admitidos por el servidor.</li>
+                <li class="option-item" data-opt="C">C) Una actualización automática del sistema.</li>
+                <li class="option-item" data-opt="D">D) El funcionamiento normal de un buscador.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">55. ¿Cuál es el código de respuesta HTTP para "No encontrado"?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) 200.</li>
+                <li class="option-item" data-opt="B">B) 403.</li>
+                <li class="option-item" data-opt="C">C) 404.</li>
+                <li class="option-item" data-opt="D">D) 500.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">56. El código 403 (Forbidden) en un log de acceso indica que:</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) La página ha sido borrada permanentemente.</li>
+                <li class="option-item" data-opt="B">B) El servidor ha tenido un fallo interno.</li>
+                <li class="option-item" data-opt="C">C) El usuario no tiene permisos para acceder al recurso válido.</li>
+                <li class="option-item" data-opt="D">D) La petición ha sido exitosa.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">57. ¿A través de qué puerto opera por defecto el protocolo HTTPS?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) 80.</li>
+                <li class="option-item" data-opt="B">B) 21.</li>
+                <li class="option-item" data-opt="C">C) 443.</li>
+                <li class="option-item" data-opt="D">D) 8080.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">58. ¿Qué función cumple TLS en la comunicación web?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Acelera la conexión a internet.</li>
+                <li class="option-item" data-opt="B">B) Autentica a las partes, cifra los datos y garantiza su integridad.</li>
+                <li class="option-item" data-opt="C">C) Permite crear microservicios.</li>
+                <li class="option-item" data-opt="D">D) Gestiona las bases de datos SQL.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="B">
+            <div class="question-text">59. ¿Qué tipo de certificado requiere que la CA verifique la existencia legal y dirección física de la empresa?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) DV (Domain Validation).</li>
+                <li class="option-item" data-opt="B">B) EV (Extended Validation).</li>
+                <li class="option-item" data-opt="C">C) Autofirmado.</li>
+                <li class="option-item" data-opt="D">D) Localhost.</li>
+            </ul>
+        </div>
+
+        <div class="question-card" data-correct="C">
+            <div class="question-text">60. ¿Qué herramienta se utiliza para generar certificados locales para pruebas de desarrollo?</div>
+            <ul class="options-list">
+                <li class="option-item" data-opt="A">A) Certbot.</li>
+                <li class="option-item" data-opt="B">B) SQLMap.</li>
+                <li class="option-item" data-opt="C">C) mkcert.</li>
+                <li class="option-item" data-opt="D">D) Wireshark.</li>
+            </ul>
+        </div>
+
+
+    </div>
+
+    <script>
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let answeredCount = 0;
+        const totalQuestions = 20;
+
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const card = this.closest('.question-card');
+                
+                // Si ya ha sido respondida, ignorar clics adicionales
+                if (card.classList.contains('answered')) return;
+
+                const selectedOption = this.getAttribute('data-opt');
+                const correctAnswer = card.getAttribute('data-correct');
+
+                card.classList.add('answered');
+                answeredCount++;
+
+                if (selectedOption === correctAnswer) {
+                    this.classList.add('correct');
+                    correctCount++;
+                } else {
+                    this.classList.add('incorrect');
+                    incorrectCount++;
+                    // Resaltar también la opción que era correcta para facilitar el aprendizaje
+                    card.querySelectorAll('.option-item').forEach(opt => {
+                        if (opt.getAttribute('data-opt') === correctAnswer) {
+                            opt.classList.add('correct');
+                        }
+                    });
+                }
+
+                // Actualizar marcador superior dinámicamente
+                document.getElementById('total-answered').innerText = `${answeredCount} / ${totalQuestions}`;
+                document.getElementById('correct-score').innerText = correctCount;
+                document.getElementById('incorrect-score').innerText = incorrectCount;
+            });
+        });
+    </script>
+</body>
+</html>
