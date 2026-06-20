@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TEST FDC</title>
+    <style>
+        :root { --primary: #003366; --secondary: #ff6600; --success: #28a745; --error: #dc3545; --bg: #f0f4f8; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.1); }
+        .nav-bar { position: sticky; top: 0; background: white; padding: 15px 0; z-index: 1000; border-bottom: 2px solid #ddd; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .nav-btn { padding: 8px 12px; border: 1px solid #ccc; border-radius: 8px; background: #f8f9fa; cursor: pointer; font-size: 0.75em; font-weight: bold; transition: 0.3s; color: var(--primary); }
+        .nav-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .score-board { position: fixed; top: 20px; right: 20px; background: var(--primary); color: white; padding: 15px 25px; border-radius: 12px; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.3); z-index: 2000; }
+        .q-card { margin-bottom: 35px; padding: 30px; border: 1px solid #e1e4e8; border-radius: 15px; background: #fafafa; }
+        .tag { display: inline-block; background: var(--secondary); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.7em; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; }
+        .q-text { font-weight: 700; font-size: 1.1em; display: block; margin-bottom: 20px; line-height: 1.4; }
+        .opt-item { margin: 12px 0; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; background: white; transition: 0.2s; }
+        .opt-item:hover { border-color: var(--primary); background: #f0f7ff; transform: translateX(5px); }
+        .correct { background-color: #d4edda !important; border-color: var(--success) !important; color: #155724; font-weight: bold; }
+        .incorrect { background-color: #f8d7da !important; border-color: var(--error) !important; color: #721c24; }
+        .feedback { display: none; margin-top: 20px; padding: 20px; border-radius: 10px; background: #fff; border-left: 6px solid #ccc; font-size: 0.95em; }
+        .ref { color: var(--primary); font-weight: 800; display: block; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; font-style: italic; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="score-board">Aciertos (1º): <span id="c-count">0</span> | Errores: <span id="w-count">0</span></div>
+
+<div class="container">
+    <h1 style="text-align: center; color: var(--primary);">Entrenador Maestro AED: Batería Total</h1>
+    <div class="nav-bar" id="nav">
+        <button class="nav-btn active" onclick="filter('all')">VER TODO</button>
+        <button class="nav-btn" style="background:#fff3e0" onclick="filter('guide')">GUÍA (24 Q)</button>
+    </div>
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+const masterBank = [
+    // --- SESIÓN 1 (12 Q) ---
+    { s: 1, q: "¿Cuál es la premisa de la Arquitectura Von Neumann?", a: ["Datos e instrucciones comparten bus y memoria", "Memorias físicas separadas", "No usa Unidad de Control", "Solo usa ROM"], c: 0, e: "Almacenamiento único para programas y datos." },
+    { s: 1, q: "¿Qué componente realiza cálculos aritméticos?", a: ["Control Unit", "Registros", "ALU", "Bus"], c: 2, e: "La ALU es el núcleo ejecutor." },
+    { s: 1, q: "¿Qué ocurre en la fase de Fetch?", a: ["Ejecución", "Captura de instrucción desde memoria", "Decodificación", "Escritura"], c: 1, e: "Traer la instrucción a la CPU." },
+    { s: 1, q: "¿Función del Registro de Instrucción (IR)?", a: ["Siguiente dirección", "Instrucción decodificándose", "Suma", "Flags"], c: 1, e: "Mantiene la orden actual." },
+    { s: 1, q: "¿Qué almacena el Program Counter (PC)?", a: ["Dato actual", "Dirección de la siguiente instrucción", "Resultado ALU", "Stack"], c: 1, e: "Puntero al flujo de ejecución." },
+    { s: 1, q: "¿Qué determina el ancho del bus de datos?", a: ["Memoria total", "Bits transferidos simultáneamente", "Velocidad CPU", "Pines"], c: 1, e: "Capacidad de flujo de bits." },
+    { s: 1, q: "¿Por qué los registros son más rápidos?", a: ["Integrados en CPU sin buses externos", "Son magnéticos", "Son grandes", "No volátiles"], c: 0, e: "Ubicación física óptima." },
+    { s: 1, q: "El 'Bus Sniffing' rompe el principio de:", a: ["Disponibilidad", "Confidencialidad", "Integridad", "No repudio"], c: 1, e: "Escucha no autorizada." },
+    { s: 1, q: "Alterar el PC permite el:", a: ["Secuestro del flujo", "Aumento de RAM", "Borrado de BIOS", "Cifrado"], c: 0, e: "Toma de control del programa." },
+    { s: 1, q: "Principio de Denegación por Defecto significa:", a: ["Confiar en todos", "Denegar todo acceso no explícito", "Acceso total", "Sniffing"], c: 1, e: "Base de la seguridad." },
+    { s: 1, q: "¿Qué representa la 'Localidad Temporal'?", a: ["Cercanía física", "Reutilizar dato accedido recientemente", "Acceso disco", "Garantía"], c: 1, e: "Eficiencia de caché." },
+    { s: 1, q: "Jerarquía de memoria: ¿Cuál es el nivel más rápido?", a: ["RAM", "Disco", "Registros de CPU", "Caché L2"], c: 2, e: "Menor tiempo de acceso." },
+
+    // --- SESIÓN 2: LÓGICA Y LEYES (18 Q) ---
+    { s: 2, q: "¿Operadores que definen el Álgebra de Boole?", a: ["NOT y OR", "OR (+) y AND (·)", "XOR y NAND", "Suma y Resta"], c: 1, e: "Estructura formal." },
+    { s: 2, q: "¿Puerta que da '0' solo si todas son '1'?", a: ["AND", "NOR", "NAND", "XOR"], c: 2, e: "NAND = Negación de AND." },
+    { s: 2, q: "¿Puerta que da '1' solo si todas son '0'?", a: ["AND", "NOR", "OR", "NAND"], c: 1, e: "NOR = Negación de OR." },
+    { s: 2, q: "Ley del Complemento (Suma): A + A'", a: ["A", "0", "1", "A'"], c: 2, e: "Siempre una opción es verdadera." },
+    { s: 2, q: "Ley del Complemento (Producto): A · A'", a: ["1", "A", "0", "A'"], c: 2, e: "No pueden ser V y F a la vez." },
+    { s: 2, q: "Ley de Identidad (Suma): A + 0", a: ["0", "A", "1", "A'"], c: 1, e: "El 0 es neutro." },
+    { s: 2, q: "Ley de Identidad (Producto): A · 1", a: ["0", "A", "1", "A'"], c: 1, e: "El 1 es neutro." },
+    { s: 2, q: "Ley Nula o Dominancia (Suma): A + 1", a: ["A", "0", "1", "A'"], c: 2, e: "El 1 domina la suma." },
+    { s: 2, q: "Ley Nula o Dominancia (Producto): A · 0", a: ["A", "0", "1", "A'"], c: 1, e: "El 0 domina el producto." },
+    { s: 2, q: "Ley Idempotente: A + A", a: ["A", "0", "1", "2A"], c: 0, e: "Sumar lo mismo no cambia el valor." },
+    { s: 2, q: "Ley de Involución (Doble Negación): (A')'", a: ["0", "1", "A", "A'"], c: 2, e: "Vuelve al original." },
+    { s: 2, q: "Ley Conmutativa: A + B", a: ["AB", "B + A", "A", "B"], c: 1, e: "El orden no altera." },
+    { s: 2, q: "Ley Distributiva: A(B + C)", a: ["AB + C", "AB + AC", "ABC", "A + BC"], c: 1, e: "Factor común." },
+    { s: 2, q: "Ley de Absorción: A + AB", a: ["B", "AB", "A", "1"], c: 2, e: "El término extra se absorbe." },
+    { s: 2, q: "Ley de Absorción Simplificada: A + A'B", a: ["A + B", "A", "B", "AB"], c: 0, e: "Elimina la variable negada." },
+    { s: 2, q: "Ley de De Morgan: (A + B)'", a: ["A' + B'", "A'B'", "AB", "A + B"], c: 1, e: "Niega y cambia operador." },
+    { s: 2, q: "Ley de De Morgan: (AB)'", a: ["A' + B'", "A'B'", "AB", "A + B"], c: 0, e: "Niega y cambia operador." },
+    { s: 2, q: "¿Puerta que es '1' solo si las entradas son distintas?", a: ["OR", "AND", "XOR", "XNOR"], c: 2, e: "Comparador de desigualdad." },
+
+    // --- SESIÓN 3: CANÓNICAS Y MAPAS K (12 Q) ---
+    { s: 3, q: "¿Qué es un minitérmino?", a: ["Suma = 0", "Producto = 1 para una fila", "Karnaugh", "Error"], c: 1, e: "Forma SOP." },
+    { s: 3, q: "¿Qué es un maxitérmino?", a: ["Producto = 1", "Suma = 0 para una fila", "SOP", "Mux"], c: 1, e: "Forma POS." },
+    { s: 3, q: "¿Relación entre minitérmino y maxitérmino?", a: ["Iguales", "Complementarios (m_i = M_i')", "Suma 1", "No hay"], c: 1, e: "Dualidad canónica." },
+    { s: 3, q: "Agrupar 8 celdas en Mapa K 4-var deja:", a: ["2 var", "1 variable", "3 var", "Constante"], c: 1, e: "2^3=8 elimina 3 vars." },
+    { s: 3, q: "¿Qué representan las 'X' en Mapa K?", a: ["Errores", "Indiferencia", "Reset", "Carry"], c: 1, e: "Comodines." },
+    { s: 3, q: "Agrupaciones en Mapa K deben ser potencias de:", a: ["1", "2", "10", "Pares"], c: 1, e: "2, 4, 8, 16..." },
+    { s: 3, q: "Si todas las celdas son 1, la función es:", a: ["f=0", "f=1", "f=A", "Error"], c: 1, e: "Constante alta." },
+    { s: 3, q: "¿Cuántas variables elimina un grupo de 4 celdas?", a: ["1", "2", "3", "4"], c: 1, e: "log2(4)=2." },
+    { s: 3, q: "¿Se pueden agrupar celdas en los extremos del mapa?", a: ["No", "Sí, el mapa es toroidal", "Solo si son 4", "Solo filas"], c: 1, e: "Adyacencia circular." },
+    { s: 3, q: "Un patrón de 'tablero de ajedrez' indica:", a: ["NAND", "OR", "XOR/XNOR", "F=0"], c: 2, e: "Paridad." },
+    { s: 3, q: "Las formas canónicas dan circuitos:", a: ["Lentos", "Más deseables y simplificados", "Grandes", "Inestables"], c: 1, e: "Optimización base." },
+    { s: 3, q: "En la expresión abreviada ∑m(0,2), ¿qué números son?", a: ["Maxitérminos", "Minitérminos", "Puertas", "Biestables"], c: 1, e: "Notación sigma para minitérminos." },
+
+    // --- SESIÓN 4: NUMERACIÓN (12 Q) ---
+    { s: 4, q: "¿Decimal 25 en binario?", a: ["10101", "11001", "11100", "11011"], c: 1, e: "16+8+1." },
+    { s: 4, q: "¿Rasgo del Código Gray?", a: ["Pesado", "Cambia 1 bit", "Hexa", "Signo"], c: 1, e: "Evita errores." },
+    { s: 4, q: "¿Bits para un dígito BCD?", a: ["1", "4", "8", "16"], c: 1, e: "Nibbles." },
+    { s: 4, q: "¿Dónde está el LSB?", a: ["Izquierda", "Derecha", "Centro", "Flags"], c: 1, e: "Menor peso." },
+    { s: 4, q: "¿Bits en un byte?", a: ["4", "16", "8", "32"], c: 2, e: "8 bits." },
+    { s: 4, q: "¿Peso de la posición 3?", a: ["3", "6", "8 (2^3)", "4"], c: 2, e: "Pesos binarios." },
+    { s: 4, q: "¿Hexa F en binario?", a: ["1010", "1110", "1111", "0000"], c: 2, e: "15." },
+    { s: 4, q: "Mayor número decimal con 4 bits:", a: ["7", "15", "16", "31"], c: 1, e: "2^4 - 1." },
+    { s: 4, q: "Hexadecimal 10h en decimal:", a: ["10", "16", "2", "32"], c: 1, e: "Base 16." },
+    { s: 4, q: "Bits para representar el decimal 100:", a: ["4", "7", "8", "16"], c: 1, e: "2^7 = 128." },
+    { s: 4, q: "¿Qué representa el código ASCII?", a: ["Solo números", "Caracteres de texto y control", "Imágenes", "Voltaje"], c: 1, e: "Estándar de texto." },
+    { s: 4, q: "En binario, el bit más a la izquierda es el:", a: ["LSB", "MSB", "Paridad", "Carry"], c: 1, e: "Most Significant Bit." },
+
+    // --- SESIÓN 5/6: COMBINACIONALES (15 Q) ---
+    { s: 5, q: "¿Diferencia FA de HA?", a: ["FA no acarreo", "FA tiene Cin previo", "HA rápido", "Nada"], c: 1, e: "Encadenamiento." },
+    { s: 6, q: "¿Qué activa una salida según la entrada?", a: ["Mux", "Decodificador", "Encoder", "Sumador"], c: 1, e: "Decodificador." },
+    { s: 6, q: "¿Líneas selección para Mux 4:1?", a: ["1", "2", "3", "4"], c: 1, e: "2^2=4." },
+    { s: 6, q: "¿Qué hace un encoder de prioridad?", a: ["Suma", "Prioriza entrada más alta", "Mux", "Demux"], c: 1, e: "Gestiona colisiones." },
+    { s: 6, q: "¿Qué hace un demultiplexor?", a: ["Suma", "Reparte 1 entrada a varias", "Codifica", "Pila"], c: 1, e: "Distribuidor." },
+    { s: 5, q: "¿Compuerta para SUMA en HA?", a: ["AND", "OR", "XOR", "NOR"], c: 2, e: "XOR." },
+    { s: 5, q: "¿Compuerta para ACARREO en HA?", a: ["XOR", "AND", "OR", "NOT"], c: 1, e: "AND." },
+    { s: 6, q: "Decodificador 3:8, entrada 010 activa:", a: ["S0", "S1", "S2", "S8"], c: 2, e: "Código 2." },
+    { s: 6, q: "¿Selectores para Mux 8:1?", a: ["2", "3", "4", "8"], c: 1, e: "2^3=8." },
+    { s: 6, q: "¿Para qué sirve un decodificador?", a: ["Sumar", "Seleccionar periféricos", "Reloj", "Flags"], c: 1, e: "Chip Select." },
+    { s: 6, q: "¿Qué componente se usa para 'conmutar' fuentes?", a: ["Decodificador", "Multiplexor", "Registro", "ALU"], c: 1, e: "Selector de datos." },
+    { s: 5, q: "¿Cuántas salidas tiene un sumador completo?", a: ["1", "2 (Suma y Acarreo)", "3", "4"], c: 1, e: "S y Cout." },
+    { s: 6, q: "Un codificador de 2^n entradas tiene:", a: ["1 salida", "n salidas", "n^2 salidas", "2n salidas"], c: 1, e: "Conversión a binario." },
+    { s: 6, q: "La señal EN (Enable) en un demux permite:", a: ["Resetear", "Habilitar/Deshabilitar el chip", "Aumentar bits", "Cambiar reloj"], c: 1, e: "Control de activación." },
+    { s: 6, q: "En un Mux 4:1, si S1S0=11, se selecciona:", a: ["D0", "D1", "D2", "D3"], c: 3, e: "Código binario 3." },
+
+    // --- SESIÓN 7: EJERCICIOS (10 Q) ---
+    { s: 7, q: "Alarma cinturón (P, M, C), ¿cuándo suena?", a: ["P+M+C", "P·M·C'", "P'·M'·C", "P·M·C"], c: 1, e: "Sensor Y Motor Y NO Cinturón." },
+    { s: 7, q: "Compuerta para aforo de 7 (111):", a: ["OR", "XOR", "AND de 3", "NAND"], c: 2, e: "Solo con 1-1-1." },
+    { s: 7, q: "En selector audio, ¿qué es la salida Y?", a: ["0", "1", "Valor entrada elegida", "Ruido"], c: 2, e: "Conmutador." },
+    { s: 7, q: "¿Por qué 3 fuentes usan Mux 4:1?", a: ["Barato", "No hay de 3", "2 bits cubren 3", "Silencio"], c: 2, e: "2 bits = 4 opciones." },
+    { s: 7, q: "Pulsar '9' en teclado da BCD:", a: ["0001", "1001", "1010", "1111"], c: 1, e: "9 = 1001." },
+    { s: 7, q: "¿Dispositivo para comparar claves?", a: ["Mux", "Decoder", "Comparador", "Encoder"], c: 2, e: "Magnitud." },
+    { s: 7, q: "En comparador, ¿cuándo Z=1?", a: ["Si uno coincide", "Igualdad total", "Si 0000", "Nunca"], c: 1, e: "Pleno." },
+    { s: 7, q: "Comparar 1111 con 1010 da:", a: ["1", "0", "F", "X"], c: 1, e: "Distintos." },
+    { s: 7, q: "Selector audio: ¿qué combinación da silencio?", a: ["00", "01", "10", "11"], c: 3, e: "Entrada D3." },
+    { s: 7, q: "Alarma cinturón: ¿qué significa C'?", a: ["Puesto", "NO puesto", "Roto", "Calor"], c: 1, e: "Señal negada." },
+
+    // --- SESIÓN 8: SECUENCIALES I (12 Q) ---
+    { s: 8, q: "¿Función del Clock?", a: ["Energía", "Sincronizar cambios", "RAM", "Enfriar"], c: 1, e: "Ritmo." },
+    { s: 8, q: "¿JK con J=1 y K=1?", a: ["Reset", "Set", "Toggle", "Error"], c: 2, e: "Inversión." },
+    { s: 8, q: "¿Latch vs FF?", a: ["FF es nivel", "FF es flanco", "Iguales", "Analog"], c: 1, e: "Disparo transición." },
+    { s: 8, q: "Estado prohibido en RS:", a: ["0-0", "0-1", "1-1", "1-0"], c: 2, e: "Indeterminado." },
+    { s: 8, q: "Biestable que sigue a D:", a: ["JK", "T", "D", "RS"], c: 2, e: "Seguidor." },
+    { s: 8, q: "Tras 111 en contador de 3 bits sigue:", a: ["1000", "000", "111", "Error"], c: 1, e: "Ciclo." },
+    { s: 8, q: "Registro PISO significa:", a: ["Paralelo-Serie", "Piso", "Power", "Static"], c: 0, e: "Carga total." },
+    { s: 8, q: "Registro SIPO significa:", a: ["Serie-Serie", "Serie-Paralelo", "LIFO", "Mux"], c: 1, e: "Salida total." },
+    { s: 8, q: "¿Qué biestable es síncrono por definición?", a: ["Latch", "Flip-Flop", "AND", "Resistor"], c: 1, e: "Reloj." },
+    { s: 8, q: "¿Qué biestable se usa para dividir frecuencia?", a: ["D", "RS", "T o JK en Toggle", "Latch"], c: 2, e: "F/2 por pulso." },
+    { s: 8, q: "En JK, si J=0 y K=1, la salida es:", a: ["Q", "Q'", "0 (Reset)", "1 (Set)"], c: 2, e: "Fuerza bajo." },
+    { s: 8, q: "Los circuitos secuenciales tienen:", a: ["Solo puertas", "Memoria", "Solo cables", "Nada"], c: 1, e: "El estado importa." },
+
+    // --- SESIÓN 9: DISEÑO (10 Q) ---
+    { s: 9, q: "¿Primer paso diseño secuencial?", a: ["Mapa K", "Especificación", "Simular", "Comprar"], c: 1, e: "Definir problema." },
+    { s: 9, q: "¿Tabla J-K para pasar de Q a Q+1?", a: ["Verdad", "Excitación", "Estados", "Asignación"], c: 1, e: "Diseño JK." },
+    { s: 9, q: "Biestables para contador 3 bits:", a: ["1", "2", "3", "8"], c: 2, e: "2^3=8." },
+    { s: 9, q: "Ecuación J0=K0 contador binario:", a: ["Q1", "1", "0", "Q2"], c: 1, e: "LSB siempre cambia." },
+    { s: 9, q: "¿Qué es la asignación de estados?", a: ["Mapa K", "Dar códigos binarios a S0, S1...", "Suma", "Reset"], c: 1, e: "Pasar a bits." },
+    { s: 9, q: "Registro almacena números de:", a: ["1 bit", "Varios bits", "Solo 0", "Solo 1"], c: 1, e: "Grupo FFs." },
+    { s: 9, q: "Registro SISO:", a: ["Serie-Serie", "Paralelo", "Pila", "Mux"], c: 0, e: "Un solo hilo." },
+    { s: 9, q: "Registro PIPO:", a: ["Todo paralelo", "Serie", "Pila", "Suma"], c: 0, e: "Carga y salida total." },
+    { s: 9, q: "Para alternancia constante, ¿qué biestable es óptimo?", a: ["RS", "D", "JK", "Latch"], c: 2, e: "Toggle flexible." },
+    { s: 9, q: "¿Qué paso minimiza la lógica de control?", a: ["Especificación", "Mapas de Karnaugh", "Asignación", "Simulación"], c: 1, e: "Simplificación booleana." },
+
+    // --- SESIÓN 10: EJERCICIOS SEC (10 Q) ---
+    { s: 10, q: "¿Función del Watchdog?", a: ["Reloj", "Reset tras bloqueo", "Virus", "RAM"], c: 1, e: "Seguridad." },
+    { s: 10, q: "En Moore, la salida depende de:", a: ["Entrada", "Solo estado actual", "Reloj", "Usuario"], c: 1, e: "Modelo Moore." },
+    { s: 10, q: "En Mealy, la salida depende de:", a: ["Solo estado", "Estado y entradas", "Solo entradas", "Nada"], c: 1, e: "Modelo Mealy." },
+    { s: 10, q: "Hardware para Watchdog:", a: ["Sumador", "Contador binario", "Mux", "Bus"], c: 1, e: "Ciclos." },
+    { s: 10, q: "Secuencia detector caja fuerte:", a: ["1010", "1101", "0000", "1111"], c: 1, e: "Código 1101." },
+    { s: 10, q: "Estado q1 en detector:", a: ["Inicial", "Recibido primer 1", "Recibido 0", "Final"], c: 1, e: "Progreso." },
+    { s: 10, q: "Si el bit es erróneo en detector:", a: ["Va a q3", "Vuelve a q0", "Se apaga", "Lock"], c: 1, e: "Reinicio." },
+    { s: 10, q: "¿Qué biestable para Watchdog?", a: ["D", "JK", "RS", "T"], c: 1, e: "Flexibilidad." },
+    { s: 10, q: "¿Tras cuántos ciclos resetea el Watchdog?", a: ["1", "2", "4 (100)", "8"], c: 2, e: "Límite." },
+    { s: 10, q: "FSM Moore cambia salida:", a: ["Solo en flanco", "Con entrada", "Al azar", "Nunca"], c: 0, e: "Fijada al estado." },
+
+    // --- SESIÓN 11: ARQUITECTURA X86 (14 Q) ---
+    { s: 11, q: "¿Registro 16 bits puntero instrucción?", a: ["SP", "IP", "AX", "BP"], c: 1, e: "Instruction Pointer." },
+    { s: 11, q: "¿Registro tope de Pila?", a: ["SI", "DI", "SP", "IP"], c: 2, e: "Stack Pointer." },
+    { s: 11, q: "¿Registro para parámetros subrutinas?", a: ["AX", "BX", "CX", "BP"], c: 3, e: "Base Pointer." },
+    { s: 11, q: "¿Registro Source Index?", a: ["SI", "DI", "SP", "IP"], c: 0, e: "Operación cadenas." },
+    { s: 11, q: "¿Registro Destination Index?", a: ["SI", "DI", "SP", "IP"], c: 1, e: "Operación cadenas." },
+    { s: 11, q: "¿Registros 8 bits de AX?", a: ["1", "2 (AH/AL)", "4", "0"], c: 1, e: "Divide 16 bits." },
+    { s: 11, q: "¿Acumulador 32 bits?", a: ["AX", "EAX", "RAX", "EAX_H"], c: 1, e: "Extended." },
+    { s: 11, q: "Registros segmento (CS, DS, SS):", a: ["Suma", "Direccionamiento segmentado", "Reset", "Clock"], c: 1, e: "Gestión memoria." },
+    { s: 11, q: "Registro FLAGS contiene:", a: ["Datos", "Bits de estado", "Código", "Nombres"], c: 1, e: "Zero, Carry..." },
+    { s: 11, q: "Directiva EQU sirve para:", a: ["Variables", "Constantes", "Pila", "Saltos"], c: 1, e: "Valor fijo." },
+    { s: 11, q: "¿En qué registro se pone el número de función para llamadas?", a: ["AX (AH)", "BX", "CX", "DX"], c: 0, e: "Selector API." },
+    { s: 11, q: "Llamada al kernel en Linux (32 bits):", a: ["INT 21h", "INT 80h", "INT 10h", "CALL"], c: 1, e: "Syscall." },
+    { s: 11, q: "¿Qué registro se usa frecuentemente como contador?", a: ["AX", "BX", "CX", "DX"], c: 2, e: "Counter register." },
+    { s: 11, q: "¿Qué registro se usa frecuentemente para direcciones de memoria?", a: ["AX", "BX", "CX", "DX"], c: 1, e: "Base register." },
+
+    // --- SESIÓN 12: ENSAMBLADOR DETALLE (14 Q) ---
+    { s: 12, q: "¿Registro contador de LOOP?", a: ["AX", "BX", "CX", "DX"], c: 2, e: "Auto decremento." },
+    { s: 12, q: "Terminador para 09h INT 21h:", a: ["#", "0", "$", "&"], c: 2, e: "Delimitador." },
+    { s: 12, q: "¿Diferencia CMP vs SUB?", a: ["CMP no guarda resultado", "SUB suma", "SUB rápida", "Nada"], c: 0, e: "Solo flags." },
+    { s: 12, q: "Registro para char en func 02h:", a: ["AL", "DL", "AH", "CL"], c: 1, e: "Dato salida." },
+    { s: 12, q: "Para mostrar '5' sumamos:", a: ["10", "48 o 30h", "0", "1"], c: 1, e: "Ajuste ASCII." },
+    { s: 12, q: "Si CX=0 al inicio de LOOP:", a: ["0", "1", "65536", "Inf"], c: 2, e: "Vuelta completa." },
+    { s: 12, q: "PUSH significa:", a: ["Extraer", "Meter en pila", "Sumar", "Cerrar"], c: 1, e: "Al tope." },
+    { s: 12, q: "POP significa:", a: ["Meter", "Extraer de pila", "Restar", "Saltar"], c: 1, e: "Desde tope." },
+    { s: 12, q: "ASCII 0Dh:", a: ["Espacio", "Retorno carro", "Tab", "Fin"], c: 1, e: "Inicio línea." },
+    { s: 12, q: "ASCII 0Ah:", a: ["Salto línea", "Espacio", "Reset", "Fin"], c: 0, e: "Bajar línea." },
+    { s: 12, q: "¿Qué hace 'MOV AL, 15h'?", a: ["Suma 15", "Copia valor 15h a AL", "Borra AL", "Salta a 15"], c: 1, e: "Transferencia." },
+    { s: 12, q: "Directiva DB reserva:", a: ["1 byte", "2 bytes", "4 bytes", "8 bytes"], c: 0, e: "Define Byte." },
+    { s: 12, q: "Directiva DW reserva:", a: ["1 byte", "Word (2 bytes)", "Double", "Quad"], c: 1, e: "Define Word." },
+    { s: 12, q: "AH=4Ch sirve para:", a: ["Imprimir", "Terminar proceso", "Reiniciar", "Leer"], c: 1, e: "Retorno SO." },
+
+    // --- GUÍA DE ESTUDIO (24 PREGUNTAS LITERALES) ---
+    { s: 'guide', q: "G1. ¿Puerta salida '0' únicamente si todas son '1'?", a: ["AND", "NOR", "NAND", "XOR"], c: 2, e: "Guía literal Q1." },
+    { s: 'guide', q: "G2. Utilizando Boole, ¿A + A'B es?", a: ["A+B", "A", "B", "AB"], c: 0, e: "Guía literal Q2." },
+    { s: 'guide', q: "G3. Grupo de 8 en Mapa K 4-var deja:", a: ["2 var", "1 var", "3 var", "Constante"], c: 1, e: "Guía literal Q3." },
+    { s: 'guide', q: "G4. Representación binaria de 25:", a: ["10101", "11100", "11001", "11011"], c: 2, e: "Guía literal Q4." },
+    { s: 'guide', q: "G5. Código Gray rasgo principal:", a: ["Cambia 1 bit", "Pesado", "4 bits", "EBCDIC"], c: 0, e: "Guía literal Q5." },
+    { s: 'guide', q: "G6. Dispositivo exclusivamente combinacional:", a: ["Registro", "Multiplexor", "Contador", "Biestable"], c: 1, e: "Guía literal Q6." },
+    { s: 'guide', q: "G7. Decoder 3:8, entrada 010 activa:", a: ["S2", "S0/S1", "Todo menos S2", "Off"], c: 0, e: "Guía literal Q7." },
+    { s: 'guide', q: "G8. Diferencia HA vs FA:", a: ["HA no acarreo", "FA tiene Cin", "FA secuencial", "3 bits HA"], c: 1, e: "Guía literal Q8." },
+    { s: 'guide', q: "G9. Minitérmino es:", a: ["Producto=1", "Suma=0", "Simplificación", "Puerta"], c: 0, e: "Guía literal Q9." },
+    { s: 'guide', q: "G10. Función del Clock:", a: ["Energía", "Sincronizar biestables", "Borrar RAM", "Bus"], c: 1, e: "Guía literal Q10." },
+    { s: 'guide', q: "G11. En JK, J=1, K=1 hace:", a: ["Igual", "Reset", "Toggle", "Indet"], c: 2, e: "Guía literal Q11." },
+    { s: 'guide', q: "G12. Latch vs FF diferencia:", a: ["Nivel vs Flanco", "Memoria", "Analógico", "Ninguna"], c: 0, e: "Guía literal Q12." },
+    { s: 'guide', q: "G13. Tras 1111 en contador 4 bits sigue:", a: ["1000", "0001", "0000", "Lock"], c: 2, e: "Guía literal Q13." },
+    { s: 'guide', q: "G14. Tabla Estados define:", a: ["Voltaje", "Relación actual/ent/sig", "Reloj", "Gates"], c: 1, e: "Guía literal Q14." },
+    { s: 'guide', q: "G15. Premisa Von Neumann:", a: ["Bus/mem compartido", "Separados", "Sin CPU", "Solo ROM"], c: 0, e: "Guía literal Q15." },
+    { s: 'guide', q: "G16. Función IR:", a: ["Dirección", "Decodifica instrucción", "Suma", "Datos"], c: 1, e: "Guía literal Q16." },
+    { s: 'guide', q: "G17. Ocurre en Fetch:", a: ["Ejecución", "Trae de memoria", "Reset", "Bus Off"], c: 1, e: "Guía literal Q17." },
+    { s: 'guide', q: "G18. Ancho bus datos determina:", a: ["Direcciones", "Bits a la vez", "Cooling", "Disco"], c: 1, e: "Guía literal Q18." },
+    { s: 'guide', q: "G19. Registros vs RAM velocidad:", a: ["Integrados", "Magnéticos", "Grandes", "Static"], c: 0, e: "Guía literal Q19." },
+    { s: 'guide', q: "G20. Localidad Temporal:", a: ["Cerca física", "Reutilizar dato reciente", "Acceso", "Garantía"], c: 1, e: "Guía literal Q20." },
+    { s: 'guide', q: "G21. Función ALU:", a: ["Decoder", "Cálculos y comparaciones", "Pila", "Monitor"], c: 1, e: "Guía literal Q21." },
+    { s: 'guide', q: "G22. Si AX=BX=5, tras CMP AX, BX:", a: ["ZF = 1", "CF = 1", "AX = 0", "ZF = 0"], c: 0, e: "Guía literal Q22." },
+    { s: 'guide', q: "G23. 0xFE + 0x03 en 8 bits resulta en:", a: ["0x01", "0x101", "0x00", "0xFF"], c: 0, e: "Guía literal Q23." },
+    { s: 'guide', q: "G24. SUB CX, CX seguido de LOOP itera:", a: ["1 vez", "65536 veces", "0 veces", "Error"], c: 1, e: "Guía literal Q24." }
+];
+
+let cCount = 0; let wCount = 0;
+const attempted = new Set();
+const alreadyFailed = new Set();
+
+function init() {
+    const nav = document.getElementById('nav');
+    for(let i=1; i<=12; i++) {
+        const b = document.createElement('button');
+        b.className = 'nav-btn';
+        b.innerText = `S${i}`;
+        b.onclick = (e) => filter('s'+i, e.target);
+        nav.insertBefore(b, nav.lastElementChild);
+    }
+
+    const container = document.getElementById('quiz-container');
+    masterBank.forEach((item, idx) => {
+        const type = item.s === 'guide' ? 'guide' : 's'+item.s;
+        const div = document.createElement('div');
+        div.className = `q-card ${type}`;
+        div.innerHTML = `
+            <span class="tag">${item.s === 'guide' ? 'Guía de Estudio' : 'Sesión ' + item.s}</span>
+            <span class="q-text">${idx + 1}. ${item.q}</span>
+            <div class="opt-list">
+                ${item.a.map((opt, aIdx) => `
+                    <div class="opt-item" onclick="check(this, ${idx}, ${aIdx})">
+                        ${String.fromCharCode(65+aIdx)}) ${opt}
+                    </div>
+                `).join('')}
+            </div>
+            <div id="fb-${idx}" class="feedback"></div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function check(el, qIdx, sel) {
+    const item = masterBank[qIdx];
+    const fb = document.getElementById(`fb-${qIdx}`);
+    if (sel === item.c) {
+        el.classList.add('correct');
+        if (!attempted.has(qIdx)) {
+            if (!alreadyFailed.has(qIdx)) {
+                cCount++;
+                document.getElementById('c-count').innerText = cCount;
+            }
+            attempted.add(qIdx);
+        }
+        fb.innerHTML = `<strong>¡Correcto!</strong> ${item.e} <span class="ref">Fuente: ${item.s === 'guide' ? 'Guía de Estudio' : 'Sesión ' + item.s}</span>`;
+        fb.style.display = "block";
+        el.parentNode.style.pointerEvents = "none";
+    } else {
+        if (!el.classList.contains('incorrect')) {
+            el.classList.add('incorrect');
+            if (!attempted.has(qIdx) && !alreadyFailed.has(qIdx)) {
+                wCount++;
+                document.getElementById('w-count').innerText = wCount;
+                alreadyFailed.add(qIdx);
+            }
+        }
+        fb.innerHTML = `<strong>Error.</strong> Puedes intentarlo de nuevo, pero no sumará al marcador de aciertos.`;
+        fb.style.display = "block";
+    }
+}
+
+function filter(id, btn) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    document.querySelectorAll('.q-card').forEach(c => {
+        if(id === 'all' || c.classList.contains(id)) c.classList.remove('hidden');
+        else c.classList.add('hidden');
+    });
+    window.scrollTo(0,0);
+}
+
+init();
+</script>
+</body>
+</html>

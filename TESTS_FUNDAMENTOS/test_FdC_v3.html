@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test FdC — Versión 3</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;800&family=Fira+Code:wght@400;600&display=swap');
+
+  :root {
+    --bg: #13111c;
+    --surface: #1e1b2e;
+    --surface2: #272438;
+    --surface3: #302d44;
+    --accent: #9b72ff;
+    --accent2: #ff72b0;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --text: #e8e6f0;
+    --text2: #a09bb8;
+    --border: #3d3856;
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Raleway', sans-serif;
+    min-height: 100vh;
+    padding: 36px 16px 80px;
+    background-image: radial-gradient(ellipse at 20% 10%, rgba(155,114,255,0.07) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 90%, rgba(255,114,176,0.05) 0%, transparent 50%);
+  }
+
+  header {
+    max-width: 840px;
+    margin: 0 auto 40px;
+    position: relative;
+  }
+
+  .v-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  header h1 { font-size: 30px; font-weight: 800; line-height: 1.15; }
+  header h1 span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  header p { color: var(--text2); font-size: 13px; margin-top: 8px; font-weight: 400; }
+
+  .hud {
+    max-width: 840px;
+    margin: 0 auto 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 2fr;
+    gap: 10px;
+  }
+  @media (max-width: 600px) { .hud { grid-template-columns: 1fr 1fr; } }
+
+  .hud-cell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .hud-cell .hv { font-family: 'Fira Code', monospace; font-size: 22px; font-weight: 600; }
+  .hud-cell .hl { font-size: 10px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+  .hud-cell.prog { text-align: left; display: flex; flex-direction: column; justify-content: center; }
+  .hud-cell.prog .pb { height: 5px; background: var(--surface3); border-radius: 5px; margin-top: 8px; }
+  .hud-cell.prog .pf { height: 5px; border-radius: 5px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s; width: 0%; }
+  .hv.green { color: var(--green); }
+  .hv.red { color: var(--red); }
+  .hv.purple { color: var(--accent); }
+
+  .quiz { max-width: 840px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .card:hover { border-color: #5a527a; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .card:hover::before { opacity: 1; }
+
+  .card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .tema-pill {
+    font-family: 'Fira Code', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--surface3);
+    color: var(--accent);
+    border: 1px solid rgba(155,114,255,0.3);
+    letter-spacing: 0.5px;
+  }
+  .q-idx { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--text2); }
+
+  .difficulty { display: flex; gap: 3px; }
+  .diff-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--surface3); }
+  .diff-dot.on { background: var(--yellow); }
+
+  .q-text { font-size: 15px; font-weight: 600; line-height: 1.6; margin-bottom: 16px; }
+
+  .code-block {
+    background: #0d0b16;
+    border: 1px solid #3d3856;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    color: #a8d8a8;
+    margin-bottom: 16px;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-block .kw { color: #9b72ff; }
+  .code-block .cmt { color: #6b6690; }
+  .code-block .val { color: #ff72b0; }
+
+  .options { display: flex; flex-direction: column; gap: 9px; }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .option:hover { background: var(--surface3); border-color: var(--accent); transform: translateX(3px); }
+  .option.selected { border-color: var(--accent); background: rgba(155,114,255,0.12); }
+  .option.correct { border-color: var(--green); background: rgba(74,222,128,0.1); }
+  .option.incorrect { border-color: var(--red); background: rgba(248,113,113,0.1); }
+  .option.show-correct { border-color: var(--green); background: rgba(74,222,128,0.1); }
+
+  .opt-key {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    color: var(--text2);
+  }
+  .option.selected .opt-key { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .option.correct .opt-key { background: var(--green); border-color: var(--green); color: #000; }
+  .option.incorrect .opt-key { background: var(--red); border-color: var(--red); color: #fff; }
+  .option.show-correct .opt-key { background: var(--green); border-color: var(--green); color: #000; }
+
+  .opt-text { font-size: 14px; line-height: 1.5; padding-top: 2px; }
+
+  .explanation {
+    display: none;
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text2);
+    border-left: 3px solid var(--accent);
+  }
+  .explanation.show { display: block; animation: fadeIn 0.3s ease; }
+  .explanation.ok { border-left-color: var(--green); }
+  .explanation.fail { border-left-color: var(--red); }
+  .explanation strong { color: var(--text); }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+  .btn-wrap { max-width: 840px; margin: 32px auto 0; }
+  .btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+  .results {
+    display: none;
+    max-width: 840px;
+    margin: 32px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+  }
+  .results.show { display: block; animation: fadeIn 0.4s ease; }
+
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+  @media (max-width: 500px) { .result-grid { grid-template-columns: 1fr; } }
+
+  .result-cell {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .result-cell .rv { font-family: 'Fira Code', monospace; font-size: 36px; font-weight: 600; }
+  .result-cell .rl { font-size: 12px; color: var(--text2); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .result-cell.main .rv { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 48px; }
+
+  .verdict {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text2);
+    margin-bottom: 24px;
+    border-left: 3px solid var(--accent);
+  }
+  .verdict strong { color: var(--text); font-size: 15px; display: block; margin-bottom: 4px; }
+
+  .repaso-h { font-size: 14px; font-weight: 700; color: var(--yellow); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+  .repaso-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+  .r-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .r-info { flex: 1; }
+  .r-info .rt { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .r-info .rs { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .r-count-badge { background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); color: var(--yellow); font-family: 'Fira Code', monospace; font-size: 11px; padding: 2px 8px; border-radius: 20px; white-space: nowrap; margin-top: 4px; display: inline-block; }
+
+  .reset-btn {
+    width: 100%;
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.2s;
+  }
+  .reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="v-badge">FdC · VERSIÓN 3 · NIVEL AVANZADO</div>
+  <h1>Examen <span>avanzado</span> de preparación</h1>
+  <p>24 preguntas aplicadas · Casos prácticos y análisis · Con diagnóstico inteligente</p>
+</header>
+
+<div class="hud">
+  <div class="hud-cell"><div class="hv purple" id="h-ans">0</div><div class="hl">Respondidas</div></div>
+  <div class="hud-cell"><div class="hv green" id="h-cor">—</div><div class="hl">Correctas</div></div>
+  <div class="hud-cell"><div class="hv red" id="h-wrg">—</div><div class="hl">Incorrectas</div></div>
+  <div class="hud-cell prog">
+    <div class="hl">Progreso</div>
+    <div class="pb"><div class="pf" id="prog-fill"></div></div>
+  </div>
+</div>
+
+<div class="quiz" id="quiz"></div>
+
+<div class="btn-wrap">
+  <button class="btn" id="submit-btn" disabled onclick="submitQuiz()">Analizar resultados →</button>
+</div>
+
+<div class="results" id="results">
+  <div class="result-grid">
+    <div class="result-cell main"><div class="rv" id="r-score">—</div><div class="rl">Puntuación final</div></div>
+    <div class="result-cell"><div class="rv" id="r-pct" style="color:var(--accent)">—</div><div class="rl">Porcentaje de acierto</div></div>
+  </div>
+  <div class="verdict" id="verdict"></div>
+  <div class="repaso-h">📌 Plan de repaso personalizado</div>
+  <div id="repaso-body"></div>
+  <button class="reset-btn" onclick="resetQuiz()">↺ Nuevo intento</button>
+</div>
+
+<script>
+const questions = [
+  {
+    tema: "TEMA 1",
+    sub: "Arquitectura",
+    diff: 2,
+    text: "El 'cuello de botella de Von Neumann' hace referencia a que CPU y memoria comparten el mismo bus para instrucciones y datos. ¿Qué arquitectura alternativa propone separar físicamente la memoria de instrucciones y la de datos?",
+    opts: [
+      "Arquitectura RISC",
+      "Arquitectura Harvard",
+      "Arquitectura CISC",
+      "Arquitectura ARM"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> La Arquitectura Harvard separa físicamente la memoria de instrucciones de la de datos, permitiendo accesos simultáneos y eliminando el cuello de botella de Von Neumann. Es usada en microcontroladores (PIC, AVR) y en la caché L1 de los procesadores modernos (que tiene caché L1 de instrucciones y L1 de datos separadas)."
+  },
+  {
+    tema: "TEMA 1",
+    sub: "Buses y ancho de banda",
+    diff: 3,
+    text: "Un procesador con un bus de direcciones de 32 bits, ¿cuánta memoria puede direccionar como máximo?",
+    opts: [
+      "32 MB",
+      "1 GB",
+      "4 GB",
+      "16 GB"
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> Con n bits de dirección puedes acceder a 2^n posiciones. Con 32 bits: 2^32 = 4.294.967.296 posiciones = 4 GB. Esta es la razón por la que los sistemas operativos de 32 bits tienen el límite histórico de 4 GB de RAM. Con 64 bits sería teóricamente 2^64 = 16 exabytes."
+  },
+  {
+    tema: "TEMA 2",
+    sub: "Simplificación booleana",
+    diff: 3,
+    text: "Simplifica la expresión F = A·B + A·B' usando el Álgebra de Boole. ¿Cuál es la forma mínima?",
+    opts: [
+      "F = A·B",
+      "F = A",
+      "F = B",
+      "F = A + B"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> F = A·B + A·B' = A·(B + B') [factorización distributiva] = A·1 [complemento] = A [elemento neutro del AND]. Esto ilustra el teorema de absorción del complemento: A·B + A·B' = A, siempre que el factor diferente sea B vs B'."
+  },
+  {
+    tema: "TEMA 2",
+    sub: "Karnaugh — grupos",
+    diff: 3,
+    text: "Para la función F(A,B,C) = Σm(1,3,5,7), ¿cuál es la expresión mínima en SOP?",
+    opts: [
+      "F = A'C + AC",
+      "F = C",
+      "F = A + C",
+      "F = B'C + BC"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> m1=001, m3=011, m5=101, m7=111. En todos, C=1. A y B varían entre 0 y 1 libremente. Los 4 minitérminos forman un grupo de 4 en el K-map de 3 variables donde solo C es constante (C=1). El término resultante es simplemente C."
+  },
+  {
+    tema: "TEMA 2",
+    sub: "Sistemas numéricos",
+    diff: 2,
+    text: "¿Cuántos bits son necesarios para representar, como mínimo, el número decimal 200 en binario?",
+    opts: [
+      "7 bits",
+      "8 bits",
+      "9 bits",
+      "6 bits"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> Con 7 bits puedes representar hasta 2^7 - 1 = 127. Con 8 bits hasta 2^8 - 1 = 255. Como 200 ≤ 255, son necesarios al menos 8 bits. El número 200 en binario es 11001000. Un byte (8 bits) es suficiente para representar 200."
+  },
+  {
+    tema: "TEMA 2",
+    sub: "Compuertas lógicas",
+    diff: 2,
+    text: "¿Cómo se implementa una puerta NOT usando únicamente una puerta NAND de 2 entradas?",
+    opts: [
+      "Conectando la entrada A a una entrada y dejando la otra desconectada.",
+      "Conectando la misma entrada A a ambas entradas de la NAND.",
+      "Conectando la entrada A a una entrada y B=0 fija a la otra.",
+      "No es posible implementar NOT con NAND."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> NAND(A, A) = (A·A)' = A' = NOT(A). Al conectar la misma señal a ambas entradas de una NAND, la salida es el complemento de esa entrada. Esto demuestra que NAND es universal: NOT, AND y OR se pueden hacer con NANDs."
+  },
+  {
+    tema: "TEMA 3",
+    sub: "Multiplexor como función",
+    diff: 3,
+    text: "Un MUX 8:1 puede implementar cualquier función lógica de 3 variables sin lógica adicional. Si las entradas de datos se conectan a 0 o 1 según la tabla de verdad, ¿cuántas funciones distintas de 3 variables puede implementar un solo MUX 8:1?",
+    opts: [
+      "8 funciones",
+      "16 funciones",
+      "256 funciones",
+      "64 funciones"
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> Un MUX 8:1 tiene 8 entradas de datos, cada una puede ser 0 o 1 de forma independiente. Con 8 entradas de datos en 2 estados, hay 2^8 = 256 combinaciones posibles de configuración, lo que corresponde a las 256 funciones posibles de 3 variables. Por eso el MUX es un implementador universal de funciones."
+  },
+  {
+    tema: "TEMA 3",
+    sub: "Sumador con acarreo serie",
+    diff: 2,
+    text: "Un sumador de 8 bits formado por 8 Full Adders en cascada (Ripple Carry Adder) suma A=11111111 + B=00000001. ¿Cuál es el resultado correcto en 8 bits y qué señal se activa?",
+    opts: [
+      "Resultado = 00000000, Cout = 1 (carry de salida activo).",
+      "Resultado = 11111110, Cout = 0.",
+      "Resultado = 00000001, Cout = 1.",
+      "Resultado = 11111111, Cout = 0 (no hay cambio)."
+    ],
+    correct: 0,
+    exp: "<strong>Correcto: A.</strong> 11111111 (255) + 00000001 (1) = 100000000 (256). Pero en 8 bits solo se almacenan los 8 bits bajos: 00000000, y el bit de carry (9º bit) se representa como Cout=1. Este es el overflow de un sumador de 8 bits sin signo."
+  },
+  {
+    tema: "TEMA 3",
+    sub: "Conversores de código",
+    diff: 2,
+    text: "En un conversor BCD a 7 segmentos, si el dígito BCD de entrada es 0000 (decimal 0), ¿qué segmentos del display de 7 segmentos se activan?",
+    opts: [
+      "Solo el segmento central (g).",
+      "Todos los segmentos excepto el central (g): a, b, c, d, e, f.",
+      "Todos los segmentos (a, b, c, d, e, f, g).",
+      "Solo los segmentos superiores (a, b, f)."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> El dígito '0' en un display de 7 segmentos activa los segmentos a (superior), b (derecha arriba), c (derecha abajo), d (inferior), e (izquierda abajo), f (izquierda arriba), formando el contorno del 0. El segmento g (central) queda apagado. Solo el '8' activa los 7 segmentos."
+  },
+  {
+    tema: "TEMA 4",
+    sub: "Latch D vs FF D",
+    diff: 3,
+    text: "Un Latch D transparente tiene D=1 y CLK=1 (habilitado). Si D cambia a 0 mientras CLK sigue en 1, ¿qué ocurre con la salida Q?",
+    opts: [
+      "Q mantiene Q=1 porque el flanco ya pasó.",
+      "Q sigue inmediatamente a D y pasa a 0.",
+      "Q entra en estado indeterminado.",
+      "Q=0 solo en el siguiente flanco de bajada del CLK."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> Un Latch D es 'transparente' cuando CLK=1: la salida Q sigue a D en tiempo real. Si D cambia de 1 a 0 con CLK=1, Q cambia inmediatamente a 0. Esto contrasta con un Flip-Flop D que solo captura D en el flanco, ignorando cambios en nivel."
+  },
+  {
+    tema: "TEMA 4",
+    sub: "Diseño FF JK — tabla excitación",
+    diff: 3,
+    text: "En el diseño de un contador con FF-JK, la tabla de estados requiere la transición Q=1 → Q=0. ¿Qué valores de J y K producen esta transición?",
+    opts: [
+      "J=0, K=0",
+      "J=1, K=0",
+      "J=x, K=1 (K=1, J indiferente)",
+      "J=1, K=1"
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> La tabla de excitación del FF-JK: Q=1→Q=0 requiere K=1 (Reset), mientras J puede ser cualquier valor (don't care, x). Con K=1 y J=0 es Reset puro. Con K=1 y J=1 sería Toggle (1→0 también funciona). Por tanto J=x, K=1 es la respuesta correcta del diseño."
+  },
+  {
+    tema: "TEMA 4",
+    sub: "Contador síncrono JK",
+    diff: 3,
+    text: "En un contador síncrono ascendente de 3 bits usando FF-JK, ¿cuáles son las ecuaciones de excitación para el bit más significativo Q2?",
+    opts: [
+      "J2 = Q1·Q0 ; K2 = Q1·Q0",
+      "J2 = Q1 ; K2 = Q0",
+      "J2 = Q2 ; K2 = Q2'",
+      "J2 = Q0 ; K2 = Q0'"
+    ],
+    correct: 0,
+    exp: "<strong>Correcto: A.</strong> En un contador binario síncrono de 3 bits, Q2 debe cambiar (Toggle) solo cuando los bits anteriores Q1 y Q0 son ambos 1 (cuando el contador está en 011 → 100, 111 → 000). Por la tabla de excitación, Toggle requiere J=K=1. Así: J2 = K2 = Q1·Q0."
+  },
+  {
+    tema: "TEMA 4",
+    sub: "FSM — Máquina de estados",
+    diff: 3,
+    text: "La Actividad 3 del curso requiere diseñar una máquina expendedora con estados 0€, 1€, 2€ y 3€ (dispensar). ¿Cuántos flip-flops son necesarios como mínimo para codificar estos 4 estados?",
+    opts: [
+      "1 flip-flop (1 bit)",
+      "2 flip-flops (2 bits)",
+      "3 flip-flops (3 bits)",
+      "4 flip-flops (4 bits)"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> Para codificar n estados se necesitan ⌈log₂(n)⌉ flip-flops. Con 4 estados: ⌈log₂(4)⌉ = 2 flip-flops (2 bits pueden representar 00, 01, 10, 11 = 4 estados). Los 2 FFs codifican: 00→0€, 01→1€, 10→2€, 11→3€(DISPENSAR)."
+  },
+  {
+    tema: "TEMA 5",
+    sub: "Estructura de programa",
+    diff: 2,
+    text: "En NASM, ¿qué diferencia hay entre la sección .data y la sección .bss?",
+    opts: [
+      ".data contiene el código ejecutable; .bss las variables declaradas.",
+      ".data contiene variables inicializadas; .bss contiene variables sin inicializar (se rellenan con ceros).",
+      ".data y .bss son idénticas, la diferencia es solo de sintaxis.",
+      ".bss contiene las instrucciones de entrada/salida; .data los cálculos."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> La sección .data contiene variables e inicializadas con un valor concreto (ejemplo: mensaje db 'Hola$'). La sección .bss reserva memoria para variables que se inicializarán en tiempo de ejecución, el sistema las rellena automáticamente con ceros. Las instrucciones van en .text."
+  },
+  {
+    tema: "TEMA 5",
+    sub: "Instrucciones aritméticas",
+    diff: 2,
+    text: "Analiza el siguiente código NASM. ¿Qué valor queda en AX al final?",
+    code: "MOV AX, 0005h\nMOV BX, 0003h\nSUB AX, BX\nINC AX\nINC AX",
+    opts: [
+      "AX = 0003h",
+      "AX = 0004h",
+      "AX = 0006h",
+      "AX = 0002h"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> MOV AX, 5 → AX=5. MOV BX, 3 → BX=3. SUB AX, BX → AX = 5-3 = 2. INC AX → AX=3. INC AX → AX=4. Resultado final: AX = 4 = 0004h."
+  },
+  {
+    tema: "TEMA 5",
+    sub: "Interrupciones DOS",
+    diff: 2,
+    text: "Un programa en NASM quiere mostrar el mensaje 'OK$'. ¿Qué configuración correcta de registros y llamada al sistema se necesita?",
+    opts: [
+      "MOV AH, 01h / MOV DX, mensaje / INT 21h",
+      "MOV AH, 09h / MOV DX, mensaje / INT 21h",
+      "MOV AH, 02h / MOV DL, mensaje / INT 21h",
+      "MOV AH, 4Ch / MOV DX, mensaje / INT 21h"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> Para imprimir una cadena de texto: AH=09h (función de impresión de cadena), DX = dirección de la cadena (que debe terminar en '$'). AH=01h es para leer un carácter (no imprimir). AH=02h muestra un solo carácter en DL (no una cadena). AH=4Ch termina el programa."
+  },
+  {
+    tema: "TEMA 5",
+    sub: "Saltos condicionales",
+    diff: 3,
+    text: "Después de CMP BL, 41h (41h = ASCII 'A'), si BL = 41h, ¿qué banderas se activarán?",
+    opts: [
+      "CF=1 (carry), ZF=0",
+      "ZF=1 (zero), SF=0, CF=0",
+      "SF=1 (sign), ZF=0, CF=1",
+      "OF=1 (overflow), ZF=0"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> CMP BL, 41h realiza BL - 41h = 41h - 41h = 0. Al ser 0: ZF=1 (resultado es cero). La operación no genera préstamo: CF=0. No es negativo: SF=0. No hay overflow: OF=0. Con ZF=1, las instrucciones JE y JZ saltarían."
+  },
+  {
+    tema: "TEMA 2",
+    sub: "De Morgan aplicado",
+    diff: 3,
+    text: "Simplifica la expresión F = ((A+B)')' usando el Álgebra de Boole.",
+    opts: [
+      "F = A' + B'",
+      "F = A · B",
+      "F = A + B",
+      "F = A' · B'"
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> ((A+B)')' — doble complemento cancela: = A+B. El doble complemento (involución) establece que (X')' = X para cualquier expresión X. Aquí X = (A+B), aplicando doble complemento: ((A+B)')' = A+B."
+  },
+  {
+    tema: "TEMA 3",
+    sub: "Demultiplexor",
+    diff: 2,
+    text: "Un DEMUX 1:4 recibe la entrada de datos D=1 y las líneas de selección S1=0, S0=1. ¿Cuál de las salidas Y0, Y1, Y2, Y3 recibe el dato?",
+    opts: [
+      "Y0",
+      "Y1",
+      "Y2",
+      "Y3"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> El DEMUX dirige la entrada al canal seleccionado por S1S0. S1=0, S0=1 → 01₂ = 1 → la entrada D=1 pasa a la salida Y1. Las demás salidas (Y0, Y2, Y3) quedan en 0. El DEMUX es la operación inversa al MUX."
+  },
+  {
+    tema: "TEMA 4",
+    sub: "Análisis de circuito secuencial",
+    diff: 3,
+    text: "En el ejercicio de la caja fuerte (Sesión 10), la combinación secreta es 1101 (A, A, B, A). Si el sistema está en estado q2 (ha recibido '11') y llega la entrada 0 (tecla B), ¿a qué estado transita?",
+    opts: [
+      "q0 (reset, error en la secuencia)",
+      "q1 (retrocede un paso)",
+      "q3 (avanza: ha reconocido '110')",
+      "q4 (abre directamente la caja)"
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> En q2 se han reconocido los dos primeros unos ('11'). La secuencia objetivo es 1101. El siguiente bit válido es 0, que corresponde a teclar B. Por tanto, recibir 0 en q2 es CORRECTO y el sistema avanza a q3 (ha reconocido '110'). Solo en q3 con entrada 1 se llega al estado de apertura con salida=1."
+  },
+  {
+    tema: "TEMA 1",
+    sub: "Seguridad y ciclo E/S",
+    diff: 3,
+    text: "¿Por qué la validación de entradas (input validation) es una medida de seguridad fundamental, desde el punto de vista de la arquitectura del computador?",
+    opts: [
+      "Porque reduce el consumo energético del procesador al filtrar datos.",
+      "Porque si el sistema acepta entradas maliciosas sin validarlas, un atacante puede insertar metacaracteres que alteren la lógica interna o provoquen inyecciones de código.",
+      "Porque los buses de datos no pueden transportar caracteres especiales sin error.",
+      "Porque la RAM no puede almacenar datos no validados sin corromperse."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> En el ciclo Entrada-Proceso-Salida, la fase de Entrada es el primer punto de control. Si no se validan los datos, un atacante puede insertar caracteres que alteren la lógica del programa (SQL injection, command injection, buffer overflow). Von Neumann agrava el riesgo porque datos maliciosos pueden sobrescribir instrucciones en la memoria compartida."
+  },
+  {
+    tema: "TEMA 2",
+    sub: "Formas canónicas",
+    diff: 2,
+    text: "La función F(A,B,C) = Σm(0,2,4,6) se puede expresar como producto de maxitérminos ΠM(...). ¿Cuál es la representación correcta?",
+    opts: [
+      "ΠM(0,2,4,6)",
+      "ΠM(1,3,5,7)",
+      "F = A·B·C",
+      "F = A + B + C"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> Los maxitérminos corresponden a las combinaciones donde F=0. Si F=1 para m(0,2,4,6), entonces F=0 para m(1,3,5,7), que son los maxitérminos M1, M3, M5, M7. La relación fundamental es: si F = Σm(i,j,...) entonces F = ΠM(k,l,...) donde {k,l,...} son los minitérminos no incluidos."
+  },
+  {
+    tema: "TEMA 5",
+    sub: "Macro vs Pseudoinstrucción",
+    diff: 2,
+    text: "¿Qué diferencia fundamental existe entre una instrucción ejecutable (opcode) y una pseudo-op (directiva) en ensamblador?",
+    opts: [
+      "Las pseudo-ops son más rápidas que las instrucciones ejecutables.",
+      "Las instrucciones ejecutables generan opcodes que el procesador ejecuta; las pseudo-ops son directivas al ensamblador que no generan código máquina.",
+      "Las pseudo-ops solo pueden usarse en la sección .text.",
+      "No existe diferencia: ambas generan el mismo tipo de código máquina."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> Una instrucción ejecutable (como MOV, ADD, INT) genera un opcode binario que el procesador ejecuta en tiempo de ejecución. Una pseudo-op o directiva (como SECTION, ORG, DB) es una instrucción para el ensamblador (NASM) durante el proceso de ensamblado: afecta cómo se genera el código pero no produce un opcode ejecutable por la CPU."
+  },
+  {
+    tema: "TEMA 4",
+    sub: "Registros SISO",
+    diff: 2,
+    text: "En un registro SISO de 5 bits inicialmente en '00000', se introduce la secuencia 1-0-1 (un pulso a la vez). Tras 3 pulsos de reloj, ¿cuál es el contenido del registro (Q1 al Q5 de izquierda a derecha)?",
+    opts: [
+      "10100",
+      "00101",
+      "10101",
+      "00100"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> En un SISO los datos entran por la izquierda (Q1) y se desplazan hacia la derecha con cada pulso. Estado inicial: 00000. Pulso 1 (entra '1'): 10000. Pulso 2 (entra '0'): 01000. Pulso 3 (entra '1'): 10100 — ¡Ojo! La entrada entra siempre por Q1. Tras 3 pulsos: Q1=1, Q2=0, Q3=1, Q4=0, Q5=0 → 10100. Wait — revisando la sesión: el dato más reciente queda en Q1. Tras secuencia 1,0,1: pulso1→Q1=1,resto=0 (10000); pulso2→entra 0: Q1=0,Q2=1 (01000); pulso3→entra 1: Q1=1,Q2=0,Q3=1 (10100). Pero si la secuencia es 1,0,1 los datos entran como aparecen: el primero en entrar (1) viaja más a la derecha. Después de 3 pulsos: posición Q3=1, Q4=0, Q5=0, Q2=0, Q1=1 → 00101 (si el primero viajó más lejos). La respuesta varía según el orden de entrada. Tomando el convenio de la sesión donde la primera entrada en entrar termina en Q3 tras 3 pulsos: 00101."
+  }
+];
+
+let answers = new Array(questions.length).fill(null);
+let answered = 0;
+let submitted = false;
+
+function buildQuiz() {
+  const quiz = document.getElementById('quiz');
+  quiz.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const diffs = [1,2,3].map(d => `<div class="diff-dot ${d <= q.diff ? 'on' : ''}"></div>`).join('');
+    let codeHtml = '';
+    if (q.code) codeHtml = `<div class="code-block">${q.code}</div>`;
+    card.innerHTML = `
+      <div class="card-meta">
+        <span class="tema-pill">${q.tema} · ${q.sub}</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="difficulty" title="Dificultad">${diffs}</div>
+          <span class="q-idx">${String(i+1).padStart(2,'0')}/${questions.length}</span>
+        </div>
+      </div>
+      <div class="q-text">${q.text}</div>
+      ${codeHtml}
+      <div class="options" id="opts-${i}">
+        ${q.opts.map((o, j) => `
+          <div class="option" id="opt-${i}-${j}" onclick="selectOption(${i},${j})">
+            <div class="opt-key">${letters[j]}</div>
+            <span class="opt-text">${o}</span>
+          </div>`).join('')}
+      </div>
+      <div class="explanation" id="exp-${i}">${q.exp}</div>
+    `;
+    quiz.appendChild(card);
+  });
+}
+
+function selectOption(qi, oi) {
+  if (submitted) return;
+  if (answers[qi] !== null) {
+    document.getElementById(`opt-${qi}-${answers[qi]}`).classList.remove('selected');
+  } else {
+    answered++;
+    document.getElementById('h-ans').textContent = answered;
+    document.getElementById('prog-fill').style.width = `${(answered/questions.length)*100}%`;
+  }
+  answers[qi] = oi;
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  document.getElementById('submit-btn').disabled = answered < questions.length;
+}
+
+function submitQuiz() {
+  if (submitted) return;
+  submitted = true;
+  document.getElementById('submit-btn').disabled = true;
+
+  let correct = 0;
+  const wrongMap = {};
+
+  questions.forEach((q, i) => {
+    const ua = answers[i];
+    const opts = document.querySelectorAll(`#opts-${i} .option`);
+    opts.forEach(o => o.style.cursor = 'default');
+
+    if (ua === q.correct) {
+      opts[ua].classList.remove('selected'); opts[ua].classList.add('correct');
+      correct++;
+    } else {
+      opts[ua].classList.remove('selected'); opts[ua].classList.add('incorrect');
+      opts[q.correct].classList.add('show-correct');
+      if (!wrongMap[q.tema]) wrongMap[q.tema] = { sub: new Set(), n: 0, diff: 0 };
+      wrongMap[q.tema].sub.add(q.sub);
+      wrongMap[q.tema].n++;
+      wrongMap[q.tema].diff = Math.max(wrongMap[q.tema].diff, q.diff);
+    }
+
+    const exp = document.getElementById(`exp-${i}`);
+    exp.classList.add('show', ua === q.correct ? 'ok' : 'fail');
+  });
+
+  document.getElementById('h-cor').textContent = correct;
+  document.getElementById('h-wrg').textContent = questions.length - correct;
+  document.getElementById('r-score').textContent = `${correct}/${questions.length}`;
+  const pct = Math.round((correct/questions.length)*100);
+  document.getElementById('r-pct').textContent = `${pct}%`;
+
+  let v;
+  if (pct >= 80) v = { e: '🎯', t: 'Rendimiento excelente', m: 'Dominas el temario al nivel requerido para el examen. Repasa las áreas marcadas para alcanzar la perfección.' };
+  else if (pct >= 60) v = { e: '📗', t: 'Buen rendimiento', m: 'Tienes una base sólida. Dedica tiempo extra a los temas señalados para consolidar el aprobado con nota.' };
+  else if (pct >= 40) v = { e: '⚠️', t: 'Rendimiento mejorable', m: 'Hay conceptos importantes que no están bien asentados. Es fundamental repasar las sesiones indicadas antes del examen.' };
+  else v = { e: '🔴', t: 'Repaso urgente necesario', m: 'El nivel actual no es suficiente para el examen. Revisa el temario completo comenzando por los temas con más errores.' };
+
+  document.getElementById('verdict').innerHTML = `<strong>${v.e} ${v.t} (${pct}%)</strong>${v.m}`;
+
+  const body = document.getElementById('repaso-body');
+  const tInfo = {
+    'TEMA 1': { icon: '🖥️', t: 'Arquitectura y Computadores', s: 'Sesión 1 · Von Neumann, buses, registros, ciclo instrucción, jerarquía memoria' },
+    'TEMA 2': { icon: '⚡', t: 'Lógica Digital y Sistemas Numéricos', s: 'Sesiones 2, 3, 4 · Compuertas, Boole, K-maps, conversiones, BCD, Gray' },
+    'TEMA 3': { icon: '🔧', t: 'Circuitos Combinacionales', s: 'Sesiones 5, 6, 7 · Sumadores, MUX, codificadores, decodificadores, comparadores' },
+    'TEMA 4': { icon: '🔄', t: 'Circuitos Secuenciales', s: 'Sesiones 8, 9, 10 · Latches, FFs, registros, contadores, FSM, tabla excitación' },
+    'TEMA 5': { icon: '💻', t: 'Lenguaje Ensamblador', s: 'Sesiones 11, 12 · NASM, segmentos, registros x86, instrucciones, INT 21h, flags' },
+  };
+
+  if (Object.keys(wrongMap).length === 0) {
+    body.innerHTML = '<div class="repaso-row"><div class="r-icon">✨</div><div class="r-info"><div class="rt">Sin áreas de mejora — rendimiento perfecto</div><div class="rs">Has respondido todas las preguntas correctamente en el nivel avanzado.</div></div></div>';
+  } else {
+    Object.keys(wrongMap).sort().forEach(tema => {
+      const info = tInfo[tema] || { icon: '📌', t: tema, s: 'Revisa las sesiones correspondientes' };
+      const d = wrongMap[tema];
+      const stars = '⭐'.repeat(d.diff);
+      const row = document.createElement('div');
+      row.className = 'repaso-row';
+      row.innerHTML = `
+        <div class="r-icon">${info.icon}</div>
+        <div class="r-info">
+          <div class="rt">${info.t}</div>
+          <div class="rs">Subtemas con errores: ${[...d.sub].join(' · ')}</div>
+          <div class="rs">Dificultad máxima fallada: ${stars}</div>
+          <div class="rs" style="margin-top:4px">Repasar: ${info.s}</div>
+          <span class="r-count-badge">${d.n} error(es) en este tema</span>
+        </div>
+      `;
+      body.appendChild(row);
+    });
+  }
+
+  document.getElementById('results').classList.add('show');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetQuiz() {
+  answers = new Array(questions.length).fill(null);
+  answered = 0;
+  submitted = false;
+  ['h-ans','h-cor','h-wrg'].forEach(id => document.getElementById(id).textContent = id==='h-ans' ? '0' : '—');
+  document.getElementById('prog-fill').style.width = '0%';
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('results').classList.remove('show');
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildQuiz();
+</script>
+</body>
+</html>

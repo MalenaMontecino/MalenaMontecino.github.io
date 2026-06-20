@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fundamentos de Computadores — Guía Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf8f4;--bg2:#f2ede4;--bg3:#e8e0d0;
+  --ink:#1c1814;--ink2:#3d3830;--ink3:#8a8070;
+  --red:#b83030;--orange:#c85a1a;--green:#2a6e3c;
+  --blue:#1a3c7a;--teal:#1a6a6a;--purple:#5a2a7a;
+  --gold:#a07820;--border:#d8d0c0;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--serif:'Fraunces',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.65}
+
+/* ── HEADER ── */
+header{background:var(--ink);color:var(--bg);border-bottom:3px solid var(--orange);position:sticky;top:0;z-index:300}
+.hdr{max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;gap:0;height:52px}
+.logo{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--orange);white-space:nowrap;padding-right:1.5rem;border-right:1px solid #333;letter-spacing:.02em}
+nav{display:flex;overflow-x:auto;flex:1;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{background:none;border:none;color:#888;font-family:var(--sans);font-size:12px;font-weight:500;padding:0 .9rem;height:52px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .15s;letter-spacing:.01em}
+nav button:hover{color:#ccc}
+nav button.on{color:var(--bg);border-bottom-color:var(--orange)}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1200px;margin:0 auto;padding:2.5rem 1.5rem}
+.page{display:none}.page.on{display:block}
+
+/* ── HERO ── */
+.hero{padding:3rem 0 2rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center}
+@media(max-width:640px){.hero{grid-template-columns:1fr}}
+.hero-tag{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);margin-bottom:.8rem}
+.hero h1{font-family:var(--serif);font-size:clamp(2rem,4vw,3rem);font-weight:900;line-height:1.1;color:var(--ink)}
+.hero h1 em{color:var(--orange);font-style:italic}
+.hero p{color:var(--ink3);font-size:14px;font-weight:300;margin-top:.8rem;max-width:500px}
+.hero-score-box{background:var(--ink);color:var(--bg);border-radius:4px;padding:1.5rem 2rem;text-align:center;min-width:140px}
+.hero-score-box .big{font-family:var(--serif);font-size:3rem;font-weight:900;color:var(--orange);line-height:1}
+.hero-score-box .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#888;margin-top:.3rem}
+
+/* ── TOPIC NAV ── */
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.8rem;margin-bottom:2rem}
+.topic-btn{background:#fff;border:1px solid var(--border);border-radius:4px;padding:1.2rem;cursor:pointer;text-align:left;transition:all .15s;box-shadow:2px 2px 0 var(--bg3);position:relative;overflow:hidden}
+.topic-btn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.topic-btn:hover{box-shadow:4px 4px 0 var(--border);transform:translate(-1px,-1px)}
+.topic-btn .t-num{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.4rem}
+.topic-btn h3{font-size:13px;font-weight:600;line-height:1.3;color:var(--ink)}
+.topic-btn p{font-size:11px;color:var(--ink3);margin-top:.3rem}
+.t1::before{background:var(--blue)}.t2::before{background:var(--orange)}.t3::before{background:var(--green)}.t4::before{background:var(--purple)}.t5::before{background:var(--red)}
+
+/* ── CARDS ── */
+.card{background:#fff;border:1px solid var(--border);border-radius:4px;padding:1.5rem;margin-bottom:1.2rem;box-shadow:2px 2px 0 var(--bg3)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-bottom:1.2rem}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.8rem;padding-bottom:1rem;border-bottom:2px solid var(--border)}
+.sec-num{font-family:var(--serif);font-size:3rem;font-weight:900;color:var(--bg3);line-height:1}
+.sec-title{font-family:var(--serif);font-size:1.6rem;font-weight:700;color:var(--ink)}
+.sec-title span{color:var(--orange);font-style:italic}
+.sec-sub{font-size:13px;color:var(--ink3);font-weight:300;margin-top:.2rem}
+h3.sec{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:.9rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+
+/* ── CONCEPT BOX ── */
+.concept{display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:3px;margin:.6rem 0}
+.concept-icon{width:36px;height:36px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.concept h4{font-size:13px;font-weight:600;margin-bottom:.25rem;color:var(--ink)}
+.concept p{font-size:12.5px;color:var(--ink2);line-height:1.6}
+.concept code{font-family:var(--mono);font-size:11.5px;background:var(--bg2);padding:1px 5px;border-radius:2px}
+
+/* ── TABLES ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;padding:9px 12px;text-align:left}
+.tbl td{padding:8px 12px;border-bottom:1px solid var(--bg3);vertical-align:top;color:var(--ink2)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg)}
+.tbl td code,.tbl th code{font-family:var(--mono);font-size:11px;background:rgba(0,0,0,.07);padding:1px 5px;border-radius:2px;color:var(--ink)}
+
+/* ── TIP / ALERT ── */
+.tip{display:flex;gap:10px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--orange);padding:10px 13px;margin:.8rem 0;font-size:12.5px;color:var(--ink2);line-height:1.6;border-radius:0 3px 3px 0}
+.tip strong{color:var(--orange)}
+.alert{border-left-color:var(--red);background:#fdf5f5}
+.alert strong{color:var(--red)}
+.info{border-left-color:var(--blue);background:#f5f7fd}
+.info strong{color:var(--blue)}
+
+/* ── CODE ── */
+.code{background:var(--ink);color:#c8c4bc;font-family:var(--mono);font-size:12px;line-height:1.85;padding:1.1rem 1.3rem;border-radius:4px;overflow-x:auto;margin:.8rem 0;position:relative}
+.code .lbl{position:absolute;top:7px;right:11px;font-size:9px;color:#444;letter-spacing:.12em;text-transform:uppercase}
+.kw{color:#e8855a;font-weight:500}.reg{color:#7ab8e8}.val{color:#c8a84a}.cmt{color:#4a5060;font-style:italic}.lbl2{color:#7ecca0;font-weight:600}.dir{color:#b088d8}
+
+/* ── GATE VISUAL ── */
+.gate-row{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0}
+.gate{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:.7rem 1rem;text-align:center;min-width:90px;flex:1}
+.gate .name{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink);margin-bottom:.4rem}
+.gate .tt{font-family:var(--mono);font-size:11px;color:var(--ink3);line-height:1.6}
+.gate .symbol{font-size:20px;margin-bottom:.3rem}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:2px;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.05em}
+.b-blue{background:#e8eef8;color:var(--blue);border:1px solid #b8c8e8}
+.b-green{background:#e8f4ed;color:var(--green);border:1px solid #b8d8c4}
+.b-orange{background:#fdf0e8;color:var(--orange);border:1px solid #e8c8a8}
+.b-red{background:#fdf0f0;color:var(--red);border:1px solid #e8c0c0}
+.b-purple{background:#f4eef8;color:var(--purple);border:1px solid #d0b8e8}
+
+/* ── QUIZ ── */
+.q-card{background:#fff;border:1px solid var(--border);border-radius:4px;padding:1.5rem;margin-bottom:1.1rem;box-shadow:2px 2px 0 var(--bg3)}
+.q-hdr{display:flex;gap:12px;align-items:flex-start;margin-bottom:1rem}
+.q-num{background:var(--ink);color:var(--bg);font-family:var(--mono);font-weight:500;font-size:11px;width:26px;height:26px;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.q-text{font-size:14px;font-weight:500;line-height:1.5;color:var(--ink)}
+.q-code{background:var(--ink);color:#c8c4bc;font-family:var(--mono);font-size:11.5px;padding:.7rem 1rem;border-radius:3px;margin:.5rem 0;line-height:1.75;overflow-x:auto}
+.q-opts{display:flex;flex-direction:column;gap:6px;margin-bottom:.8rem}
+.q-opt{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:9px 13px;cursor:pointer;font-size:12.5px;font-family:var(--sans);color:var(--ink);text-align:left;display:flex;align-items:center;gap:9px;transition:all .12s;line-height:1.4}
+.q-opt:hover:not(:disabled){border-color:var(--blue);background:#f5f7fd}
+.q-opt.correct{border-color:var(--green);background:#eaf4ee;color:var(--green);font-weight:500}
+.q-opt.wrong{border-color:var(--red);background:#fdf3f3;color:var(--red)}
+.q-opt:disabled{cursor:default}
+.q-opt .ol{font-family:var(--mono);font-size:10px;font-weight:500;width:18px;height:18px;border-radius:2px;background:var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.q-fb{display:none;padding:10px 13px;border-radius:3px;font-size:12.5px;line-height:1.65;margin-top:.4rem}
+.q-fb.show{display:block}
+.q-fb.ok{background:#eaf4ee;border:1px solid #a8d4b4;color:var(--green)}
+.q-fb.fail{background:#fdf3f3;border:1px solid #e0b4b4;color:var(--red)}
+
+/* ── SCORE BAR ── */
+.score-wrap{background:#fff;border:1px solid var(--border);border-radius:4px;padding:1.2rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;box-shadow:2px 2px 0 var(--bg3)}
+.sc-big{font-family:var(--serif);font-size:2.2rem;font-weight:900;color:var(--ink);min-width:70px}
+.sc-right{flex:1;min-width:140px}
+.sc-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:.4rem}
+.sc-bg{background:var(--bg2);height:6px;border-radius:3px;overflow:hidden}
+.sc-fill{height:100%;background:var(--green);border-radius:3px;transition:width .4s ease,background .3s}
+.btn-reset{background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:7px 16px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;color:var(--ink2);transition:all .12s}
+.btn-reset:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ── EXAM BANNER ── */
+.exam-banner{display:inline-flex;align-items:center;gap:8px;background:rgba(184,48,48,.07);border:1px solid rgba(184,48,48,.2);border-radius:3px;padding:5px 12px;margin-bottom:.7rem;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;color:var(--red);text-transform:uppercase}
+.new-banner{background:rgba(26,60,122,.07);border-color:rgba(26,60,122,.2);color:var(--blue)}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:1.8rem 0}
+
+/* ── PROGRESS DOTS ── */
+.progress-row{display:flex;gap:.4rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.pdot{width:10px;height:10px;border-radius:50%;background:var(--bg3);transition:background .2s}
+.pdot.done{background:var(--green)}.pdot.active{background:var(--orange)}
+
+/* ── BINARY VIZ ── */
+.bin-box{display:flex;flex-wrap:wrap;gap:3px;margin:.6rem 0}
+.bit{width:32px;height:32px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;border:1px solid var(--border)}
+.bit.one{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bit.zero{background:#fff;color:var(--ink3)}
+.bit-lbl{font-family:var(--mono);font-size:9px;color:var(--ink3);text-align:center;margin-top:2px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){.wrap{padding:1.5rem 1rem}.hdr{padding:0 1rem}.sec-num{font-size:2rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="logo">Fund. Computadores</div>
+    <nav id="main-nav">
+      <button class="on" onclick="go('home')">Inicio</button>
+      <button onclick="go('t1')">T1 Von Neumann</button>
+      <button onclick="go('t2')">T2 Lógica</button>
+      <button onclick="go('t3')">T3 Combinacional</button>
+      <button onclick="go('t4')">T4 Secuencial</button>
+      <button onclick="go('t5')">T5 Ensamblador</button>
+      <button onclick="go('examen')">📝 Examen simulado</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ══ HOME ══ -->
+<div id="home" class="page on">
+  <div class="hero">
+    <div>
+      <div class="hero-tag">VIU · Grado Ciberseguridad · Guía de examen</div>
+      <h1>Fundamentos<br>del <em>Computador</em></h1>
+      <p>Teoría completa por tema, preguntas de la guía oficial y examen simulado con corrección inmediata.</p>
+    </div>
+    <div class="hero-score-box">
+      <div class="big" id="global-score">0</div>
+      <div class="lbl">pts acumulados</div>
+    </div>
+  </div>
+
+  <div class="topic-grid">
+    <div class="topic-btn t1" onclick="go('t1')">
+      <div class="t-num" style="color:var(--blue)">Tema 1</div>
+      <h3>Introducción a los Computadores</h3>
+      <p>Von Neumann · CPU · Buses · Memoria</p>
+    </div>
+    <div class="topic-btn t2" onclick="go('t2')">
+      <div class="t-num" style="color:var(--orange)">Tema 2</div>
+      <h3>Lógica y Sistemas Numéricos</h3>
+      <p>Puertas · Boole · Karnaugh · Binario</p>
+    </div>
+    <div class="topic-btn t3" onclick="go('t3')">
+      <div class="t-num" style="color:var(--green)">Tema 3</div>
+      <h3>Circuitos Combinacionales</h3>
+      <p>MUX · Decodificador · Sumadores</p>
+    </div>
+    <div class="topic-btn t4" onclick="go('t4')">
+      <div class="t-num" style="color:var(--purple)">Tema 4</div>
+      <h3>Circuitos Secuenciales</h3>
+      <p>Biestables · FSM · Contadores</p>
+    </div>
+    <div class="topic-btn t5" onclick="go('t5')">
+      <div class="t-num" style="color:var(--red)">Tema 5</div>
+      <h3>Lenguaje Ensamblador</h3>
+      <p>FLAGS · CMP · LOOP · Desbordamiento</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">Cómo usar esta guía</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.8rem">
+      <div class="concept"><div class="concept-icon" style="background:#e8eef8">📖</div><div><h4>Estudia la teoría</h4><p>Cada tema tiene los conceptos clave explicados de forma clara con tablas y ejemplos visuales.</p></div></div>
+      <div class="concept"><div class="concept-icon" style="background:#fdf0e8">✏️</div><div><h4>Responde las preguntas</h4><p>Al final de cada tema están las preguntas exactas de la guía oficial de la profesora.</p></div></div>
+      <div class="concept"><div class="concept-icon" style="background:#eaf4ee">🧪</div><div><h4>Haz el examen simulado</h4><p>Examen completo de 24 preguntas nuevas del mismo nivel, con cronómetro y nota final.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TEMA 1 ══ -->
+<div id="t1" class="page">
+  <div class="sec-hdr">
+    <div class="sec-num">01</div>
+    <div><div class="sec-title">Introducción a los <span>Computadores</span></div><div class="sec-sub">Von Neumann · CPU · ALU · Registros · Buses · Memoria · Ciclo de instrucción</div></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">1.1 Arquitectura de Von Neumann</h3>
+    <div class="concept"><div class="concept-icon" style="background:#e8eef8">🏗</div><div><h4>Premisa fundamental</h4><p>Datos e instrucciones comparten el <strong>mismo bus y la misma memoria</strong>. El procesador no distingue si un byte es un dato o una instrucción hasta que lo interpreta.</p></div></div>
+    <div class="concept"><div class="concept-icon" style="background:#e8eef8">📦</div><div><h4>Componentes principales</h4><p><strong>CPU</strong> (procesa) · <strong>Memoria</strong> (almacena programas y datos) · <strong>Dispositivos de E/S</strong> (teclado, pantalla) · <strong>Bus</strong> (comunica todo). Los cuatro conectados por un bus compartido.</p></div></div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:1.2rem;margin-top:1rem">
+      <div style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--orange);margin-bottom:.9rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)">Von Neumann vs Harvard — diferencia clave</div>
+      <table class="tbl">
+        <tr><th>Característica</th><th>Von Neumann</th><th>Harvard</th></tr>
+        <tr>
+          <td>Memoria</td>
+          <td>Una sola memoria compartida para <strong>datos e instrucciones</strong></td>
+          <td>Dos memorias <strong>separadas</strong>: una para datos, otra para instrucciones</td>
+        </tr>
+        <tr>
+          <td>Bus</td>
+          <td>Un único bus compartido para todo</td>
+          <td>Buses independientes para cada memoria</td>
+        </tr>
+        <tr>
+          <td>Velocidad</td>
+          <td>Más lento: datos e instrucciones compiten por el mismo bus</td>
+          <td>Más rápido: puede leer datos e instrucciones a la vez, en paralelo</td>
+        </tr>
+        <tr>
+          <td>Complejidad</td>
+          <td>Más sencilla y barata de fabricar</td>
+          <td>Más compleja y costosa</td>
+        </tr>
+        <tr>
+          <td>Dónde se usa</td>
+          <td>PCs y ordenadores de propósito general</td>
+          <td>Microcontroladores, DSPs, procesadores de señal</td>
+        </tr>
+      </table>
+      <div style="margin-top:.9rem;font-size:13px;color:var(--ink2);line-height:1.7">
+        <strong>En resumen:</strong> en Von Neumann el procesador no puede buscar una instrucción y leer un dato al mismo tiempo porque comparten el mismo camino (bus). En Harvard sí puede, porque tiene dos caminos separados. A este problema de Von Neumann se le llama el <strong>"cuello de botella de Von Neumann"</strong>.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">1.2 La CPU: unidades internas</h3>
+    <table class="tbl">
+      <tr><th>Componente</th><th>Función</th><th>Analogía</th></tr>
+      <tr><td><strong>ALU</strong><br><span style="font-size:11px;color:var(--ink3)">Unidad Aritmético-Lógica</span></td><td>Realiza <strong>cálculos y comparaciones</strong>: sumas, restas, AND, OR, NOT, CMP…</td><td>La calculadora del procesador</td></tr>
+      <tr><td><strong>CU</strong><br><span style="font-size:11px;color:var(--ink3)">Unidad de Control</span></td><td>Decodifica instrucciones y coordina el resto de componentes. Dirige el tráfico.</td><td>El director de orquesta</td></tr>
+      <tr><td><strong>Registros</strong></td><td>Memoria interna ultra-rápida de la CPU (AX, BX, PC, IR, SP…)</td><td>Post-its en el escritorio</td></tr>
+      <tr><td><strong>PC</strong><br><span style="font-size:11px;color:var(--ink3)">Program Counter</span></td><td>Almacena la <strong>dirección de la siguiente instrucción</strong> a ejecutar.</td><td>El marcapáginas</td></tr>
+      <tr><td><strong>IR</strong><br><span style="font-size:11px;color:var(--ink3)">Instruction Register</span></td><td>Almacena la instrucción <strong>que se está decodificando</strong> en este momento.</td><td>El papel sobre el escritorio</td></tr>
+    </table>
+    <div class="tip info"><strong>Examen:</strong> PC apunta a la SIGUIENTE instrucción. IR contiene la instrucción ACTUAL. No confundirlos.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">1.3 El ciclo de instrucción (Fetch-Decode-Execute)</h3>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin:.8rem 0">
+      <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--blue);border-radius:3px;padding:1rem;text-align:center">
+        <div style="font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--blue);margin-bottom:.4rem">FETCH</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.6">La CPU <strong>trae la instrucción</strong> desde la memoria a través del bus. La copia en el IR. El PC se incrementa.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--orange);border-radius:3px;padding:1rem;text-align:center">
+        <div style="font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--orange);margin-bottom:.4rem">DECODE</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.6">La Unidad de Control <strong>interpreta</strong> la instrucción del IR: qué operación es y qué operandos necesita.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--green);border-radius:3px;padding:1rem;text-align:center">
+        <div style="font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--green);margin-bottom:.4rem">EXECUTE</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.6">La ALU o la CU <strong>ejecuta la operación</strong>: calcula, escribe en memoria, salta… El resultado se almacena.</div>
+      </div>
+    </div>
+    <div class="tip"><strong>Fase Fetch:</strong> La CPU trae la instrucción desde memoria. No la ejecuta aún — solo la copia al IR y actualiza el PC para apuntar a la siguiente.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">1.4 Buses y memoria</h3>
+    <table class="tbl">
+      <tr><th>Bus</th><th>Qué transporta</th><th>Ancho determina…</th></tr>
+      <tr><td><strong>Bus de datos</strong></td><td>Los datos que se transfieren</td><td><strong>Bits transferidos simultáneamente</strong> (8, 16, 32, 64 bits)</td></tr>
+      <tr><td><strong>Bus de direcciones</strong></td><td>La dirección de memoria a la que acceder</td><td>La <strong>cantidad de memoria direccionable</strong> (2ⁿ posiciones)</td></tr>
+      <tr><td><strong>Bus de control</strong></td><td>Señales de lectura/escritura, reloj, interrupciones…</td><td>El tipo de operaciones posibles</td></tr>
+    </table>
+    <div class="tip info">
+      <div>
+        <strong>Clave de examen — dos conceptos distintos:</strong><br><br>
+        🔵 <strong>Bus de DATOS</strong> → determina cuántos bits se transfieren a la vez. Un bus de 64 bits mueve 64 bits en cada transferencia.<br><br>
+        🟠 <strong>Bus de DIRECCIONES</strong> → determina cuántas posiciones de memoria se pueden usar. Con 32 bits de dirección se pueden referenciar hasta 2³² = 4 GB de memoria.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">1.5 Jerarquía de memoria y localidad</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem">
+      <div class="concept"><div class="concept-icon" style="background:#e8eef8">⚡</div><div><h4>¿Por qué los registros son más rápidos?</h4><p>Están <strong>integrados físicamente en la CPU</strong>, sin bus externo. El acceso es directo e instantáneo, en el mismo ciclo de reloj.</p></div></div>
+      <div class="concept"><div class="concept-icon" style="background:#fdf0e8">📍</div><div><h4>Localidad Temporal</h4><p>Tendencia a <strong>reutilizar un dato accedido recientemente</strong>. Si usas una variable, probablemente la usarás otra vez pronto → la caché la guarda.</p></div></div>
+      <div class="concept"><div class="concept-icon" style="background:#eaf4ee">📏</div><div><h4>Localidad Espacial</h4><p>Tendencia a acceder a datos <strong>cercanos en memoria</strong> a los recién usados. Si accedes a array[0], pronto accederás a array[1], array[2]…</p></div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="background:rgba(26,60,122,.04);border:1px solid rgba(26,60,122,.15);border-radius:3px;padding:8px 14px;margin-bottom:1rem;font-family:var(--mono);font-size:10px;color:var(--blue);font-weight:500;letter-spacing:.1em;text-transform:uppercase">📋 Preguntas de la guía oficial — Tema 1</div>
+
+  <div class="score-wrap"><div class="sc-big" id="sc1">0/7</div><div class="sc-right"><div class="sc-lbl">Puntuación tema 1</div><div class="sc-bg"><div class="sc-fill" id="sb1" style="width:0%"></div></div></div><button class="btn-reset" onclick="resetTopic(1,7)">↺ Reiniciar</button></div>
+
+  <div class="q-card" id="t1q1"><div class="q-hdr"><div class="q-num">15</div><div class="q-text">¿Cuál es la premisa fundamental de la Arquitectura de Von Neumann?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t1',1,this,'c')"><span class="ol">A</span>Datos e instrucciones comparten el mismo bus y memoria</button><button class="q-opt" onclick="ans('t1',1,this,'w')"><span class="ol">B</span>Separación de memoria de datos e instrucciones</button><button class="q-opt" onclick="ans('t1',1,this,'w')"><span class="ol">C</span>No usa CPU</button><button class="q-opt" onclick="ans('t1',1,this,'w')"><span class="ol">D</span>Solo usa memoria ROM</button></div><div class="q-fb" id="t1f1">✅ Von Neumann define que datos e instrucciones residen en la <strong>misma memoria</strong> y comparten el mismo bus. La opción B describe la arquitectura Harvard (separada), que es la alternativa opuesta.</div></div>
+
+  <div class="q-card" id="t1q2"><div class="q-hdr"><div class="q-num">16</div><div class="q-text">¿Cuál es la función del Registro de Instrucción (IR)?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t1',2,this,'w')"><span class="ol">A</span>Almacenar la dirección de la siguiente instrucción</button><button class="q-opt" onclick="ans('t1',2,this,'c')"><span class="ol">B</span>Almacenar la instrucción que se está decodificando</button><button class="q-opt" onclick="ans('t1',2,this,'w')"><span class="ol">C</span>Realizar sumas</button><button class="q-opt" onclick="ans('t1',2,this,'w')"><span class="ol">D</span>Guardar datos del usuario</button></div><div class="q-fb" id="t1f2">✅ El IR (Instruction Register) contiene la instrucción que se está decodificando <em>ahora mismo</em>. La opción A describe el PC (Program Counter), que apunta a la <em>siguiente</em> instrucción. Son dos registros diferentes con funciones opuestas.</div></div>
+
+  <div class="q-card" id="t1q3"><div class="q-hdr"><div class="q-num">17</div><div class="q-text">¿Qué ocurre durante la fase de 'Fetch' (Búsqueda) del ciclo de instrucción?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t1',3,this,'w')"><span class="ol">A</span>Se ejecuta la operación</button><button class="q-opt" onclick="ans('t1',3,this,'c')"><span class="ol">B</span>La CPU trae la instrucción desde la memoria a la CPU</button><button class="q-opt" onclick="ans('t1',3,this,'w')"><span class="ol">C</span>Se borra el registro PC</button><button class="q-opt" onclick="ans('t1',3,this,'w')"><span class="ol">D</span>Se apaga el bus de datos</button></div><div class="q-fb" id="t1f3">✅ Fetch = búsqueda/carga. La CPU usa el PC para leer la instrucción desde memoria y la copia en el IR. El PC se incrementa para apuntar a la siguiente. Aún no se ejecuta nada — eso es la fase Execute.</div></div>
+
+  <div class="q-card" id="t1q4"><div class="q-hdr"><div class="q-num">18</div><div class="q-text">¿Qué determina el ancho del bus de datos?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t1',4,this,'w')"><span class="ol">A</span>La cantidad de memoria direccionable</button><button class="q-opt" onclick="ans('t1',4,this,'c')"><span class="ol">B</span>La cantidad de bits transferidos simultáneamente</button><button class="q-opt" onclick="ans('t1',4,this,'w')"><span class="ol">C</span>La velocidad del ventilador</button><button class="q-opt" onclick="ans('t1',4,this,'w')"><span class="ol">D</span>La capacidad del disco duro</button></div><div class="q-fb" id="t1f4">✅ El bus de datos tiene N líneas paralelas → puede transferir N bits a la vez. Un bus de 64 bits transfiere 64 bits simultáneamente. La opción A describe el bus de <em>direcciones</em>: más bits de dirección = más memoria accesible.</div></div>
+
+  <div class="q-card" id="t1q5"><div class="q-hdr"><div class="q-num">19</div><div class="q-text">¿Por qué los registros de la CPU son más rápidos que la RAM?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t1',5,this,'c')"><span class="ol">A</span>Están integrados en la CPU y no usan buses externos</button><button class="q-opt" onclick="ans('t1',5,this,'w')"><span class="ol">B</span>Son magnéticos</button><button class="q-opt" onclick="ans('t1',5,this,'w')"><span class="ol">C</span>Son más grandes</button><button class="q-opt" onclick="ans('t1',5,this,'w')"><span class="ol">D</span>No son volátiles</button></div><div class="q-fb" id="t1f5">✅ Los registros están físicamente dentro del chip de la CPU. No necesitan bus externo, ni controlador de memoria. El acceso es en el mismo ciclo de reloj. La RAM requiere salir de la CPU por el bus, pasar por el controlador de memoria, y volver — decenas o cientos de ciclos más.</div></div>
+
+  <div class="q-card" id="t1q6"><div class="q-hdr"><div class="q-num">20</div><div class="q-text">¿Qué representa la 'Localidad Temporal'?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t1',6,this,'w')"><span class="ol">A</span>Cercanía física de datos</button><button class="q-opt" onclick="ans('t1',6,this,'c')"><span class="ol">B</span>Tendencia a reutilizar un dato accedido recientemente</button><button class="q-opt" onclick="ans('t1',6,this,'w')"><span class="ol">C</span>El tiempo de acceso al disco</button><button class="q-opt" onclick="ans('t1',6,this,'w')"><span class="ol">D</span>La caducidad de la garantía</button></div><div class="q-fb" id="t1f6">✅ Localidad <em>Temporal</em> = tiempo: si usé un dato hace poco, probablemente lo use otra vez pronto. La caché lo guarda. Localidad <em>Espacial</em> (distractor) = espacio: si usé A, probablemente use lo que está cerca de A en memoria.</div></div>
+
+  <div class="q-card" id="t1q7"><div class="q-hdr"><div class="q-num">21</div><div class="q-text">¿Cuál es la función de la ALU?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t1',7,this,'w')"><span class="ol">A</span>Decodificar instrucciones</button><button class="q-opt" onclick="ans('t1',7,this,'c')"><span class="ol">B</span>Realizar cálculos y comparaciones</button><button class="q-opt" onclick="ans('t1',7,this,'w')"><span class="ol">C</span>Guardar archivos</button><button class="q-opt" onclick="ans('t1',7,this,'w')"><span class="ol">D</span>Controlar el monitor</button></div><div class="q-fb" id="t1f7">✅ La ALU (Arithmetic Logic Unit) ejecuta todas las operaciones matemáticas (suma, resta, multiplicación) y lógicas (AND, OR, NOT, comparaciones). La decodificación de instrucciones es función de la Unidad de Control (CU).</div></div>
+</div>
+
+<!-- ══ TEMA 2 ══ -->
+<div id="t2" class="page">
+  <div class="sec-hdr">
+    <div class="sec-num">02</div>
+    <div><div class="sec-title">Lógica y <span>Sistemas Numéricos</span></div><div class="sec-sub">Puertas lógicas · Álgebra de Boole · Karnaugh · Binario · Código Gray</div></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">2.1 Puertas lógicas fundamentales</h3>
+    <div class="gate-row">
+      <div class="gate"><div class="symbol">⋅</div><div class="name">AND</div><div class="tt">00→0 01→0<br>10→0 <strong>11→1</strong></div><div style="font-size:11px;color:var(--ink3);margin-top:.3rem">Solo 1 si TODAS entradas = 1</div></div>
+      <div class="gate"><div class="symbol">+</div><div class="name">OR</div><div class="tt"><strong>00→0</strong> 01→1<br>10→1 11→1</div><div style="font-size:11px;color:var(--ink3);margin-top:.3rem">Solo 0 si TODAS entradas = 0</div></div>
+      <div class="gate"><div class="symbol">¬</div><div class="name">NOT</div><div class="tt">0→1<br>1→0</div><div style="font-size:11px;color:var(--ink3);margin-top:.3rem">Invierte la entrada</div></div>
+      <div class="gate"><div class="symbol">⊼</div><div class="name">NAND</div><div class="tt">00→1 01→1<br>10→1 <strong>11→0</strong></div><div style="font-size:11px;color:var(--ink3);margin-top:.3rem">Solo 0 si TODAS = 1</div></div>
+      <div class="gate"><div class="symbol">⊽</div><div class="name">NOR</div><div class="tt"><strong>00→1</strong> 01→0<br>10→0 11→0</div><div style="font-size:11px;color:var(--ink3);margin-top:.3rem">Solo 1 si TODAS = 0</div></div>
+      <div class="gate"><div class="symbol">⊕</div><div class="name">XOR</div><div class="tt">00→0 <strong>01→1</strong><br><strong>10→1</strong> 11→0</div><div style="font-size:11px;color:var(--ink3);margin-top:.3rem">1 si entradas son DISTINTAS</div></div>
+    </div>
+    <div class="tip alert"><strong>Pregunta del examen:</strong> ¿Cuál da 0 solo cuando TODAS las entradas son 1? → <strong>NAND</strong>. NAND = NOT AND. Si todas = 1, AND daría 1, NAND lo invierte → 0.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">2.2 Álgebra de Boole — Leyes clave</h3>
+    <table class="tbl">
+      <tr><th>Ley</th><th>Expresión AND</th><th>Expresión OR</th></tr>
+      <tr><td>Identidad</td><td>A · 1 = A</td><td>A + 0 = A</td></tr>
+      <tr><td>Nulo</td><td>A · 0 = 0</td><td>A + 1 = 1</td></tr>
+      <tr><td>Idempotente</td><td>A · A = A</td><td>A + A = A</td></tr>
+      <tr><td>Complemento</td><td>A · Ā = 0</td><td>A + Ā = 1</td></tr>
+      <tr><td>Absorción</td><td>A(A+B) = A</td><td><strong>A + ĀB = A + B</strong></td></tr>
+      <tr><td>De Morgan</td><td>¬(A·B) = Ā+B̄</td><td>¬(A+B) = Ā·B̄</td></tr>
+    </table>
+    <div class="tip"><strong>A + ĀB = A + B</strong> (ley de absorción/consenso). Demostración: A+ĀB = A·1 + ĀB = A(1+B̄) + ĀB ... o simplemente: si A=1 → A+B=1 ✓; si A=0 → 0+B=B = ĀB cuando A=0 → B ✓. Resultado: <strong>A + B</strong>.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">2.3 Mapas de Karnaugh (K-Map)</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--orange);font-weight:500;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.1em">Regla de agrupación</div>
+        <table class="tbl">
+          <tr><th>Grupo de…</th><th>Variables que quedan</th></tr>
+          <tr><td>1 celda</td><td>n variables (sin simplificar)</td></tr>
+          <tr><td>2 celdas</td><td>n−1 variables</td></tr>
+          <tr><td>4 celdas</td><td>n−2 variables</td></tr>
+          <tr><td>8 celdas</td><td>n−3 variables → <strong>1 variable</strong> (con 4 variables)</td></tr>
+          <tr><td>16 celdas</td><td>0 variables → <strong>constante = 1</strong></td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--orange);font-weight:500;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.1em">Reglas del K-Map</div>
+        <div class="concept" style="margin:0 0 .5rem"><div class="concept-icon" style="background:#fdf0e8;width:28px;height:28px;font-size:14px">1</div><div><p>Los grupos deben ser potencias de 2: 1, 2, 4, 8, 16…</p></div></div>
+        <div class="concept" style="margin:0 0 .5rem"><div class="concept-icon" style="background:#fdf0e8;width:28px;height:28px;font-size:14px">2</div><div><p>Las celdas se pueden repetir en distintos grupos.</p></div></div>
+        <div class="concept" style="margin:0"><div class="concept-icon" style="background:#fdf0e8;width:28px;height:28px;font-size:14px">3</div><div><p>Los grupos deben ser lo más grandes posible.</p></div></div>
+      </div>
+    </div>
+    <div class="tip alert"><strong>Examen (4 variables):</strong> Agrupar 8 celdas → elimina 3 variables → queda <strong>1 sola variable</strong>. Agrupar 16 celdas → constante 1.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">2.4 Conversión binario ↔ decimal</h3>
+    <div style="font-size:13px;color:var(--ink2);margin-bottom:.8rem">Decimal → Binario: divide entre 2 y lee los restos de abajo a arriba.</div>
+    <div style="background:var(--bg);border:1px solid var(--border);padding:.8rem 1rem;border-radius:3px;font-family:var(--mono);font-size:12.5px;line-height:1.9">
+      25 ÷ 2 = 12 resto <strong>1</strong><br>
+      12 ÷ 2 = 6  resto <strong>0</strong><br>
+       6 ÷ 2 = 3  resto <strong>0</strong><br>
+       3 ÷ 2 = 1  resto <strong>1</strong><br>
+       1 ÷ 2 = 0  resto <strong>1</strong><br>
+      <span style="color:var(--orange)">Leyendo de abajo a arriba: 11001 ✓</span>
+    </div>
+    <div style="margin-top:.8rem">
+      <div class="bin-box">
+        <div><div class="bit one">1</div><div class="bit-lbl">16</div></div>
+        <div><div class="bit one">1</div><div class="bit-lbl">8</div></div>
+        <div><div class="bit zero">0</div><div class="bit-lbl">4</div></div>
+        <div><div class="bit zero">0</div><div class="bit-lbl">2</div></div>
+        <div><div class="bit one">1</div><div class="bit-lbl">1</div></div>
+      </div>
+      <div style="font-size:12px;color:var(--ink3)">16 + 8 + 0 + 0 + 1 = <strong style="color:var(--ink)">25</strong> ✓</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">2.5 Código Gray</h3>
+    <div class="concept"><div class="concept-icon" style="background:#eaf4ee">🔄</div><div><h4>Característica fundamental</h4><p>Entre dos valores consecutivos <strong>solo cambia 1 bit</strong>. Esto elimina los estados transitorios erróneos que ocurren en el binario normal cuando cambian varios bits a la vez.</p></div></div>
+    <table class="tbl" style="margin-top:.8rem">
+      <tr><th>Decimal</th><th>Binario</th><th>Gray</th><th>Bits que cambian</th></tr>
+      <tr><td>0</td><td>000</td><td>000</td><td>—</td></tr>
+      <tr><td>1</td><td>001</td><td>001</td><td>1 bit ✓</td></tr>
+      <tr><td>2</td><td>010</td><td>011</td><td>1 bit ✓</td></tr>
+      <tr><td>3</td><td>011</td><td>010</td><td>1 bit ✓</td></tr>
+      <tr><td>4</td><td>100</td><td>110</td><td>1 bit ✓</td></tr>
+    </table>
+    <div class="tip"><strong>NO es</strong> un código posicional pesado (opción B incorrecta). No tiene pesos fijos por posición. Es un código de cambio mínimo.</div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="background:rgba(200,90,26,.04);border:1px solid rgba(200,90,26,.15);border-radius:3px;padding:8px 14px;margin-bottom:1rem;font-family:var(--mono);font-size:10px;color:var(--orange);font-weight:500;letter-spacing:.1em;text-transform:uppercase">📋 Preguntas de la guía oficial — Tema 2</div>
+
+  <div class="score-wrap"><div class="sc-big" id="sc2">0/5</div><div class="sc-right"><div class="sc-lbl">Puntuación tema 2</div><div class="sc-bg"><div class="sc-fill" id="sb2" style="width:0%"></div></div></div><button class="btn-reset" onclick="resetTopic(2,5)">↺ Reiniciar</button></div>
+
+  <div class="q-card" id="t2q1"><div class="q-hdr"><div class="q-num">1</div><div class="q-text">¿Cuál es la puerta lógica cuya salida es '0' únicamente cuando todas sus entradas están en nivel alto ('1')?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t2',1,this,'w')"><span class="ol">A</span>AND</button><button class="q-opt" onclick="ans('t2',1,this,'w')"><span class="ol">B</span>NOR</button><button class="q-opt" onclick="ans('t2',1,this,'c')"><span class="ol">C</span>NAND</button><button class="q-opt" onclick="ans('t2',1,this,'w')"><span class="ol">D</span>XOR</button></div><div class="q-fb" id="t2f1">✅ NAND = NOT AND. AND da 1 solo cuando todas las entradas son 1; NAND invierte ese resultado → da <strong>0 solo cuando todas las entradas son 1</strong>. NOR daría 0 cuando cualquier entrada es 1. AND da 1 cuando todas son 1 (no 0). XOR da 1 cuando las entradas son distintas.</div></div>
+
+  <div class="q-card" id="t2q2"><div class="q-hdr"><div class="q-num">2</div><div class="q-text">Utilizando las leyes del Álgebra de Boole, ¿a qué expresión es equivalente A + ĀB?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t2',2,this,'c')"><span class="ol">A</span>A + B</button><button class="q-opt" onclick="ans('t2',2,this,'w')"><span class="ol">B</span>A</button><button class="q-opt" onclick="ans('t2',2,this,'w')"><span class="ol">C</span>B</button><button class="q-opt" onclick="ans('t2',2,this,'w')"><span class="ol">D</span>AB</button></div><div class="q-fb" id="t2f2">✅ Ley de absorción: A + ĀB = A + B. Demostración por casos: si A=0 → 0 + 1·B = B = 0+B ✓. Si A=1 → 1+ĀB = 1 = 1+B ✓. En ambos casos el resultado es igual a A+B.</div></div>
+
+  <div class="q-card" id="t2q3"><div class="q-hdr"><div class="q-num">3</div><div class="q-text">En un Mapa de Karnaugh de 4 variables, ¿qué resulta de agrupar 8 celdas adyacentes con valor '1'?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t2',3,this,'w')"><span class="ol">A</span>Un término con 2 variables</button><button class="q-opt" onclick="ans('t2',3,this,'c')"><span class="ol">B</span>Un término con 1 sola variable</button><button class="q-opt" onclick="ans('t2',3,this,'w')"><span class="ol">C</span>Un término con 3 variables</button><button class="q-opt" onclick="ans('t2',3,this,'w')"><span class="ol">D</span>Una función constante igual a 1</button></div><div class="q-fb" id="t2f3">✅ Con 4 variables y grupos de 2ⁿ celdas: 8 = 2³ → se eliminan 3 variables → quedan 4-3 = <strong>1 variable</strong>. Para constante=1 necesitarías las 16 celdas (2⁴). Con 4 celdas quedarían 2 variables. Con 2 celdas, 3 variables.</div></div>
+
+  <div class="q-card" id="t2q4"><div class="q-hdr"><div class="q-num">4</div><div class="q-text">¿Cuál es la representación en binario del número decimal 25?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t2',4,this,'w')"><span class="ol">A</span>10101</button><button class="q-opt" onclick="ans('t2',4,this,'w')"><span class="ol">B</span>11100</button><button class="q-opt" onclick="ans('t2',4,this,'c')"><span class="ol">C</span>11001</button><button class="q-opt" onclick="ans('t2',4,this,'w')"><span class="ol">D</span>11011</button></div><div class="q-fb" id="t2f4">✅ 25 = 16+8+1 = 2⁴+2³+2⁰ = <strong>11001</strong>. Verificación: 10101=21, 11100=28, 11001=25 ✓, 11011=27. Método: 25÷2=12r1, 12÷2=6r0, 6÷2=3r0, 3÷2=1r1, 1÷2=0r1. Leer restos al revés: 11001.</div></div>
+
+  <div class="q-card" id="t2q5"><div class="q-hdr"><div class="q-num">5</div><div class="q-text">¿Qué característica define primordialmente al Código Gray?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t2',5,this,'c')"><span class="ol">A</span>Solo cambia un bit entre valores consecutivos</button><button class="q-opt" onclick="ans('t2',5,this,'w')"><span class="ol">B</span>Es un código posicional pesado</button><button class="q-opt" onclick="ans('t2',5,this,'w')"><span class="ol">C</span>Utiliza 4 bits para cada dígito decimal</button><button class="q-opt" onclick="ans('t2',5,this,'w')"><span class="ol">D</span>No permite representación binaria</button></div><div class="q-fb" id="t2f5">✅ El Código Gray es un código de cambio mínimo: entre dos valores consecutivos <strong>solo cambia 1 bit</strong>. Esto evita estados transitorios erróneos en hardware. La opción B describe BCD (4 bits por dígito), no Gray. Gray no es posicional.</div></div>
+</div>
+
+<!-- ══ TEMA 3 ══ -->
+<div id="t3" class="page">
+  <div class="sec-hdr">
+    <div class="sec-num">03</div>
+    <div><div class="sec-title">Diseño de Circuitos <span>Combinacionales</span></div><div class="sec-sub">Multiplexor · Decodificador · Sumadores · Minitérminos</div></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">3.1 Combinacional vs Secuencial</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--green);border-radius:3px;padding:1rem">
+        <div style="font-weight:600;font-size:13px;margin-bottom:.5rem;color:var(--green)">Circuito COMBINACIONAL</div>
+        <div style="font-size:12.5px;color:var(--ink2);line-height:1.6">La salida depende <strong>solo de las entradas actuales</strong>. No tiene memoria ni estado. Mismo input → siempre mismo output.<br><br><strong>Ejemplos:</strong> MUX, decodificador, sumador, puertas lógicas.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--purple);border-radius:3px;padding:1rem">
+        <div style="font-weight:600;font-size:13px;margin-bottom:.5rem;color:var(--purple)">Circuito SECUENCIAL</div>
+        <div style="font-size:12.5px;color:var(--ink2);line-height:1.6">La salida depende de las entradas actuales <strong>Y del estado anterior</strong> (tiene memoria). Necesita reloj o señal de control.<br><br><strong>Ejemplos:</strong> biestable D, registro de desplazamiento, contador, FSM.</div>
+      </div>
+    </div>
+    <div class="tip alert"><strong>Examen:</strong> Registro de desplazamiento, contador síncrono y biestable D → secuenciales. <strong>Multiplexor → combinacional</strong>.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">3.2 Decodificador</h3>
+    <div class="concept"><div class="concept-icon" style="background:#eaf4ee">🔓</div><div><h4>¿Qué es?</h4><p>Circuito con <strong>N entradas y 2ᴺ salidas</strong>. Activa <strong>exactamente una</strong> salida según el código binario de entrada. Ej: 3 entradas → 8 salidas (decodificador 3:8).</p></div></div>
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:.9rem;margin:.8rem 0;font-size:13px">
+      <strong>Ejemplo decodificador 3:8 con entrada 010:</strong><br><br>
+      010 en binario = 2 en decimal → <strong>Se activa la salida S2</strong> (y solo esa). Todas las demás están a 0.
+    </div>
+    <div class="tip"><strong>Regla:</strong> La salida activada es la que coincide con el número decimal representado por la entrada binaria.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">3.3 Half Adder vs Full Adder</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1rem">
+        <div style="font-weight:600;margin-bottom:.5rem;font-size:13px">Semi-sumador (Half Adder)</div>
+        <div style="font-size:12.5px;color:var(--ink2);line-height:1.7">Entradas: <strong>A, B</strong> (2 entradas)<br>Salidas: Suma (S), Acarreo (C)<br><br>SÍ genera acarreo de salida (Cout).<br><strong>NO acepta</strong> acarreo de entrada (Cin).<br>Solo sirve para el bit menos significativo.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1rem">
+        <div style="font-weight:600;margin-bottom:.5rem;font-size:13px">Sumador completo (Full Adder)</div>
+        <div style="font-size:12.5px;color:var(--ink2);line-height:1.7">Entradas: <strong>A, B, Cin</strong> (3 entradas)<br>Salidas: Suma (S), Acarreo (Cout)<br><br>Tiene entrada para el <strong>acarreo previo (Cin)</strong>.<br>Se puede encadenar para sumar números de varios bits.</div>
+      </div>
+    </div>
+    <div class="tip alert"><strong>Examen:</strong> La diferencia clave es que el Full Adder tiene una <strong>entrada adicional Cin</strong> (carry-in). El Half Adder SÍ genera acarreo, pero NO lo acepta como entrada. No es secuencial.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">3.4 Minitérminos y Maxitérminos</h3>
+    <div class="concept"><div class="concept-icon" style="background:#eaf4ee">📝</div><div><h4>Minitérmino (minterms)</h4><p>Es un <strong>producto lógico</strong> (AND de variables) que vale '1' para una sola combinación de entradas. Una función expresada como suma de minitérminos se llama Suma de Productos (SOP).</p></div></div>
+    <div class="concept"><div class="concept-icon" style="background:#f5f7fd">📝</div><div><h4>Maxitérmino (maxterms)</h4><p>Es una <strong>suma lógica</strong> (OR de variables) que vale '0' para una sola combinación de entradas. Una función expresada como producto de maxitérminos se llama Producto de Sumas (POS).</p></div></div>
+    <div class="tip"><strong>Memoria:</strong> Mini → pequeño → producto (AND). El minitérmino es el "pedacito" más pequeño — un AND que solo activa una fila de la tabla de verdad.</div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="background:rgba(42,110,60,.04);border:1px solid rgba(42,110,60,.15);border-radius:3px;padding:8px 14px;margin-bottom:1rem;font-family:var(--mono);font-size:10px;color:var(--green);font-weight:500;letter-spacing:.1em;text-transform:uppercase">📋 Preguntas de la guía oficial — Tema 3</div>
+
+  <div class="score-wrap"><div class="sc-big" id="sc3">0/4</div><div class="sc-right"><div class="sc-lbl">Puntuación tema 3</div><div class="sc-bg"><div class="sc-fill" id="sb3" style="width:0%"></div></div></div><button class="btn-reset" onclick="resetTopic(3,4)">↺ Reiniciar</button></div>
+
+  <div class="q-card" id="t3q1"><div class="q-hdr"><div class="q-num">6</div><div class="q-text">¿Cuál de los siguientes dispositivos es un circuito exclusivamente combinacional?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t3',1,this,'w')"><span class="ol">A</span>Registro de desplazamiento</button><button class="q-opt" onclick="ans('t3',1,this,'c')"><span class="ol">B</span>Multiplexor</button><button class="q-opt" onclick="ans('t3',1,this,'w')"><span class="ol">C</span>Contador síncrono</button><button class="q-opt" onclick="ans('t3',1,this,'w')"><span class="ol">D</span>Biestable tipo D</button></div><div class="q-fb" id="t3f1">✅ El multiplexor es combinacional: su salida depende solo de las entradas actuales (selector + datos), sin estado interno ni reloj. Registro de desplazamiento, contador síncrono y biestable D son todos secuenciales — tienen memoria y requieren señal de reloj.</div></div>
+
+  <div class="q-card" id="t3q2"><div class="q-hdr"><div class="q-num">7</div><div class="q-text">En un decodificador de 3 entradas y 8 salidas, ¿qué sucede si la entrada es el código binario 010?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t3',2,this,'c')"><span class="ol">A</span>Se activa únicamente la salida número 2 (S2)</button><button class="q-opt" onclick="ans('t3',2,this,'w')"><span class="ol">B</span>Se activan las salidas S0 y S1 simultáneamente</button><button class="q-opt" onclick="ans('t3',2,this,'w')"><span class="ol">C</span>Se activan todas las salidas excepto la S2</button><button class="q-opt" onclick="ans('t3',2,this,'w')"><span class="ol">D</span>El dispositivo se apaga</button></div><div class="q-fb" id="t3f2">✅ 010 en binario = 2 en decimal → se activa <strong>S2 y solo S2</strong>. El decodificador convierte el código binario a la salida correspondiente: código 000→S0, 001→S1, 010→S2, 011→S3, etc. Siempre exactamente una salida activa.</div></div>
+
+  <div class="q-card" id="t3q3"><div class="q-hdr"><div class="q-num">8</div><div class="q-text">¿Qué diferencia técnica fundamental existe entre un semi-sumador (Half Adder) y un sumador completo (Full Adder)?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t3',3,this,'w')"><span class="ol">A</span>El semi-sumador no genera acarreo</button><button class="q-opt" onclick="ans('t3',3,this,'c')"><span class="ol">B</span>El sumador completo tiene una entrada para el acarreo previo (Cin)</button><button class="q-opt" onclick="ans('t3',3,this,'w')"><span class="ol">C</span>El sumador completo es secuencial</button><button class="q-opt" onclick="ans('t3',3,this,'w')"><span class="ol">D</span>El semi-sumador suma 3 bits</button></div><div class="q-fb" id="t3f3">✅ La diferencia clave es el <strong>Cin (carry-in)</strong>: el Full Adder acepta el acarreo de la etapa anterior, permitiendo encadenar varios sumadores. El Half Adder SÍ genera acarreo de salida (Cout) pero no acepta Cin. Ambos son combinacionales.</div></div>
+
+  <div class="q-card" id="t3q4"><div class="q-hdr"><div class="q-num">9</div><div class="q-text">¿Qué representa un "minitérmino" en una función lógica?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t3',4,this,'c')"><span class="ol">A</span>Un producto lógico que vale '1' para una sola combinación</button><button class="q-opt" onclick="ans('t3',4,this,'w')"><span class="ol">B</span>Una suma que vale '0' para una sola combinación</button><button class="q-opt" onclick="ans('t3',4,this,'w')"><span class="ol">C</span>La versión simplificada de la función</button><button class="q-opt" onclick="ans('t3',4,this,'w')"><span class="ol">D</span>Una puerta lógica de tamaño reducido</button></div><div class="q-fb" id="t3f4">✅ Un minitérmino es un <strong>producto (AND)</strong> de todas las variables que produce 1 para exactamente una combinación de entradas. La opción B describe un maxitérmino (suma/OR que vale 0 para una sola combinación). Los minitérminos son los bloques de construcción de la forma SOP.</div></div>
+</div>
+
+<!-- ══ TEMA 4 ══ -->
+<div id="t4" class="page">
+  <div class="sec-hdr">
+    <div class="sec-num">04</div>
+    <div><div class="sec-title">Circuitos <span>Secuenciales</span></div><div class="sec-sub">Reloj · Biestables SR/JK/D · Latch vs Flip-Flop · Contadores · FSM</div></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">4.1 El reloj (Clock) en sistemas síncronos</h3>
+    <div class="concept"><div class="concept-icon" style="background:#f4eef8">⏱</div><div><h4>Función del reloj</h4><p>La señal de reloj <strong>sincroniza el cambio de estado</strong> de todos los biestables del sistema. Sin él, los cambios ocurrirían en momentos aleatorios causando inconsistencias. El reloj no da energía — es una señal de sincronización.</p></div></div>
+    <div class="tip"><strong>Flanco vs nivel:</strong> Los sistemas síncronos modernos reaccionan al <em>flanco</em> (subida o bajada) del reloj, no al nivel. Así todos los biestables cambian exactamente al mismo tiempo.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">4.2 Biestables (Flip-Flops)</h3>
+    <table class="tbl">
+      <tr><th>Tipo</th><th>Entradas</th><th>Comportamiento clave</th><th>Estado especial</th></tr>
+      <tr><td><strong>SR</strong></td><td>S (Set), R (Reset)</td><td>S=1→Q=1, R=1→Q=0, S=R=0→mantiene</td><td>S=R=1 → estado prohibido</td></tr>
+      <tr><td><strong>JK</strong></td><td>J (Set), K (Reset)</td><td>J=1,K=0→Q=1; J=0,K=1→Q=0; J=K=0→mantiene</td><td><strong>J=K=1 → Toggle</strong> (conmuta)</td></tr>
+      <tr><td><strong>D</strong></td><td>D (Data)</td><td>Q toma el valor de D en el flanco de reloj</td><td>Ninguno — muy limpio</td></tr>
+      <tr><td><strong>T</strong></td><td>T (Toggle)</td><td>T=0→mantiene; T=1→conmuta (Toggle)</td><td>—</td></tr>
+    </table>
+    <div class="tip alert"><strong>Examen JK:</strong> J=1, K=1 → la salida <strong>conmuta (Toggle)</strong>. Si Q era 0 pasa a 1, y viceversa. No es estado prohibido (eso era el SR). Es la ventaja del JK sobre el SR.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">4.3 Latch vs Flip-Flop</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--teal);border-radius:3px;padding:1rem">
+        <div style="font-weight:600;margin-bottom:.5rem;font-size:13px;color:var(--teal)">LATCH</div>
+        <div style="font-size:12.5px;color:var(--ink2);line-height:1.7">Sensible al <strong>nivel</strong> de la señal de habilitación. Mientras la señal está activa (nivel alto), la salida sigue a la entrada en tiempo real. Puede cambiar en cualquier momento durante el nivel.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--purple);border-radius:3px;padding:1rem">
+        <div style="font-weight:600;margin-bottom:.5rem;font-size:13px;color:var(--purple)">FLIP-FLOP</div>
+        <div style="font-size:12.5px;color:var(--ink2);line-height:1.7">Sensible al <strong>flanco</strong> (subida o bajada) del reloj. Solo cambia en el instante exacto del flanco. El resto del tiempo mantiene su estado.</div>
+      </div>
+    </div>
+    <div class="tip"><strong>Regla mnemotécnica:</strong> Latch = Level (nivel). Flip-Flop = Flanco (edge). Los sistemas síncronos usan flip-flops para mayor predictibilidad.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">4.4 Contadores binarios</h3>
+    <div class="concept"><div class="concept-icon" style="background:#f4eef8">🔢</div><div><h4>Contador de 4 bits</h4><p>Cuenta de 0000 a 1111 (0 a 15). Tras el estado <strong>1111, el siguiente pulso de reloj lo lleva a 0000</strong> — desbordamiento circular (overflow). Con N bits: cuenta de 0 a 2ᴺ-1.</p></div></div>
+    <div class="tip alert"><strong>Examen:</strong> ¿Qué sigue a 1111 en un contador de 4 bits? → <strong>0000</strong>. El contador desborda y vuelve a cero. No se bloquea.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">4.5 Máquinas de Estado Finito (FSM)</h3>
+    <div class="concept"><div class="concept-icon" style="background:#eaf4ee">🗺</div><div><h4>Tabla de Estados</h4><p>Define la <strong>relación entre estado actual, entradas y estado siguiente</strong>. Es la descripción completa del comportamiento de la FSM. También puede incluir las salidas.</p></div></div>
+    <div class="tip info"><strong>Tipos de FSM:</strong> Mealy (salidas dependen de estado + entradas) vs Moore (salidas dependen solo del estado).</div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="background:rgba(90,42,122,.04);border:1px solid rgba(90,42,122,.15);border-radius:3px;padding:8px 14px;margin-bottom:1rem;font-family:var(--mono);font-size:10px;color:var(--purple);font-weight:500;letter-spacing:.1em;text-transform:uppercase">📋 Preguntas de la guía oficial — Tema 4</div>
+
+  <div class="score-wrap"><div class="sc-big" id="sc4">0/5</div><div class="sc-right"><div class="sc-lbl">Puntuación tema 4</div><div class="sc-bg"><div class="sc-fill" id="sb4" style="width:0%"></div></div></div><button class="btn-reset" onclick="resetTopic(4,5)">↺ Reiniciar</button></div>
+
+  <div class="q-card" id="t4q1"><div class="q-hdr"><div class="q-num">10</div><div class="q-text">¿Cuál es la función principal de la señal de reloj (Clock) en un sistema sincrónico?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t4',1,this,'w')"><span class="ol">A</span>Proporcionar energía</button><button class="q-opt" onclick="ans('t4',1,this,'c')"><span class="ol">B</span>Sincronizar el cambio de estado de los biestables</button><button class="q-opt" onclick="ans('t4',1,this,'w')"><span class="ol">C</span>Borrar la memoria RAM</button><button class="q-opt" onclick="ans('t4',1,this,'w')"><span class="ol">D</span>Aumentar la velocidad del bus</button></div><div class="q-fb" id="t4f1">✅ El reloj es una señal de sincronización: asegura que todos los biestables cambien de estado en el mismo instante (en el flanco). Esto hace el sistema predecible y sin carreras de señal. No proporciona energía ni borra nada.</div></div>
+
+  <div class="q-card" id="t4q2"><div class="q-hdr"><div class="q-num">11</div><div class="q-text">En un biestable tipo JK, ¿qué sucede si J=1 y K=1 durante el flanco de reloj?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t4',2,this,'w')"><span class="ol">A</span>La salida se mantiene igual</button><button class="q-opt" onclick="ans('t4',2,this,'w')"><span class="ol">B</span>La salida se pone a '0'</button><button class="q-opt" onclick="ans('t4',2,this,'c')"><span class="ol">C</span>La salida conmuta al estado opuesto (Toggle)</button><button class="q-opt" onclick="ans('t4',2,this,'w')"><span class="ol">D</span>La salida entra en estado prohibido</button></div><div class="q-fb" id="t4f2">✅ J=K=1 → Toggle. El JK fue diseñado para resolver el estado prohibido del SR (S=R=1). En JK, J=K=1 tiene un comportamiento definido: la salida conmuta (si era 0 pasa a 1, si era 1 pasa a 0). El estado prohibido no existe en JK.</div></div>
+
+  <div class="q-card" id="t4q3"><div class="q-hdr"><div class="q-num">12</div><div class="q-text">¿Cuál es la diferencia operativa entre un Latch y un Flip-Flop?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t4',3,this,'c')"><span class="ol">A</span>El Latch es sensible al nivel y el Flip-Flop al flanco</button><button class="q-opt" onclick="ans('t4',3,this,'w')"><span class="ol">B</span>El Latch no tiene memoria</button><button class="q-opt" onclick="ans('t4',3,this,'w')"><span class="ol">C</span>El Flip-Flop es analógico</button><button class="q-opt" onclick="ans('t4',3,this,'w')"><span class="ol">D</span>No hay diferencia</button></div><div class="q-fb" id="t4f3">✅ Latch → sensible al <em>nivel</em> de la señal de habilitación (puede cambiar en cualquier momento mientras el nivel está activo). Flip-Flop → sensible al <em>flanco</em> del reloj (solo cambia en el instante exacto de subida o bajada). Ambos tienen memoria.</div></div>
+
+  <div class="q-card" id="t4q4"><div class="q-hdr"><div class="q-num">13</div><div class="q-text">En un contador binario de 4 bits, ¿qué valor sigue al estado 1111 tras un pulso de reloj?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t4',4,this,'w')"><span class="ol">A</span>1000</button><button class="q-opt" onclick="ans('t4',4,this,'w')"><span class="ol">B</span>0001</button><button class="q-opt" onclick="ans('t4',4,this,'c')"><span class="ol">C</span>0000</button><button class="q-opt" onclick="ans('t4',4,this,'w')"><span class="ol">D</span>1111 (se bloquea)</button></div><div class="q-fb" id="t4f4">✅ 1111 = 15 en decimal. Al sumar 1: 15+1=16, pero 16 en 4 bits es 10000 → el bit de mayor peso (el 5º) se pierde → queda <strong>0000</strong>. El contador desborda circularmente. Es el mismo principio que el desbordamiento en registros de la CPU.</div></div>
+
+  <div class="q-card" id="t4q5"><div class="q-hdr"><div class="q-num">14</div><div class="q-text">¿Qué información define la Tabla de Estados de una FSM?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t4',5,this,'w')"><span class="ol">A</span>El voltaje de los biestables</button><button class="q-opt" onclick="ans('t4',5,this,'c')"><span class="ol">B</span>La relación entre estado actual, entradas y estado siguiente</button><button class="q-opt" onclick="ans('t4',5,this,'w')"><span class="ol">C</span>La velocidad del reloj</button><button class="q-opt" onclick="ans('t4',5,this,'w')"><span class="ol">D</span>La cantidad de compuertas AND</button></div><div class="q-fb" id="t4f5">✅ La tabla de estados (o tabla de transición) muestra para cada combinación de (estado actual + entradas) cuál será el estado siguiente, y opcionalmente cuál es la salida. Es la representación tabular del diagrama de estados de la FSM.</div></div>
+</div>
+
+<!-- ══ TEMA 5 ══ -->
+<div id="t5" class="page">
+  <div class="sec-hdr">
+    <div class="sec-num">05</div>
+    <div><div class="sec-title">Lenguaje <span>Ensamblador</span></div><div class="sec-sub">FLAGS · CMP · JE/JNE · LOOP · Desbordamiento · Registros</div></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">5.1 Banderas del procesador (FLAGS)</h3>
+    <table class="tbl">
+      <tr><th>FLAG</th><th>Nombre</th><th>Se activa (=1) cuando…</th><th>Usada por</th></tr>
+      <tr><td><span class="badge b-blue">ZF</span></td><td>Zero Flag</td><td>El resultado de la operación es <strong>exactamente 0</strong></td><td>JE, JZ, JNE, JNZ</td></tr>
+      <tr><td><span class="badge b-orange">CF</span></td><td>Carry Flag</td><td>La operación produce <strong>acarreo</strong> (desbordamiento sin signo)</td><td>JC, JNC, JB, JAE</td></tr>
+      <tr><td><span class="badge b-purple">SF</span></td><td>Sign Flag</td><td>El resultado tiene el <strong>bit más significativo a 1</strong> (negativo)</td><td>JS, JNS</td></tr>
+      <tr><td><span class="badge b-red">OF</span></td><td>Overflow Flag</td><td>Desbordamiento con <strong>signo</strong></td><td>JO, JNO</td></tr>
+    </table>
+    <div class="tip alert"><strong>CMP AX, BX:</strong> Hace AX-BX internamente. Si son iguales → resultado=0 → <strong>ZF=1</strong>. Si son distintos → resultado≠0 → ZF=0. AX y BX no se modifican.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">5.2 Desbordamiento en registros de 8 bits</h3>
+    <div class="code"><span class="kw">mov</span> <span class="reg">al</span>, <span class="val">0xFE</span>   <span class="cmt">; AL = 254 = 1111 1110</span>
+<span class="kw">add</span> <span class="reg">al</span>, <span class="val">0x03</span>   <span class="cmt">; 254 + 3 = 257 = 0x101</span>
+                 <span class="cmt">; AL solo tiene 8 bits → guarda 0x01</span>
+                 <span class="cmt">; CF = 1 (el bit 9 activa Carry Flag)</span></div>
+    <div style="background:var(--ink);color:#c8c4bc;font-family:var(--mono);font-size:12px;padding:1rem;border-radius:4px;margin:.8rem 0;line-height:1.9">
+      <span style="color:#888">  0xFE = 1111 1110</span><br>
+      <span style="color:#c8a84a">+ 0x03 = 0000 0011</span><br>
+      <span style="color:#444">  ─────────────────</span><br>
+      <span style="color:#e8855a">= 0x101 = 1|0000 0001  ← bit 9 se pierde en AL</span><br>
+      <span style="color:#7ecca0">  AL   =   0000 0001 = <strong>0x01</strong> ✓</span>
+    </div>
+    <div class="tip"><strong>Regla:</strong> AL es 8 bits → máximo 0xFF (255). Si el resultado supera 255, AL guarda solo los 8 bits bajos. El bit extra activa CF=1 pero no se almacena en AL.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">5.3 El bucle LOOP y la trampa de CX=0</h3>
+    <div class="code"><span class="kw">sub</span> <span class="reg">cx</span>, <span class="reg">cx</span>    <span class="cmt">; CX = 0  (CX - CX = 0)</span>
+<span class="lbl2">BUCLE:</span>
+  <span class="cmt">; instrucciones...</span>
+  <span class="kw">loop</span> <span class="lbl2">BUCLE</span>   <span class="cmt">; 1. CX-- → CX = 0-1 = 0xFFFF (16 bits)</span>
+                <span class="cmt">; 2. ¿CX=0? No (0xFFFF≠0) → salta</span>
+                <span class="cmt">; Resultado: 65.536 iteraciones</span></div>
+    <div class="tip alert"><strong>Trampa:</strong> LOOP primero decrementa CX, luego comprueba. Si CX=0 → CX-- → CX=0xFFFF (65535) → el bucle se ejecuta 65.536 veces en total. No es infinito (termina), pero es un error clásico y devastador en rendimiento.</div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="background:rgba(184,48,48,.04);border:1px solid rgba(184,48,48,.15);border-radius:3px;padding:8px 14px;margin-bottom:1rem;font-family:var(--mono);font-size:10px;color:var(--red);font-weight:500;letter-spacing:.1em;text-transform:uppercase">📋 Preguntas de la guía oficial — Tema 5</div>
+
+  <div class="score-wrap"><div class="sc-big" id="sc5">0/3</div><div class="sc-right"><div class="sc-lbl">Puntuación tema 5</div><div class="sc-bg"><div class="sc-fill" id="sb5" style="width:0%"></div></div></div><button class="btn-reset" onclick="resetTopic(5,3)">↺ Reiniciar</button></div>
+
+  <div class="q-card" id="t5q1"><div class="q-hdr"><div class="q-num">22</div><div class="q-text">Considera este código NASM:<div class="q-code">mov ax, 5 / mov bx, 5 / cmp ax, bx / je destino</div>¿Qué banderas se modifican con <code>cmp ax, bx</code> para que <code>je</code> sea efectivo?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t5',1,this,'c')"><span class="ol">A</span>Resta interna (AX-BX) sin alterar registros, se activa ZF=1</button><button class="q-opt" onclick="ans('t5',1,this,'w')"><span class="ol">B</span>AX se pone en 0 automáticamente y se activa CF=1</button><button class="q-opt" onclick="ans('t5',1,this,'w')"><span class="ol">C</span>BX se incrementa para forzar igualdad y se apaga ZF</button><button class="q-opt" onclick="ans('t5',1,this,'w')"><span class="ol">D</span>Resta interna sin alterar registros, se activa ZF=0</button></div><div class="q-fb" id="t5f1">✅ CMP hace AX-BX = 5-5 = 0 → ZF=1. AX y BX no cambian. JE (Jump if Equal) salta si ZF=1. La opción D es casi igual pero dice ZF=0, que es el caso contrario (valores distintos). ZF=1 significa resultado cero = valores iguales.</div></div>
+
+  <div class="q-card" id="t5q2"><div class="q-hdr"><div class="q-num">23</div><div class="q-text">¿Qué valor hexadecimal queda en AL (8 bits) tras: <code>mov al, 0xFE</code> / <code>add al, 0x03</code>?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t5',2,this,'c')"><span class="ol">A</span>0x01</button><button class="q-opt" onclick="ans('t5',2,this,'w')"><span class="ol">B</span>0x101</button><button class="q-opt" onclick="ans('t5',2,this,'w')"><span class="ol">C</span>0x00</button><button class="q-opt" onclick="ans('t5',2,this,'w')"><span class="ol">D</span>0xFF</button></div><div class="q-fb" id="t5f2">✅ 0xFE(254) + 0x03(3) = 0x101(257). AL tiene 8 bits → solo guarda los 8 bits bajos: 0x101 & 0xFF = <strong>0x01</strong>. El bit 9 activa CF=1 pero no se almacena en AL. 0x101 es el resultado matemático real, no lo que queda en AL.</div></div>
+
+  <div class="q-card" id="t5q3"><div class="q-hdr"><div class="q-num">24</div><div class="q-text"><code>sub cx, cx</code> seguido de un bucle con <code>loop</code>. ¿Qué impacto tiene en el flujo de ejecución?</div></div><div class="q-opts"><button class="q-opt" onclick="ans('t5',3,this,'c')"><span class="ol">A</span>CX=0; LOOP decrementa CX a 0xFFFF, forzando 65.536 iteraciones</button><button class="q-opt" onclick="ans('t5',3,this,'w')"><span class="ol">B</span>El bucle se omite sin ejecutar su bloque ni una vez</button><button class="q-opt" onclick="ans('t5',3,this,'w')"><span class="ol">C</span>Se dispara excepción de desbordamiento que detiene el SO</button><button class="q-opt" onclick="ans('t5',3,this,'w')"><span class="ol">D</span>Bucle infinito puro que bloquea el bus de control</button></div><div class="q-fb" id="t5f3">✅ SUB CX,CX → CX=0. LOOP decrementa primero: CX=0→0-1=0xFFFF (desbordamiento circular en 16 bits). Como 0xFFFF≠0, el bucle no para. Se ejecuta 65.536 veces hasta que CX vuelve a 0. No es infinito exactamente, pero es un error gravísimo de rendimiento.</div></div>
+</div>
+
+<!-- ══ EXAMEN SIMULADO ══ -->
+<div id="examen" class="page">
+  <div class="sec-hdr">
+    <div class="sec-num">📝</div>
+    <div><div class="sec-title">Examen <span>Simulado</span></div><div class="sec-sub">24 preguntas nuevas del mismo nivel · Todos los temas · Corrección inmediata</div></div>
+  </div>
+
+  <div class="score-wrap">
+    <div class="sc-big" id="esc">0/24</div>
+    <div class="sc-right">
+      <div class="sc-lbl">Nota del examen</div>
+      <div class="sc-bg"><div class="sc-fill" id="esb" style="width:0%"></div></div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:.4rem" id="enota">Responde preguntas para ver tu nota</div>
+    </div>
+    <button class="btn-reset" onclick="resetExam()">↺ Reiniciar examen</button>
+  </div>
+
+  <div style="background:rgba(26,60,122,.04);border:1px solid rgba(26,60,122,.15);border-radius:3px;padding:8px 14px;margin-bottom:1.2rem;font-family:var(--mono);font-size:10px;color:var(--blue);font-weight:500;letter-spacing:.08em;text-transform:uppercase">T1: Von Neumann (Preguntas 1–5)</div>
+
+  <div class="q-card" id="eq1"><div class="q-hdr"><div class="q-num">1</div><div class="q-text">¿Qué ocurre durante la fase 'Decode' del ciclo de instrucción?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',1)"><span class="ol">A</span>La CPU trae la instrucción desde memoria</button><button class="q-opt" onclick="ae(this,'c',1)"><span class="ol">B</span>La Unidad de Control interpreta la instrucción del IR</button><button class="q-opt" onclick="ae(this,'w',1)"><span class="ol">C</span>La ALU realiza el cálculo</button><button class="q-opt" onclick="ae(this,'w',1)"><span class="ol">D</span>El PC se pone a cero</button></div><div class="q-fb" id="ef1">✅ Decode: la Unidad de Control lee el IR y determina qué operación es y qué operandos necesita. Fetch es traer la instrucción. Execute es realizar la operación. El PC se incrementa en Fetch, no se pone a cero.</div></div>
+
+  <div class="q-card" id="eq2"><div class="q-hdr"><div class="q-num">2</div><div class="q-text">Un bus de direcciones de 32 bits, ¿cuántas posiciones de memoria puede direccionar?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',2)"><span class="ol">A</span>32 posiciones</button><button class="q-opt" onclick="ae(this,'w',2)"><span class="ol">B</span>64 posiciones</button><button class="q-opt" onclick="ae(this,'c',2)"><span class="ol">C</span>2³² posiciones (4 GB)</button><button class="q-opt" onclick="ae(this,'w',2)"><span class="ol">D</span>2¹⁶ posiciones</button></div><div class="q-fb" id="ef2">✅ Con N bits de dirección se pueden referenciar 2ᴺ posiciones. 2³² = 4.294.967.296 posiciones = 4 GB si cada posición es 1 byte. Por eso los sistemas operativos de 32 bits tenían un límite de ~4 GB de RAM.</div></div>
+
+  <div class="q-card" id="eq3"><div class="q-hdr"><div class="q-num">3</div><div class="q-text">¿Qué registro contiene siempre la dirección de la instrucción que se ejecutará a continuación?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',3)"><span class="ol">A</span>IR (Instruction Register)</button><button class="q-opt" onclick="ae(this,'c',3)"><span class="ol">B</span>PC (Program Counter)</button><button class="q-opt" onclick="ae(this,'w',3)"><span class="ol">C</span>SP (Stack Pointer)</button><button class="q-opt" onclick="ae(this,'w',3)"><span class="ol">D</span>ALU</button></div><div class="q-fb" id="ef3">✅ El PC (Program Counter) apunta a la SIGUIENTE instrucción. El IR contiene la instrucción ACTUAL. El SP apunta a la cima de la pila. La ALU no es un registro de dirección.</div></div>
+
+  <div class="q-card" id="eq4"><div class="q-hdr"><div class="q-num">4</div><div class="q-text">¿Qué representa la 'Localidad Espacial'?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',4)"><span class="ol">A</span>Tendencia a reutilizar datos recientes</button><button class="q-opt" onclick="ae(this,'c',4)"><span class="ol">B</span>Tendencia a acceder a datos cercanos en memoria al dato recién accedido</button><button class="q-opt" onclick="ae(this,'w',4)"><span class="ol">C</span>El tiempo de acceso a la RAM</button><button class="q-opt" onclick="ae(this,'w',4)"><span class="ol">D</span>El espacio libre en disco</button></div><div class="q-fb" id="ef4">✅ Localidad Espacial: si accedo a A, probablemente accederé pronto a datos cercanos a A (arrays, instrucciones secuenciales). Localidad Temporal (distractor A): reutilizar el mismo dato reciente. La caché explota ambos principios.</div></div>
+
+  <div class="q-card" id="eq5"><div class="q-hdr"><div class="q-num">5</div><div class="q-text">¿Cuál de las siguientes afirmaciones sobre la Arquitectura de Von Neumann es FALSA?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',5)"><span class="ol">A</span>Datos e instrucciones comparten la misma memoria</button><button class="q-opt" onclick="ae(this,'c',5)"><span class="ol">B</span>Tiene buses separados para datos e instrucciones</button><button class="q-opt" onclick="ae(this,'w',5)"><span class="ol">C</span>La CPU incluye ALU y Unidad de Control</button><button class="q-opt" onclick="ae(this,'w',5)"><span class="ol">D</span>Incluye dispositivos de entrada y salida</button></div><div class="q-fb" id="ef5">✅ La afirmación FALSA es B. Von Neumann tiene un <em>único bus compartido</em> para datos e instrucciones. Tener buses separados describe la arquitectura Harvard. Las demás opciones son características reales de Von Neumann.</div></div>
+
+  <div style="background:rgba(200,90,26,.04);border:1px solid rgba(200,90,26,.15);border-radius:3px;padding:8px 14px;margin:1.2rem 0;font-family:var(--mono);font-size:10px;color:var(--orange);font-weight:500;letter-spacing:.08em;text-transform:uppercase">T2: Lógica y Sistemas Numéricos (Preguntas 6–10)</div>
+
+  <div class="q-card" id="eq6"><div class="q-hdr"><div class="q-num">6</div><div class="q-text">¿Cuál es la puerta lógica cuya salida es '1' únicamente cuando TODAS sus entradas son '0'?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',6)"><span class="ol">A</span>NAND</button><button class="q-opt" onclick="ae(this,'c',6)"><span class="ol">B</span>NOR</button><button class="q-opt" onclick="ae(this,'w',6)"><span class="ol">C</span>XOR</button><button class="q-opt" onclick="ae(this,'w',6)"><span class="ol">D</span>AND</button></div><div class="q-fb" id="ef6">✅ NOR = NOT OR. OR da 0 solo cuando todas las entradas son 0; NOR invierte → da <strong>1 solo cuando todas son 0</strong>. NAND da 0 cuando todas son 1 (lo opuesto). XOR da 1 cuando las entradas son distintas.</div></div>
+
+  <div class="q-card" id="eq7"><div class="q-hdr"><div class="q-num">7</div><div class="q-text">¿A qué se simplifica la expresión booleana A · (A + B)?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'c',7)"><span class="ol">A</span>A</button><button class="q-opt" onclick="ae(this,'w',7)"><span class="ol">B</span>A + B</button><button class="q-opt" onclick="ae(this,'w',7)"><span class="ol">C</span>AB</button><button class="q-opt" onclick="ae(this,'w',7)"><span class="ol">D</span>B</button></div><div class="q-fb" id="ef7">✅ Ley de absorción: A·(A+B) = A. Demostración: A·A + A·B = A + AB = A·(1+B) = A·1 = <strong>A</strong>. O por casos: si A=0 → 0·(0+B)=0 ✓; si A=1 → 1·(1+B)=1·1=1 ✓. El resultado siempre es igual a A.</div></div>
+
+  <div class="q-card" id="eq8"><div class="q-hdr"><div class="q-num">8</div><div class="q-text">¿Cuál es la representación binaria del número hexadecimal 0x1A?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',8)"><span class="ol">A</span>0001 0001</button><button class="q-opt" onclick="ae(this,'c',8)"><span class="ol">B</span>0001 1010</button><button class="q-opt" onclick="ae(this,'w',8)"><span class="ol">C</span>0001 1100</button><button class="q-opt" onclick="ae(this,'w',8)"><span class="ol">D</span>0010 1010</button></div><div class="q-fb" id="ef8">✅ 0x1A: 1→0001, A→1010. En binario: <strong>0001 1010</strong>. Verificación decimal: 16+8+2=26=0x1A ✓. Cada dígito hexadecimal se convierte directamente a 4 bits binarios.</div></div>
+
+  <div class="q-card" id="eq9"><div class="q-hdr"><div class="q-num">9</div><div class="q-text">En un K-Map de 4 variables, si todas las 16 celdas tienen valor '1', ¿cuál es la expresión mínima?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',9)"><span class="ol">A</span>A + B + C + D</button><button class="q-opt" onclick="ae(this,'w',9)"><span class="ol">B</span>Una sola variable</button><button class="q-opt" onclick="ae(this,'c',9)"><span class="ol">C</span>1 (constante — la función siempre vale 1)</button><button class="q-opt" onclick="ae(this,'w',9)"><span class="ol">D</span>ABCD</button></div><div class="q-fb" id="ef9">✅ Si todas las celdas son 1, la función siempre es verdadera independientemente de las entradas → simplifica a la constante <strong>1</strong>. Agrupar las 16 celdas (2⁴) elimina las 4 variables → queda 0 variables → constante 1.</div></div>
+
+  <div class="q-card" id="eq10"><div class="q-hdr"><div class="q-num">10</div><div class="q-text">Aplicando De Morgan, ¿a qué es equivalente ¬(A + B)?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',10)"><span class="ol">A</span>Ā + B̄</button><button class="q-opt" onclick="ae(this,'c',10)"><span class="ol">B</span>Ā · B̄</button><button class="q-opt" onclick="ae(this,'w',10)"><span class="ol">C</span>A · B</button><button class="q-opt" onclick="ae(this,'w',10)"><span class="ol">D</span>A + B</button></div><div class="q-fb" id="ef10">✅ Segunda ley de De Morgan: ¬(A+B) = <strong>Ā · B̄</strong>. La negación de una OR es la AND de las negaciones. Primera ley: ¬(A·B) = Ā+B̄. Mnemotecnia: "rompe la barra y cambia la operación" (OR↔AND).</div></div>
+
+  <div style="background:rgba(42,110,60,.04);border:1px solid rgba(42,110,60,.15);border-radius:3px;padding:8px 14px;margin:1.2rem 0;font-family:var(--mono);font-size:10px;color:var(--green);font-weight:500;letter-spacing:.08em;text-transform:uppercase">T3: Circuitos Combinacionales (Preguntas 11–15)</div>
+
+  <div class="q-card" id="eq11"><div class="q-hdr"><div class="q-num">11</div><div class="q-text">¿Cuántas salidas tiene un decodificador con 4 entradas binarias?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',11)"><span class="ol">A</span>4 salidas</button><button class="q-opt" onclick="ae(this,'w',11)"><span class="ol">B</span>8 salidas</button><button class="q-opt" onclick="ae(this,'c',11)"><span class="ol">C</span>16 salidas</button><button class="q-opt" onclick="ae(this,'w',11)"><span class="ol">D</span>2 salidas</button></div><div class="q-fb" id="ef11">✅ Decodificador N:2ᴺ. Con N=4 entradas: 2⁴ = <strong>16 salidas</strong>. 3 entradas → 8 salidas, 2 entradas → 4 salidas. Siempre exactamente una salida activa a la vez.</div></div>
+
+  <div class="q-card" id="eq12"><div class="q-hdr"><div class="q-num">12</div><div class="q-text">¿Qué circuito selecciona una de sus N entradas de datos y la dirige a una única salida según una señal de selección?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',12)"><span class="ol">A</span>Decodificador</button><button class="q-opt" onclick="ae(this,'c',12)"><span class="ol">B</span>Multiplexor (MUX)</button><button class="q-opt" onclick="ae(this,'w',12)"><span class="ol">C</span>Registro de desplazamiento</button><button class="q-opt" onclick="ae(this,'w',12)"><span class="ol">D</span>Biestable D</button></div><div class="q-fb" id="ef12">✅ El Multiplexor (MUX) es un "selector de datos": tiene N entradas de datos, bits de selección, y una salida. La señal de selección elige cuál de las entradas pasa a la salida. Es combinacional (sin memoria).</div></div>
+
+  <div class="q-card" id="eq13"><div class="q-hdr"><div class="q-num">13</div><div class="q-text">Un sumador completo (Full Adder) produce Suma=1 y Cout=1 con A=1, B=1, Cin=1. ¿Cuál es el valor decimal resultante?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',13)"><span class="ol">A</span>2</button><button class="q-opt" onclick="ae(this,'c',13)"><span class="ol">B</span>3</button><button class="q-opt" onclick="ae(this,'w',13)"><span class="ol">C</span>1</button><button class="q-opt" onclick="ae(this,'w',13)"><span class="ol">D</span>4</button></div><div class="q-fb" id="ef13">✅ 1+1+1=3. En binario: Cout=1, Suma=1 → el resultado es 11 en binario = <strong>3</strong> en decimal. Cout es el bit de mayor peso (vale 2) y Suma es el bit de menor peso (vale 1). 2+1=3 ✓.</div></div>
+
+  <div class="q-card" id="eq14"><div class="q-hdr"><div class="q-num">14</div><div class="q-text">¿Qué elemento NO es un circuito combinacional?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',14)"><span class="ol">A</span>Sumador completo</button><button class="q-opt" onclick="ae(this,'w',14)"><span class="ol">B</span>Decodificador</button><button class="q-opt" onclick="ae(this,'w',14)"><span class="ol">C</span>Multiplexor</button><button class="q-opt" onclick="ae(this,'c',14)"><span class="ol">D</span>Registro de desplazamiento</button></div><div class="q-fb" id="ef14">✅ El registro de desplazamiento es <strong>secuencial</strong>: tiene biestables internos que guardan estado y necesita señal de reloj. Sumador, decodificador y multiplexor son todos combinacionales — su salida depende solo de las entradas actuales.</div></div>
+
+  <div class="q-card" id="eq15"><div class="q-hdr"><div class="q-num">15</div><div class="q-text">¿Cuál es la diferencia entre un minitérmino y un maxitérmino?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',15)"><span class="ol">A</span>El minitérmino usa OR, el maxitérmino usa AND</button><button class="q-opt" onclick="ae(this,'c',15)"><span class="ol">B</span>El minitérmino es un producto que vale 1 para una combinación; el maxitérmino es una suma que vale 0 para una combinación</button><button class="q-opt" onclick="ae(this,'w',15)"><span class="ol">C</span>Son lo mismo con distinto nombre</button><button class="q-opt" onclick="ae(this,'w',15)"><span class="ol">D</span>El maxitérmino siempre vale 1</button></div><div class="q-fb" id="ef15">✅ Minitérmino: producto (AND) que vale 1 para una sola fila de la tabla de verdad. Maxitérmino: suma (OR) que vale 0 para una sola fila. Son duales. SOP usa minitérminos; POS usa maxitérminos.</div></div>
+
+  <div style="background:rgba(90,42,122,.04);border:1px solid rgba(90,42,122,.15);border-radius:3px;padding:8px 14px;margin:1.2rem 0;font-family:var(--mono);font-size:10px;color:var(--purple);font-weight:500;letter-spacing:.08em;text-transform:uppercase">T4: Circuitos Secuenciales (Preguntas 16–20)</div>
+
+  <div class="q-card" id="eq16"><div class="q-hdr"><div class="q-num">16</div><div class="q-text">En un biestable SR, ¿qué ocurre si S=0 y R=0?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'c',16)"><span class="ol">A</span>La salida mantiene su estado anterior (memoria)</button><button class="q-opt" onclick="ae(this,'w',16)"><span class="ol">B</span>La salida se pone a 0</button><button class="q-opt" onclick="ae(this,'w',16)"><span class="ol">C</span>La salida se pone a 1</button><button class="q-opt" onclick="ae(this,'w',16)"><span class="ol">D</span>Estado prohibido</button></div><div class="q-fb" id="ef16">✅ SR con S=0, R=0 → sin acción → el biestable <strong>mantiene su estado anterior</strong>. Esto es la función de memoria. S=1,R=0 → Q=1 (Set). S=0,R=1 → Q=0 (Reset). S=R=1 → estado prohibido (indeterminado).</div></div>
+
+  <div class="q-card" id="eq17"><div class="q-hdr"><div class="q-num">17</div><div class="q-text">¿Cuántos estados puede almacenar un sistema con 3 biestables tipo D?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',17)"><span class="ol">A</span>3 estados</button><button class="q-opt" onclick="ae(this,'w',17)"><span class="ol">B</span>6 estados</button><button class="q-opt" onclick="ae(this,'c',17)"><span class="ol">C</span>8 estados</button><button class="q-opt" onclick="ae(this,'w',17)"><span class="ol">D</span>16 estados</button></div><div class="q-fb" id="ef17">✅ N biestables pueden representar 2ᴺ estados. Con N=3: 2³ = <strong>8 estados</strong> (000 a 111). Con 4 biestables: 16 estados. Con 8: 256. Es el mismo principio que los bits en binario.</div></div>
+
+  <div class="q-card" id="eq18"><div class="q-hdr"><div class="q-num">18</div><div class="q-text">¿Qué tipo de biestable actúa como "retardo de un ciclo de reloj" ya que su salida Q toma el valor de D en el siguiente flanco?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',18)"><span class="ol">A</span>JK</button><button class="q-opt" onclick="ae(this,'w',18)"><span class="ol">B</span>SR</button><button class="q-opt" onclick="ae(this,'c',18)"><span class="ol">C</span>D</button><button class="q-opt" onclick="ae(this,'w',18)"><span class="ol">D</span>T</button></div><div class="q-fb" id="ef18">✅ El biestable D (Data/Delay) es el más simple: en el flanco de reloj, Q toma el valor de D. Funciona como retardo de un ciclo. Es el biestable más usado en registros y pipelines de la CPU moderna.</div></div>
+
+  <div class="q-card" id="eq19"><div class="q-hdr"><div class="q-num">19</div><div class="q-text">Un contador binario de 3 bits está en el estado 101. ¿Cuál es el siguiente estado?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',19)"><span class="ol">A</span>100</button><button class="q-opt" onclick="ae(this,'c',19)"><span class="ol">B</span>110</button><button class="q-opt" onclick="ae(this,'w',19)"><span class="ol">C</span>111</button><button class="q-opt" onclick="ae(this,'w',19)"><span class="ol">D</span>000</button></div><div class="q-fb" id="ef19">✅ 101 = 5 en decimal. 5+1 = 6 = <strong>110</strong> en binario. El contador avanza de uno en uno en binario. (000→001→010→011→100→101→<strong>110</strong>→111→000…). 111 vendría después de 110, y 000 después de 111.</div></div>
+
+  <div class="q-card" id="eq20"><div class="q-hdr"><div class="q-num">20</div><div class="q-text">¿Qué tipo de FSM genera sus salidas solo en función del estado actual, sin depender de las entradas?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',20)"><span class="ol">A</span>Mealy</button><button class="q-opt" onclick="ae(this,'c',20)"><span class="ol">B</span>Moore</button><button class="q-opt" onclick="ae(this,'w',20)"><span class="ol">C</span>Von Neumann</button><button class="q-opt" onclick="ae(this,'w',20)"><span class="ol">D</span>Harvard</button></div><div class="q-fb" id="ef20">✅ FSM Moore: salidas dependen solo del <em>estado actual</em>. FSM Mealy: salidas dependen del estado actual <em>y</em> de las entradas. Moore es más predecible; Mealy puede ser más compacta. Von Neumann y Harvard son arquitecturas de computadores, no tipos de FSM.</div></div>
+
+  <div style="background:rgba(184,48,48,.04);border:1px solid rgba(184,48,48,.15);border-radius:3px;padding:8px 14px;margin:1.2rem 0;font-family:var(--mono);font-size:10px;color:var(--red);font-weight:500;letter-spacing:.08em;text-transform:uppercase">T5: Lenguaje Ensamblador (Preguntas 21–24)</div>
+
+  <div class="q-card" id="eq21"><div class="q-hdr"><div class="q-num">21</div><div class="q-text">¿Cuál es el valor en AL tras: <code>mov al, 0xFF</code> / <code>add al, 0x02</code>?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'c',21)"><span class="ol">A</span>0x01 — 0xFF+2=0x101, AL guarda los 8 bits bajos (01), CF=1</button><button class="q-opt" onclick="ae(this,'w',21)"><span class="ol">B</span>0xFF — no cambia porque ya está en el máximo</button><button class="q-opt" onclick="ae(this,'w',21)"><span class="ol">C</span>0x101 — el resultado completo</button><button class="q-opt" onclick="ae(this,'w',21)"><span class="ol">D</span>0x00 — hay desbordamiento total</button></div><div class="q-fb" id="ef21">✅ 0xFF(255)+0x02(2)=0x101(257). AL tiene 8 bits → guarda 257 & 0xFF = <strong>0x01</strong>. CF=1 por el acarreo. (0x00 sería si sumaras 1 al 0xFF; sumando 2 da 0x01, no 0x00).</div></div>
+
+  <div class="q-card" id="eq22"><div class="q-hdr"><div class="q-num">22</div><div class="q-text">¿Qué FLAG se activa tras <code>cmp ax, bx</code> cuando AX=10 y BX=15?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',22)"><span class="ol">A</span>ZF=1 porque la comparación fue exitosa</button><button class="q-opt" onclick="ae(this,'c',22)"><span class="ol">B</span>ZF=0 y SF=1 porque AX-BX=10-15=-5 (resultado negativo)</button><button class="q-opt" onclick="ae(this,'w',22)"><span class="ol">C</span>CF=1 y ZF=1 simultáneamente</button><button class="q-opt" onclick="ae(this,'w',22)"><span class="ol">D</span>Ninguna flag se activa</button></div><div class="q-fb" id="ef22">✅ CMP hace AX-BX = 10-15 = -5. Como -5 ≠ 0 → ZF=0. Como el resultado es negativo → SF=1 (bit más significativo a 1 en complemento a 2). JL (Jump if Less) usaría esta condición para saltar.</div></div>
+
+  <div class="q-card" id="eq23"><div class="q-hdr"><div class="q-num">23</div><div class="q-text">¿Cuántas veces se ejecuta el cuerpo de este bucle?<div class="q-code">mov cx, 0005h
+inicio: [instrucciones] / loop inicio</div></div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',23)"><span class="ol">A</span>4 veces</button><button class="q-opt" onclick="ae(this,'c',23)"><span class="ol">B</span>5 veces</button><button class="q-opt" onclick="ae(this,'w',23)"><span class="ol">C</span>6 veces</button><button class="q-opt" onclick="ae(this,'w',23)"><span class="ol">D</span>65.536 veces</button></div><div class="q-fb" id="ef23">✅ CX=5 → 5 vueltas. LOOP: decrementa CX → si ≠0 salta. Vueltas: CX=5→4(salta), 4→3(salta), 3→2(salta), 2→1(salta), 1→0(NO salta, fin). Cuerpo ejecutado: <strong>5 veces</strong>. 65.536 sería si CX empezara en 0.</div></div>
+
+  <div class="q-card" id="eq24"><div class="q-hdr"><div class="q-num">24</div><div class="q-text">¿Qué instrucción es funcionalmente equivalente a <code>xor ax, ax</code> para poner AX a cero?</div></div><div class="q-opts"><button class="q-opt" onclick="ae(this,'w',24)"><span class="ol">A</span>not ax</button><button class="q-opt" onclick="ae(this,'c',24)"><span class="ol">B</span>sub ax, ax</button><button class="q-opt" onclick="ae(this,'w',24)"><span class="ol">C</span>inc ax</button><button class="q-opt" onclick="ae(this,'w',24)"><span class="ol">D</span>cmp ax, 0</button></div><div class="q-fb" id="ef24">✅ SUB AX, AX hace AX-AX=0, exactamente igual que XOR AX,AX (cualquier valor XOR consigo mismo = 0). Ambas activan ZF=1. NOT AX invierte todos los bits (no pone a cero). CMP AX,0 hace la comparación pero no modifica AX.</div></div>
+
+</div><!-- end examen -->
+</div><!-- end wrap -->
+
+<script>
+// ── NAVIGATION ──
+const pages=['home','t1','t2','t3','t4','t5','examen'];
+function go(id){
+  pages.forEach(p=>document.getElementById(p).classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.querySelectorAll('nav button').forEach((b,i)=>b.classList.toggle('on',pages[i]===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── PER-TOPIC QUIZ ──
+const topicState={};
+const topicMax={1:7,2:5,3:4,4:5,5:3};
+
+function ans(topic,n,btn,result){
+  const key=topic+'_'+n;
+  if(topicState[key]) return;
+  topicState[key]=result==='c'?1:0;
+  const card=document.getElementById(topic+'q'+n);
+  const fb=document.getElementById(topic+'f'+n);
+  card.querySelectorAll('.q-opt').forEach(o=>o.disabled=true);
+  if(result==='c'){
+    btn.classList.add('correct');
+    fb.classList.add('show','ok');
+  } else {
+    btn.classList.add('wrong');
+    fb.classList.add('show','fail');
+    fb.textContent='❌ Incorrecto. '+fb.textContent.replace('✅ ','');
+    card.querySelectorAll('.q-opt').forEach(o=>{
+      if(o.getAttribute('onclick')&&o.getAttribute('onclick').includes("'c'")) o.classList.add('correct');
+    });
+  }
+  updateTopicScore(topic);
+  updateGlobal();
+}
+
+function updateTopicScore(t){
+  const tnum=t.replace('t','');
+  const max=topicMax[tnum];
+  let sc=0;
+  for(let k in topicState){if(k.startsWith(t+'_')&&topicState[k]===1)sc++;}
+  const pct=Math.round(sc/max*100);
+  document.getElementById('sc'+tnum).textContent=sc+'/'+max;
+  const bar=document.getElementById('sb'+tnum);
+  bar.style.width=pct+'%';
+  bar.style.background=pct>=80?'#2a6e3c':pct>=50?'#c85a1a':'#b83030';
+}
+
+function resetTopic(tnum,max){
+  const t='t'+tnum;
+  for(let k in topicState){if(k.startsWith(t+'_')) delete topicState[k];}
+  for(let i=1;i<=max;i++){
+    const card=document.getElementById(t+'q'+i);
+    const fb=document.getElementById(t+'f'+i);
+    if(!card) continue;
+    card.querySelectorAll('.q-opt').forEach(o=>{o.disabled=false;o.classList.remove('correct','wrong')});
+    fb.className='q-fb';
+    if(fb.textContent.startsWith('❌')) fb.textContent=fb.textContent.replace('❌ Incorrecto. ','✅ ');
+  }
+  document.getElementById('sc'+tnum).textContent='0/'+max;
+  document.getElementById('sb'+tnum).style.width='0%';
+  updateGlobal();
+}
+
+// ── EXAM ──
+let eScore=0; const eAnswered={};
+function ae(btn,result,n){
+  if(eAnswered[n]) return;
+  eAnswered[n]=true;
+  const card=document.getElementById('eq'+n);
+  const fb=document.getElementById('ef'+n);
+  card.querySelectorAll('.q-opt').forEach(o=>o.disabled=true);
+  if(result==='c'){
+    btn.classList.add('correct');
+    fb.classList.add('show','ok');
+    eScore++;
+  } else {
+    btn.classList.add('wrong');
+    fb.classList.add('show','fail');
+    fb.textContent='❌ Incorrecto. '+fb.textContent.replace('✅ ','');
+    card.querySelectorAll('.q-opt').forEach(o=>{
+      if(o.getAttribute('onclick')&&o.getAttribute('onclick').includes("'c'")) o.classList.add('correct');
+    });
+  }
+  const pct=Math.round(eScore/24*100);
+  const nota=pct>=90?'Sobresaliente 🏆':pct>=70?'Notable 👍':pct>=50?'Aprobado ✓':'Suspendido — repasa los temas en rojo';
+  document.getElementById('esc').textContent=eScore+'/24';
+  const bar=document.getElementById('esb');
+  bar.style.width=pct+'%';
+  bar.style.background=pct>=70?'#2a6e3c':pct>=50?'#c85a1a':'#b83030';
+  document.getElementById('enota').textContent=nota;
+  updateGlobal();
+}
+
+function resetExam(){
+  eScore=0;
+  for(let k in eAnswered) delete eAnswered[k];
+  for(let i=1;i<=24;i++){
+    const card=document.getElementById('eq'+i);
+    const fb=document.getElementById('ef'+i);
+    if(!card) continue;
+    card.querySelectorAll('.q-opt').forEach(o=>{o.disabled=false;o.classList.remove('correct','wrong')});
+    fb.className='q-fb';
+    if(fb.textContent.startsWith('❌')) fb.textContent=fb.textContent.replace('❌ Incorrecto. ','✅ ');
+  }
+  document.getElementById('esc').textContent='0/24';
+  document.getElementById('esb').style.width='0%';
+  document.getElementById('enota').textContent='Responde preguntas para ver tu nota';
+  window.scrollTo({top:0,behavior:'smooth'});
+  updateGlobal();
+}
+
+// ── GLOBAL SCORE ──
+function updateGlobal(){
+  let total=0;
+  for(let k in topicState) if(topicState[k]===1) total++;
+  total+=eScore;
+  document.getElementById('global-score').textContent=total;
+}
+</script>
+</body>
+</html>

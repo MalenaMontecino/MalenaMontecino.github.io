@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test FdC — Versión 1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --danger: #f85149;
+    --warn: #e3b341;
+    --text: #c9d1d9;
+    --text2: #8b949e;
+    --border: #30363d;
+    --radius: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  header {
+    max-width: 800px;
+    margin: 0 auto 32px;
+    border-left: 4px solid var(--accent);
+    padding-left: 16px;
+  }
+  header .label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  header h1 { font-size: 26px; font-weight: 700; line-height: 1.2; }
+  header p { color: var(--text2); font-size: 13px; margin-top: 6px; }
+
+  .progress-bar-wrap { max-width: 800px; margin: 0 auto 28px; }
+  .progress-bar-wrap label { font-size: 12px; color: var(--text2); font-family: 'Space Mono', monospace; margin-bottom: 6px; display: block; }
+  .progress-bar { background: var(--surface2); border-radius: 20px; height: 6px; }
+  .progress-fill { height: 6px; border-radius: 20px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s ease; width: 0%; }
+
+  .quiz { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: #444c56; }
+
+  .q-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .q-text { font-size: 15px; font-weight: 600; line-height: 1.5; margin-bottom: 14px; }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .option:hover { background: #292f38; border-color: var(--accent); }
+  .option.selected { border-color: var(--accent); background: #1a2332; }
+  .option.correct { border-color: var(--accent2); background: #0d2b1a; }
+  .option.incorrect { border-color: var(--danger); background: #2b0d0d; }
+  .option.show-correct { border-color: var(--accent2); background: #0d2b1a; }
+
+  .option-letter {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text2);
+    min-width: 20px;
+    margin-top: 1px;
+  }
+  .option.correct .option-letter, .option.show-correct .option-letter { color: var(--accent2); }
+  .option.incorrect .option-letter { color: var(--danger); }
+
+  .option-text { font-size: 14px; line-height: 1.4; }
+
+  .explanation {
+    display: none;
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text2);
+  }
+  .explanation strong { color: var(--text); }
+  .explanation.show { display: block; }
+  .explanation.correct-exp { border-left-color: var(--accent2); }
+  .explanation.incorrect-exp { border-left-color: var(--danger); }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: #21262d;
+    color: var(--text2);
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-wrap { max-width: 800px; margin: 32px auto 0; text-align: center; }
+  .btn {
+    background: var(--accent);
+    color: #0d1117;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 32px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+
+  .results {
+    display: none;
+    max-width: 800px;
+    margin: 32px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+  .results.show { display: block; }
+  .results h2 { font-size: 22px; margin-bottom: 6px; }
+  .results .score { font-family: 'Space Mono', monospace; font-size: 40px; font-weight: 700; color: var(--accent); margin: 12px 0; }
+  .results p { color: var(--text2); font-size: 14px; line-height: 1.6; }
+
+  .repaso-list { margin-top: 20px; }
+  .repaso-list h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--warn); }
+  .repaso-item {
+    background: var(--surface2);
+    border-left: 3px solid var(--warn);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .repaso-item strong { color: var(--text); display: block; font-size: 13px; }
+  .repaso-item span { color: var(--text2); }
+
+  .all-correct .repaso-list h3 { color: var(--accent2); }
+  .all-correct .repaso-item { border-left-color: var(--accent2); }
+
+  .reset-btn {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.2s;
+  }
+  .reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Fundamentos de Computadores · VIU · Versión 1</div>
+  <h1>Test de preparación para el examen</h1>
+  <p>24 preguntas tipo test · 4 opciones · Con explicaciones detalladas</p>
+</header>
+
+<div class="progress-bar-wrap">
+  <label id="progress-label">Progreso: 0 / 24</label>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+</div>
+
+<div class="quiz" id="quiz"></div>
+
+<div class="btn-wrap">
+  <button class="btn" id="submit-btn" disabled>Ver resultados</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Resultado final</h2>
+  <div class="score" id="score-display"></div>
+  <p id="score-msg"></p>
+  <div class="repaso-list" id="repaso-list"></div>
+  <button class="reset-btn" onclick="resetQuiz()">↺ Reiniciar test</button>
+</div>
+
+<script>
+const questions = [
+  {
+    tema: "TEMA 1 · Arquitectura Von Neumann",
+    text: "¿Cuál es la premisa fundamental de la Arquitectura de Von Neumann que también es origen de vulnerabilidades de seguridad?",
+    opts: [
+      "Separación estricta entre memoria de datos y memoria de instrucciones.",
+      "Datos e instrucciones comparten el mismo bus y la misma memoria.",
+      "La CPU no puede acceder directamente a la RAM.",
+      "Solo utiliza memoria ROM para almacenar programas."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> En Von Neumann, datos e instrucciones comparten la misma memoria RAM y el mismo bus. Esto genera el cuello de botella de Von Neumann y permite ataques como el buffer overflow, donde un dato desborda su zona y sobrescribe instrucciones."
+  },
+  {
+    tema: "TEMA 1 · Ciclo de instrucción",
+    text: "¿Qué ocurre durante la fase de Fetch (Búsqueda) del ciclo de instrucción?",
+    opts: [
+      "La ALU ejecuta la operación aritmética.",
+      "Se borra el contenido del registro PC.",
+      "La CPU trae la instrucción desde la memoria hasta el Registro de Instrucción (IR).",
+      "El bus de datos se apaga para evitar interferencias."
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> En la fase Fetch la CPU lee la dirección indicada por el PC, trae la instrucción de la RAM al IR (Instruction Register) y después incrementa el PC para apuntar a la siguiente instrucción."
+  },
+  {
+    tema: "TEMA 1 · Registros",
+    text: "¿Cuál es la función del Registro de Instrucción (IR)?",
+    opts: [
+      "Almacenar la dirección de la siguiente instrucción a ejecutar.",
+      "Almacenar la instrucción que está siendo decodificada/ejecutada actualmente.",
+      "Realizar operaciones de suma y resta.",
+      "Guardar los datos del usuario en disco."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> El IR contiene la instrucción en curso (la que se está decodificando y ejecutando). El PC es el que almacena la dirección de la SIGUIENTE instrucción. La ALU es quien realiza sumas y restas."
+  },
+  {
+    tema: "TEMA 1 · Buses",
+    text: "¿Qué determina el ancho del bus de datos de un procesador?",
+    opts: [
+      "La cantidad de posiciones de memoria que puede direccionar.",
+      "La cantidad de bits que se transfieren simultáneamente entre CPU y memoria.",
+      "La velocidad de rotación del ventilador del procesador.",
+      "La capacidad máxima del disco duro."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> El ancho del bus de datos (8, 16, 32 o 64 bits) determina cuántos bits viajan al mismo tiempo. El bus de DIRECCIONES es el que determina la cantidad de memoria direccionable (2^n posiciones)."
+  },
+  {
+    tema: "TEMA 1 · ALU y registros",
+    text: "¿Por qué los registros de la CPU son más rápidos que la memoria RAM?",
+    opts: [
+      "Porque los registros son de mayor tamaño y tienen más capacidad.",
+      "Porque son no volátiles y no necesitan refrescarse.",
+      "Porque están físicamente integrados en la CPU y no necesitan buses externos para ser accedidos.",
+      "Porque son de tipo magnético, lo que aumenta su velocidad."
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> Los registros están dentro del propio chip de la CPU. No hay que ir a buscarlos por el bus de datos externo, lo que elimina latencia. La RAM, aunque es electrónica, requiere comunicarse a través del bus, que es mucho más lento."
+  },
+  {
+    tema: "TEMA 2 · Compuertas lógicas",
+    text: "¿Cuál es la compuerta lógica cuya salida es '0' ÚNICAMENTE cuando todas sus entradas están en nivel alto ('1')?",
+    opts: [
+      "AND",
+      "NOR",
+      "NAND",
+      "XOR"
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> La puerta NAND produce 0 solo cuando TODAS las entradas son 1. En cualquier otro caso produce 1. Es el complemento de AND. La AND produciría 1 (no 0) cuando todas las entradas son 1."
+  },
+  {
+    tema: "TEMA 2 · Álgebra de Boole",
+    text: "Utilizando las leyes del Álgebra de Boole, ¿a qué expresión es equivalente A + ĀB?",
+    opts: [
+      "A + B",
+      "A",
+      "B",
+      "A·B"
+    ],
+    correct: 0,
+    exp: "<strong>Correcto: A.</strong> Por el teorema de consenso: A + Ā·B = A + B. Demostración: A + Ā·B = (A + Ā)·(A + B) = 1·(A + B) = A + B. Esto se llama absorción por complemento y es un resultado importante del álgebra de Boole."
+  },
+  {
+    tema: "TEMA 2 · Sistemas de numeración",
+    text: "¿Cuál es la representación en binario del número decimal 25?",
+    opts: [
+      "10101₂",
+      "11100₂",
+      "11001₂",
+      "11011₂"
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> 25 = 16 + 8 + 1 = 2⁴ + 2³ + 2⁰ = 11001₂. Verificación: 1·16 + 1·8 + 0·4 + 0·2 + 1·1 = 25. La opción A (10101) vale 21, la B (11100) vale 28 y la D (11011) vale 27."
+  },
+  {
+    tema: "TEMA 2 · Código Gray",
+    text: "¿Qué característica define principalmente al Código Gray frente al binario puro?",
+    opts: [
+      "Solo cambia un bit entre valores consecutivos.",
+      "Es un código posicional pesado con base 2.",
+      "Utiliza exactamente 4 bits para cada dígito decimal.",
+      "No permite representar números en binario estándar."
+    ],
+    correct: 0,
+    exp: "<strong>Correcto: A.</strong> El Código Gray es un código no ponderado donde entre dos valores consecutivos solo cambia 1 bit. Esto lo hace ideal en encoders mecánicos y conversores A/D para evitar errores de transición (en binario puro, del 7 al 8 cambian 4 bits simultáneamente). La opción C describe el BCD."
+  },
+  {
+    tema: "TEMA 2 · K-maps",
+    text: "En un Mapa de Karnaugh de 4 variables, ¿qué resulta de agrupar 8 celdas adyacentes con valor '1'?",
+    opts: [
+      "Un término producto con 2 variables.",
+      "Un término producto con 1 sola variable.",
+      "Un término producto con 3 variables.",
+      "Una función constante igual a 1."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> En un K-map de n variables, agrupar 2^k celdas elimina k variables. Agrupar 8 = 2³ celdas en 4 variables elimina 3 variables, dejando un término de 4-3 = 1 variable. Agrupar 16 (todas) daría la función constante 1."
+  },
+  {
+    tema: "TEMA 3 · Circuitos combinacionales",
+    text: "¿Cuál de los siguientes dispositivos es un circuito EXCLUSIVAMENTE combinacional (sin memoria)?",
+    opts: [
+      "Registro de desplazamiento SISO",
+      "Multiplexor 4:1",
+      "Contador síncrono de 4 bits",
+      "Biestable tipo D"
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> El Multiplexor es puramente combinacional: su salida depende solo de las entradas actuales (datos + selección). Los registros de desplazamiento, contadores y biestables son secuenciales porque tienen memoria (almacenan estado)."
+  },
+  {
+    tema: "TEMA 3 · Decodificadores",
+    text: "En un decodificador de 3 entradas y 8 salidas, ¿qué sucede cuando la entrada es el código binario 010?",
+    opts: [
+      "Se activa únicamente la salida número 2 (S2).",
+      "Se activan las salidas S0 y S1 simultáneamente.",
+      "Se activan todas las salidas excepto la S2.",
+      "El decodificador se apaga por código inválido."
+    ],
+    correct: 0,
+    exp: "<strong>Correcto: A.</strong> Un decodificador 3→8 activa exactamente UNA salida correspondiente al número binario de entrada. El código 010 = 2 en decimal, por tanto se activa S2. Las demás salidas quedan en 0."
+  },
+  {
+    tema: "TEMA 3 · Sumadores",
+    text: "¿Qué diferencia técnica fundamental existe entre un semi-sumador (Half Adder) y un sumador completo (Full Adder)?",
+    opts: [
+      "El semi-sumador no genera ningún acarreo de salida.",
+      "El sumador completo incorpora una entrada de acarreo previo (Cin).",
+      "El sumador completo es un circuito secuencial con memoria.",
+      "El semi-sumador puede sumar hasta 3 bits."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> El Full Adder suma A + B + Cin, donde Cin es el acarreo que llega del bit anterior. El Half Adder solo suma A + B, sin acarreo de entrada. Ambos generan Cout. Para sumar números de más de 1 bit en cascada se necesitan Full Adders."
+  },
+  {
+    tema: "TEMA 3 · Formas canónicas",
+    text: "¿Qué representa un 'minitérmino' en el contexto del Álgebra de Boole?",
+    opts: [
+      "Un producto lógico (AND) que vale '1' para una sola combinación de entradas.",
+      "Una suma lógica (OR) que vale '0' para una sola combinación de entradas.",
+      "La versión simplificada y mínima de una función lógica.",
+      "Una compuerta AND de tamaño reducido físicamente."
+    ],
+    correct: 0,
+    exp: "<strong>Correcto: A.</strong> Un minitérmino es un producto (AND) de todas las variables (o sus complementos) que toma valor 1 para una única combinación de entradas. Para n variables hay 2^n minitérminos. La opción B describe un maxitérmino."
+  },
+  {
+    tema: "TEMA 4 · Biestables",
+    text: "¿Cuál es la función principal de la señal de reloj (Clock) en un sistema digital sincrónico?",
+    opts: [
+      "Proporcionar energía eléctrica a los flip-flops.",
+      "Sincronizar el cambio de estado de todos los biestables del sistema.",
+      "Borrar el contenido de la memoria RAM.",
+      "Aumentar la velocidad del bus de datos."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> El reloj es la señal de referencia temporal que determina CUÁNDO cambian los biestables (en el flanco de subida o bajada). Esto garantiza que todo el sistema cambie de estado de forma coordinada, evitando condiciones de carrera."
+  },
+  {
+    tema: "TEMA 4 · Flip-Flop JK",
+    text: "En un biestable tipo JK, ¿qué sucede cuando J=1 y K=1 en el flanco activo del reloj?",
+    opts: [
+      "La salida Q se mantiene en su estado actual (no cambia).",
+      "La salida Q se pone a '0' (Reset forzado).",
+      "La salida Q conmuta al estado opuesto (Toggle).",
+      "El biestable entra en un estado indefinido o prohibido."
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> El estado J=1, K=1 en el JK produce Toggle (la salida conmuta: si Q=0 pasa a 1, si Q=1 pasa a 0). Esta es la gran mejora del JK sobre el SR, que tiene estado prohibido con S=R=1. Con J=0,K=0 → mantiene; J=1,K=0 → Set; J=0,K=1 → Reset."
+  },
+  {
+    tema: "TEMA 4 · Latch vs Flip-Flop",
+    text: "¿Cuál es la diferencia operativa fundamental entre un Latch y un Flip-Flop?",
+    opts: [
+      "El Latch es sensible al nivel de la señal de reloj; el Flip-Flop es sensible al flanco.",
+      "El Latch no tiene memoria; el Flip-Flop sí.",
+      "El Flip-Flop es un dispositivo analógico; el Latch es digital.",
+      "No existe diferencia real entre ambos dispositivos."
+    ],
+    correct: 0,
+    exp: "<strong>Correcto: A.</strong> El Latch es transparente mientras el nivel del reloj (o enable) está activo: la salida sigue a la entrada. El Flip-Flop solo actualiza su estado en el FLANCO (subida o bajada) del reloj. Esta distinción es fundamental en el diseño de circuitos síncronos."
+  },
+  {
+    tema: "TEMA 4 · Contadores",
+    text: "En un contador binario síncrono de 4 bits, ¿qué valor sigue al estado 1111 tras un pulso de reloj?",
+    opts: [
+      "1000",
+      "0001",
+      "0000",
+      "1111 (se bloquea en este estado)"
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> El contador de 4 bits cuenta de 0000 (0) a 1111 (15). Tras 1111, se produce un desbordamiento (overflow/rollover) y el contador vuelve a 0000. Es equivalente a 15+1=16, que en 4 bits es 0 (se descarta el carry)."
+  },
+  {
+    tema: "TEMA 4 · FSM / Diseño secuencial",
+    text: "¿Qué información define la Tabla de Estados de una Máquina de Estados Finitos (FSM)?",
+    opts: [
+      "El voltaje de alimentación de los biestables.",
+      "La relación entre estado actual, entradas del sistema y estado siguiente.",
+      "La frecuencia del reloj del sistema.",
+      "La cantidad de compuertas AND utilizadas en el diseño."
+    ],
+    correct: 1,
+    exp: "<strong>Correcto: B.</strong> La tabla de estados especifica, para cada combinación de estado actual y entradas, cuál será el estado siguiente y la salida. Es la representación tabular del diagrama de estados y es el punto de partida para obtener las ecuaciones de los flip-flops."
+  },
+  {
+    tema: "TEMA 5 · Ensamblador",
+    text: "En el ciclo de desarrollo en ensamblador de 16 bits (NASM + DOSBox), ¿qué papel cumple el programa NASM?",
+    opts: [
+      "Es el emulador que ejecuta los programas .COM en un entorno DOS virtual.",
+      "Es el editor de texto donde se escribe el código fuente (.asm).",
+      "Es el ensamblador que convierte los mnemónicos (.asm) en código máquina (opcodes).",
+      "Es el sistema operativo que gestiona las interrupciones INT 21h."
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> NASM (Netwide Assembler) traduce el código fuente con mnemónicos legibles (MOV, ADD, etc.) a bytes de código máquina (opcodes). DOSBox es el emulador que ejecuta el resultado. El editor de texto es el Bloc de Notas u otro similar."
+  },
+  {
+    tema: "TEMA 5 · CMP y banderas",
+    text: "Se ejecuta: MOV AX, 5 / MOV BX, 5 / CMP AX, BX / JE destino. ¿Qué hace la instrucción CMP y qué bandera activa para que JE salte?",
+    opts: [
+      "Realiza AX - BX sin guardar el resultado; activa ZF=1 si son iguales.",
+      "Pone AX en 0 automáticamente y activa la Bandera de Acarreo (CF=1).",
+      "Incrementa BX transparentemente y apaga la bandera ZF.",
+      "Realiza AX - BX sin guardar el resultado; activa ZF=0 si son iguales."
+    ],
+    correct: 0,
+    exp: "<strong>Correcto: A.</strong> CMP realiza internamente una resta (AX - BX = 5 - 5 = 0) SIN modificar AX ni BX. Al dar 0, activa la Zero Flag (ZF=1). La instrucción JE (Jump if Equal) salta a 'destino' cuando ZF=1. La opción D es incorrecta porque ZF=1 (no ZF=0) indica igualdad."
+  },
+  {
+    tema: "TEMA 5 · Aritmética en registros",
+    text: "Se ejecuta: MOV AL, 0xFE / ADD AL, 0x03. ¿Qué valor hexadecimal quedará en AL?",
+    opts: [
+      "0x01",
+      "0x101",
+      "0x00",
+      "0xFF"
+    ],
+    correct: 0,
+    exp: "<strong>Correcto: A.</strong> AL es un registro de 8 bits (0-255). 0xFE = 254, 0x03 = 3. 254+3 = 257. Pero 8 bits solo representan hasta 255 (0xFF). 257 mod 256 = 1 → 0x01. Se activa el Carry Flag (CF=1) indicando el desbordamiento. La opción B (0x101) tiene 9 bits, imposible en AL."
+  },
+  {
+    tema: "TEMA 5 · Instrucción LOOP",
+    text: "Un programa en ensamblador ejecuta SUB CX, CX (para poner CX=0) y luego entra en un bucle controlado con LOOP. ¿Qué ocurre?",
+    opts: [
+      "CX = 0; LOOP decrementa CX a 0xFFFF (65535) y el bucle itera 65.536 veces.",
+      "El bucle se omite inmediatamente sin ejecutar ninguna iteración.",
+      "Se dispara una excepción por desbordamiento aritmético.",
+      "La CPU entra en un bucle infinito de hardware irreversible."
+    ],
+    correct: 0,
+    exp: "<strong>Correcto: A.</strong> LOOP funciona así: primero decrementa CX, luego comprueba si CX≠0. Si CX=0 antes del LOOP, al decrementar pasa a 0xFFFF = 65535, que ≠ 0, por lo que continúa. El bucle se ejecutará 65.536 veces hasta que CX vuelva a 0. No hay excepción, no es infinito."
+  },
+  {
+    tema: "TEMA 5 · INT 21h",
+    text: "¿Qué función del sistema DOS (INT 21h) se invoca cuando AH = 09h?",
+    opts: [
+      "Leer un carácter desde el teclado y guardarlo en AL.",
+      "Mostrar un único carácter almacenado en DL.",
+      "Imprimir en pantalla una cadena de texto terminada en '$', cuya dirección está en DX.",
+      "Terminar el programa y devolver el control al sistema operativo."
+    ],
+    correct: 2,
+    exp: "<strong>Correcto: C.</strong> AH=09h + INT 21h imprime la cadena de texto cuya dirección está en DX. La cadena debe terminar con el carácter '$'. AH=01h lee un carácter (en AL). AH=02h muestra el carácter de DL. AH=4Ch termina el programa."
+  }
+];
+
+let answers = new Array(questions.length).fill(null);
+let answered = 0;
+let submitted = false;
+
+function buildQuiz() {
+  const quiz = document.getElementById('quiz');
+  quiz.innerHTML = '';
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `card-${i}`;
+    const letters = ['A', 'B', 'C', 'D'];
+    card.innerHTML = `
+      <div class="tag">${q.tema}</div>
+      <div class="q-number">PREGUNTA ${String(i+1).padStart(2,'0')}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="options" id="opts-${i}">
+        ${q.opts.map((o, j) => `
+          <div class="option" id="opt-${i}-${j}" onclick="selectOption(${i},${j})">
+            <span class="option-letter">${letters[j]}</span>
+            <span class="option-text">${o}</span>
+          </div>`).join('')}
+      </div>
+      <div class="explanation" id="exp-${i}">${q.exp}</div>
+    `;
+    quiz.appendChild(card);
+  });
+}
+
+function selectOption(qi, oi) {
+  if (submitted) return;
+  if (answers[qi] !== null) {
+    document.getElementById(`opt-${qi}-${answers[qi]}`).classList.remove('selected');
+  } else {
+    answered++;
+  }
+  answers[qi] = oi;
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  updateProgress();
+  document.getElementById('submit-btn').disabled = answered < questions.length;
+}
+
+function updateProgress() {
+  document.getElementById('progress-label').textContent = `Progreso: ${answered} / ${questions.length}`;
+  document.getElementById('progress-fill').style.width = `${(answered / questions.length) * 100}%`;
+}
+
+function submitQuiz() {
+  if (submitted) return;
+  submitted = true;
+  document.getElementById('submit-btn').disabled = true;
+
+  let correct = 0;
+  const wrongByTema = {};
+
+  questions.forEach((q, i) => {
+    const userAns = answers[i];
+    const opts = document.querySelectorAll(`#opts-${i} .option`);
+    opts.forEach(o => o.style.cursor = 'default');
+
+    if (userAns === q.correct) {
+      opts[userAns].classList.remove('selected');
+      opts[userAns].classList.add('correct');
+      correct++;
+    } else {
+      opts[userAns].classList.remove('selected');
+      opts[userAns].classList.add('incorrect');
+      opts[q.correct].classList.add('show-correct');
+      const tema = q.tema.split(' · ')[0];
+      if (!wrongByTema[tema]) wrongByTema[tema] = [];
+      wrongByTema[tema].push(q.tema);
+    }
+
+    const exp = document.getElementById(`exp-${i}`);
+    exp.classList.add('show');
+    exp.classList.add(userAns === q.correct ? 'correct-exp' : 'incorrect-exp');
+  });
+
+  showResults(correct, wrongByTema);
+}
+
+function showResults(correct, wrongByTema) {
+  const results = document.getElementById('results');
+  results.classList.add('show');
+  document.getElementById('score-display').textContent = `${correct} / ${questions.length}`;
+
+  const pct = Math.round((correct / questions.length) * 100);
+  let msg = '';
+  if (pct === 100) msg = '🎯 ¡Perfecto! Dominas todo el temario.';
+  else if (pct >= 75) msg = '✅ Buen resultado. Repasa los temas marcados para asegurar el aprobado.';
+  else if (pct >= 50) msg = '⚠️ Resultado aceptable. Hay temas importantes que necesitas reforzar antes del examen.';
+  else msg = '🔴 Necesitas repasar el temario con más profundidad. No te rindas, ¡aún hay tiempo!';
+
+  document.getElementById('score-msg').textContent = `${pct}% de acierto. ${msg}`;
+
+  const repList = document.getElementById('repaso-list');
+  if (Object.keys(wrongByTema).length === 0) {
+    results.classList.add('all-correct');
+    repList.innerHTML = '<h3>✨ Sin áreas de mejora detectadas</h3><div class="repaso-item"><strong>¡Excelente trabajo!</strong><span>Has respondido todas las preguntas correctamente.</span></div>';
+  } else {
+    const temaInfo = {
+      'TEMA 1': { titulo: 'Arquitectura Von Neumann, Ciclo de instrucción, Registros, ALU, Buses', sesiones: 'Sesión 1 · Material de apoyo UC1' },
+      'TEMA 2': { titulo: 'Sistemas de numeración, Compuertas lógicas, Álgebra de Boole, K-maps', sesiones: 'Sesiones 2, 3, 4' },
+      'TEMA 3': { titulo: 'Circuitos combinacionales: sumadores, comparadores, MUX, codificadores, decodificadores', sesiones: 'Sesiones 5, 6, 7' },
+      'TEMA 4': { titulo: 'Biestables, Flip-flops, Registros, Contadores, FSM', sesiones: 'Sesiones 8, 9, 10' },
+      'TEMA 5': { titulo: 'Lenguaje ensamblador, NASM, Registros x86, Instrucciones, INT 21h', sesiones: 'Sesiones 11, 12' },
+    };
+    repList.innerHTML = '<h3>📚 Áreas que debes repasar</h3>';
+    Object.keys(wrongByTema).forEach(tema => {
+      const info = temaInfo[tema] || { titulo: 'Revisa las sesiones correspondientes', sesiones: '' };
+      const item = document.createElement('div');
+      item.className = 'repaso-item';
+      item.innerHTML = `<strong>${tema}: ${info.titulo}</strong><span>Fallos: ${wrongByTema[tema].length} pregunta(s) · Repasar: ${info.sesiones}</span>`;
+      repList.appendChild(item);
+    });
+  }
+
+  results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetQuiz() {
+  answers = new Array(questions.length).fill(null);
+  answered = 0;
+  submitted = false;
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').classList.remove('all-correct');
+  updateProgress();
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildQuiz();
+</script>
+</body>
+</html>

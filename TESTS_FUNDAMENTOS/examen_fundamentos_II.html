@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen II — Fundamentos de Computadores</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1117;
+    --paper: #f7f4ee;
+    --accent: #1f5c8b;
+    --accent2: #c0441a;
+    --muted: #7a7468;
+    --correct: #1a7a45;
+    --wrong: #c0441a;
+    --rule: #d9d4c7;
+    --chip-bg: #eae6dc;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--paper); color: var(--ink); min-height: 100vh; padding: 0 0 80px; }
+
+  header { background: var(--accent); color: var(--paper); padding: 40px 48px 32px; position: relative; overflow: hidden; }
+  header::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(-45deg,transparent,transparent 18px,rgba(255,255,255,.04) 18px,rgba(255,255,255,.04) 19px); }
+  .header-inner { position: relative; max-width: 820px; margin: 0 auto; }
+  .header-tag { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: rgba(247,244,238,.6); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .header-tag::before { content: '▶'; font-size: 8px; color: var(--accent2); }
+  h1 { font-family: var(--serif); font-size: clamp(28px,5vw,48px); line-height: 1.1; margin-bottom: 8px; letter-spacing: -.01em; }
+  .header-sub { font-size: 14px; color: rgba(247,244,238,.55); font-weight: 300; margin-bottom: 28px; }
+  .meta-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); border-radius: 4px; padding: 4px 12px; font-size: 12px; font-family: var(--mono); }
+
+  .progress-bar-wrap { background: var(--accent); padding: 0 48px 16px; }
+  .progress-bar-inner { max-width: 820px; margin: 0 auto; }
+  .progress-track { height: 3px; background: rgba(255,255,255,.15); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent2); border-radius: 2px; width: 0%; transition: width .4s ease; }
+  .progress-label { font-size: 11px; font-family: var(--mono); color: rgba(247,244,238,.4); margin-top: 6px; display: flex; justify-content: space-between; }
+
+  main { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+
+  .section-divider { display: flex; align-items: center; gap: 14px; margin: 48px 0 24px; }
+  .section-divider-line { flex: 1; height: 1px; background: var(--rule); }
+  .section-divider-label { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+
+  .q-card { background: white; border: 1px solid var(--rule); border-radius: 8px; margin-bottom: 16px; overflow: hidden; transition: box-shadow .2s; }
+  .q-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.06); }
+  .q-header { display: flex; align-items: flex-start; gap: 14px; padding: 20px 22px 0; }
+  .q-num { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--accent); background: #edf3f8; border: 1px solid #b3cfe0; border-radius: 4px; padding: 2px 8px; white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
+  .q-text { font-size: 15px; font-weight: 500; line-height: 1.5; color: var(--ink); padding-bottom: 14px; }
+  .q-code { font-family: var(--mono); font-size: 13px; background: #1a1a2e; color: #e0e0e0; border-radius: 6px; padding: 12px 16px; margin: 0 22px 14px; white-space: pre; overflow-x: auto; line-height: 1.65; border-left: 3px solid var(--accent2); }
+
+  .options { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .opt { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: 6px; border: 1.5px solid transparent; cursor: pointer; transition: all .15s; font-size: 14px; line-height: 1.45; background: var(--chip-bg); }
+  .opt:hover { border-color: var(--accent); background: #edf3f8; }
+  .opt-letter { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--muted); min-width: 18px; margin-top: 1px; flex-shrink: 0; transition: color .15s; }
+  .opt.selected { border-color: var(--accent); background: #edf3f8; }
+  .opt.selected .opt-letter { color: var(--accent); font-weight: 700; }
+  .opt.correct { border-color: var(--correct) !important; background: #e6f4ec !important; }
+  .opt.correct .opt-letter { color: var(--correct) !important; font-weight: 700; }
+  .opt.wrong { border-color: var(--wrong) !important; background: #fef0ec !important; }
+  .opt.wrong .opt-letter { color: var(--wrong) !important; font-weight: 700; }
+  .opt.show-correct { border-color: var(--correct) !important; background: #e6f4ec !important; }
+  .opt.show-correct .opt-letter { color: var(--correct) !important; }
+  .opt.disabled { cursor: default; pointer-events: none; }
+
+  .feedback { margin: 0 14px 14px; padding: 10px 14px; border-radius: 6px; font-size: 13px; line-height: 1.55; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #e6f4ec; border: 1px solid #a3d9b8; color: #0f5c2e; }
+  .feedback.fail { background: #fef0ec; border: 1px solid #f5c4b3; color: #8b2200; }
+  .feedback strong { font-weight: 600; }
+
+  .results { display: none; background: var(--ink); color: var(--paper); border-radius: 10px; padding: 36px 40px; margin: 40px 0; text-align: center; position: relative; overflow: hidden; }
+  .results::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(-45deg,transparent,transparent 18px,rgba(255,255,255,.02) 18px,rgba(255,255,255,.02) 19px); }
+  .results.show { display: block; }
+  .results-inner { position: relative; }
+  .results-score { font-family: var(--serif); font-size: 72px; line-height: 1; color: var(--accent2); margin-bottom: 4px; }
+  .results-label { font-size: 13px; color: rgba(247,244,238,.5); font-family: var(--mono); margin-bottom: 20px; }
+  .results-msg { font-size: 16px; font-weight: 300; color: rgba(247,244,238,.85); margin-bottom: 28px; line-height: 1.5; }
+  .results-breakdown { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 28px; }
+  .breakdown-item { text-align: center; }
+  .breakdown-num { font-family: var(--serif); font-size: 28px; }
+  .breakdown-num.g { color: #6de0a0; }
+  .breakdown-num.r { color: #f5866a; }
+  .breakdown-sub { font-size: 11px; font-family: var(--mono); color: rgba(247,244,238,.4); text-transform: uppercase; letter-spacing: .08em; }
+
+  .btn-submit { display: block; width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 6px; font-family: var(--sans); font-size: 14px; font-weight: 600; cursor: pointer; margin: 24px 0 0; transition: background .15s, transform .1s; letter-spacing: .02em; }
+  .btn-submit:hover { background: #174870; }
+  .btn-submit:active { transform: scale(.99); }
+  .btn-submit:disabled { background: var(--muted); cursor: default; }
+  .btn-reset { display: inline-block; padding: 10px 24px; background: rgba(255,255,255,.1); color: var(--paper); border: 1px solid rgba(255,255,255,.2); border-radius: 6px; font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s; }
+  .btn-reset:hover { background: rgba(255,255,255,.18); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-tag">Simulacro de examen · Serie II</div>
+    <h1>Fundamentos de Computadores</h1>
+    <div class="header-sub">Grado en Ciberseguridad · VIU · Dra. Zulaima Chiquin</div>
+    <div class="meta-pills">
+      <span class="pill">25 preguntas</span>
+      <span class="pill">Tipo test · una respuesta correcta</span>
+      <span class="pill">Todos los temas</span>
+    </div>
+  </div>
+</header>
+<div class="progress-bar-wrap">
+  <div class="progress-bar-inner">
+    <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    <div class="progress-label">
+      <span id="prog-done">0 respondidas</span>
+      <span id="prog-pct">0 %</span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div id="quiz"></div>
+  <button class="btn-submit" id="btn-submit" disabled onclick="submit()">Ver resultados</button>
+  <div class="results" id="results">
+    <div class="results-inner">
+      <div class="results-score" id="r-score">—</div>
+      <div class="results-label">respuestas correctas de 25</div>
+      <div class="results-msg" id="r-msg"></div>
+      <div class="results-breakdown">
+        <div class="breakdown-item"><div class="breakdown-num g" id="r-ok">—</div><div class="breakdown-sub">Correctas</div></div>
+        <div class="breakdown-item"><div class="breakdown-num r" id="r-ko">—</div><div class="breakdown-sub">Incorrectas</div></div>
+        <div class="breakdown-item"><div class="breakdown-num" id="r-pct">—</div><div class="breakdown-sub">Porcentaje</div></div>
+      </div>
+      <button class="btn-reset" onclick="reset()">↺ Intentarlo de nuevo</button>
+    </div>
+  </div>
+</main>
+
+<script>
+const Q = [
+  // ── TEMA 1: Introducción ──────────────────────────────────────────────────
+  {
+    sec: "Tema 1 — Introducción a los Computadores",
+    q: "¿Cuál de los siguientes componentes actúa como 'árbitro' del sistema, coordinando la ejecución de instrucciones y el acceso a los recursos?",
+    opts: ["La ALU.", "La Unidad de Control (UC).", "La memoria RAM.", "El bus de direcciones."],
+    ans: 1,
+    exp: "La Unidad de Control dirige el tráfico: lee instrucciones, las decodifica y envía señales de control al resto de componentes. La ALU ejecuta, pero es la UC quien decide cuándo y qué ejecutar."
+  },
+  {
+    sec: "Tema 1 — Introducción a los Computadores",
+    q: "Un bus de direcciones de 32 bits, ¿cuánta memoria puede direccionar como máximo?",
+    opts: ["2 GB", "4 GB", "8 GB", "16 GB"],
+    ans: 1,
+    exp: "Con 32 bits de dirección se pueden referenciar 2³² = 4.294.967.296 posiciones de memoria = 4 GB. Este es el límite histórico de los sistemas x86 de 32 bits, razón por la que Windows de 32 bits no podía usar más de ~3.2 GB de RAM."
+  },
+  {
+    sec: "Tema 1 — Introducción a los Computadores",
+    q: "¿Qué implicación de seguridad tiene el hecho de que datos e instrucciones compartan la misma memoria en la Arquitectura Von Neumann?",
+    opts: ["Que la CPU es más lenta porque tiene que distinguir entre ambos.", "Que un atacante que desborde un buffer de datos puede sobreescribir instrucciones y controlar el flujo del programa.", "Que la RAM se llena más rápido al almacenar ambos tipos.", "Que el sistema operativo no puede proteger la memoria de usuario."],
+    ans: 1,
+    exp: "Este es el fundamento del ataque de desbordamiento de buffer (buffer overflow): si un dato desborda su zona asignada, puede sobreescribir la dirección de retorno (EIP/RIP) u otras instrucciones, haciendo que el procesador ejecute código arbitrario del atacante."
+  },
+  // ── TEMA 2: Álgebra de Boole ──────────────────────────────────────────────
+  {
+    sec: "Tema 2 — Álgebra de Boole y Compuertas",
+    q: "¿Cuál de las siguientes expresiones es la forma correcta del Teorema de De Morgan para una operación AND?",
+    opts: ["NOT(A·B) = Ā·B̄", "NOT(A·B) = Ā+B̄", "NOT(A+B) = Ā·B̄ + A·B", "NOT(A·B) = A+B"],
+    ans: 1,
+    exp: "De Morgan: NOT(A·B) = Ā+B̄. La negación de un AND se convierte en un OR de las negaciones. La forma dual es: NOT(A+B) = Ā·B̄ (la negación de un OR es el AND de las negaciones)."
+  },
+  {
+    sec: "Tema 2 — Álgebra de Boole y Compuertas",
+    q: "Una compuerta XOR con entradas A=1 y B=0 produce:",
+    opts: ["0, porque una entrada es 0.", "1, porque las entradas son diferentes.", "1, porque hay al menos una entrada a 1.", "0, porque no todas las entradas son iguales."],
+    ans: 1,
+    exp: "XOR (OR exclusivo) da 1 cuando las entradas son DIFERENTES y 0 cuando son IGUALES. A=1, B=0 → diferentes → salida 1. Recuerda: A=1,B=1 → iguales → salida 0 (a diferencia de OR, que daría 1)."
+  },
+  {
+    sec: "Tema 2 — Álgebra de Boole y Compuertas",
+    q: "¿Por qué la compuerta NAND se llama 'universal'?",
+    opts: ["Porque tiene el mayor número de entradas posible.", "Porque funciona tanto en lógica positiva como negativa.", "Porque combinando solo compuertas NAND se puede implementar cualquier función lógica.", "Porque produce siempre la misma salida independientemente de la entrada."],
+    ans: 2,
+    exp: "Con NAND se puede construir NOT (conectando ambas entradas), AND (NAND seguida de NOT) y OR (De Morgan). Como AND, OR y NOT forman un conjunto completo, NAND sola es suficiente para cualquier circuito digital."
+  },
+  {
+    sec: "Tema 2 — Álgebra de Boole y Compuertas",
+    q: "Simplifica la expresión: F = A·Ā + B·1",
+    opts: ["F = A + B", "F = B", "F = A·B", "F = 0"],
+    ans: 1,
+    exp: "Aplicando las leyes del álgebra: A·Ā = 0 (ley del complemento) y B·1 = B (ley de identidad). Por tanto F = 0 + B = B (ley de identidad del OR)."
+  },
+  {
+    sec: "Tema 2 — Álgebra de Boole y Compuertas",
+    q: "¿Cuántos minitérminos tiene una función booleana de 3 variables?",
+    opts: ["4", "6", "8", "16"],
+    ans: 2,
+    exp: "Con n variables hay 2ⁿ combinaciones posibles de entrada. Con 3 variables: 2³ = 8 minitérminos (m₀ a m₇). Con 4 variables serían 16, con 2 variables serían 4."
+  },
+  // ── TEMA 3: Karnaugh y Numeración ─────────────────────────────────────────
+  {
+    sec: "Tema 3 — Karnaugh y Sistemas de Numeración",
+    q: "En un mapa de Karnaugh, ¿por qué las columnas se ordenan 00, 01, 11, 10 en lugar de 00, 01, 10, 11?",
+    opts: ["Por convención arbitraria sin implicación matemática.", "Para que celdas adyacentes solo difieran en 1 bit (código Gray), permitiendo eliminar esa variable al agrupar.", "Para que los grupos siempre tengan exactamente 4 celdas.", "Porque el orden 00, 01, 10, 11 produciría grupos incorrectos."],
+    ans: 1,
+    exp: "El código Gray garantiza que dos columnas contiguas difieran en un solo bit. Esto es clave: al agrupar dos celdas adyacentes, la variable que cambia entre ellas se cancela y desaparece del término resultante."
+  },
+  {
+    sec: "Tema 3 — Karnaugh y Sistemas de Numeración",
+    q: "¿Cuánto vale en hexadecimal el número binario 11010110?",
+    opts: ["C6", "D6", "E4", "B8"],
+    ans: 1,
+    exp: "Agrupar de 4 en 4 desde la derecha: 1101 | 0110. 1101 = 13 = D. 0110 = 6. Resultado: D6₁₆. Verificación decimal: 128+64+16+4+2 = 214 = 13×16+6 = D6 ✓"
+  },
+  {
+    sec: "Tema 3 — Karnaugh y Sistemas de Numeración",
+    q: "¿Cuál es el valor decimal de (2B)₁₆?",
+    opts: ["29", "41", "43", "37"],
+    ans: 2,
+    exp: "2×16¹ + B×16⁰ = 2×16 + 11×1 = 32 + 11 = 43. Recuerda que B en hexadecimal vale 11 decimal."
+  },
+  {
+    sec: "Tema 3 — Karnaugh y Sistemas de Numeración",
+    q: "F(A,B,C) = Σm(0,2,4,6). ¿Cuál es la expresión simplificada?",
+    opts: ["F = Ā·B", "F = C̄", "F = Ā+C̄", "F = B·C̄"],
+    ans: 1,
+    exp: "Los minitérminos 0,2,4,6 en binario son 000,010,100,110. En todos ellos C=0 (bit LSB). Forman un grupo de 4 que cubre toda la columna C=0: A y B varían → se eliminan. Solo queda C̄."
+  },
+  // ── TEMA 4: Circuitos Combinacionales ────────────────────────────────────
+  {
+    sec: "Tema 4 — Circuitos Combinacionales",
+    q: "Un sumador completo tiene A=1, B=0, Cin=1. ¿Cuáles son Suma y Cout?",
+    opts: ["Suma=0, Cout=0", "Suma=0, Cout=1", "Suma=1, Cout=0", "Suma=1, Cout=1"],
+    ans: 1,
+    exp: "S = A⊕B⊕Cin = 1⊕0⊕1 = 0. Cout = A·B + Cin·(A⊕B) = 1·0 + 1·(1⊕0) = 0 + 1·1 = 1. Resultado binario: 10 = 2 en decimal (1+0+1=2) ✓"
+  },
+  {
+    sec: "Tema 4 — Circuitos Combinacionales",
+    q: "En un codificador de 8 entradas, ¿cuántas salidas tiene?",
+    opts: ["2 salidas", "3 salidas", "4 salidas", "8 salidas"],
+    ans: 1,
+    exp: "Un codificador de 2ⁿ entradas produce n salidas. Para 8 entradas: 2ⁿ = 8 → n = 3. Con 3 bits se pueden representar 8 combinaciones (000 a 111), una por cada entrada posible."
+  },
+  {
+    sec: "Tema 4 — Circuitos Combinacionales",
+    q: "¿Qué diferencia hay entre un codificador y un decodificador?",
+    opts: ["El codificador usa compuertas OR y el decodificador compuertas AND.", "El codificador convierte una entrada activa en su código binario; el decodificador convierte un código binario en una única salida activa.", "El codificador es secuencial y el decodificador combinacional.", "Solo difieren en el número de entradas, no en su función."],
+    ans: 1,
+    exp: "Son funciones inversas: codificador (2ⁿ→n): 'qué entrada está activa → código'. Decodificador (n→2ⁿ): 'qué código entra → activa esa salida'. El decodificador se usa para selección de memoria; el codificador para teclados y prioridades."
+  },
+  {
+    sec: "Tema 4 — Circuitos Combinacionales",
+    q: "Un DEMUX 1×8, ¿cuántas líneas de selección necesita?",
+    opts: ["2", "3", "4", "8"],
+    ans: 1,
+    exp: "Con n líneas de selección se dirige la señal a una de 2ⁿ salidas. Para 8 salidas: 2ⁿ=8 → n=3. El DEMUX es circuitalmente idéntico al decodificador con habilitación."
+  },
+  // ── TEMA 5: Circuitos Secuenciales ───────────────────────────────────────
+  {
+    sec: "Tema 5 — Circuitos Secuenciales",
+    q: "Un Flip-flop D tiene Q=1. Llegan tres flancos de reloj consecutivos con D=0, D=1, D=0. ¿Cuál es Q final?",
+    opts: ["Q=1", "Q=0", "Q=1 (sin cambio porque empezó en 1)", "Indeterminado"],
+    ans: 1,
+    exp: "El FF-D captura D en cada flanco ↑. Flanco 1: D=0 → Q=0. Flanco 2: D=1 → Q=1. Flanco 3: D=0 → Q=0. Estado final: Q=0."
+  },
+  {
+    sec: "Tema 5 — Circuitos Secuenciales",
+    q: "¿Cuál es la ventaja del Latch JK sobre el Latch SR?",
+    opts: ["El JK es más rápido porque usa menos compuertas.", "El JK elimina el estado prohibido: con J=K=1 realiza Toggle en lugar de comportamiento indefinido.", "El JK puede almacenar más de un bit.", "El JK no necesita señal de reloj."],
+    ans: 1,
+    exp: "En el SR, S=R=1 es prohibido porque Q y Q̄ se ponen ambas a 1 (contradicción). El JK resuelve esto: J=K=1 simplemente invierte Q (Toggle), lo que tiene un comportamiento perfectamente definido."
+  },
+  {
+    sec: "Tema 5 — Circuitos Secuenciales",
+    q: "¿Qué tipo de registro usarías para convertir una señal serie (un bit cada ciclo) en datos paralelos (todos los bits a la vez)?",
+    opts: ["PIPO (Paralelo-In Paralelo-Out)", "SISO (Serie-In Serie-Out)", "SIPO (Serie-In Paralelo-Out)", "PISO (Paralelo-In Serie-Out)"],
+    ans: 2,
+    exp: "SIPO: los bits entran uno a uno (serie) durante n ciclos de reloj y luego las n salidas presentan todos los bits simultáneamente (paralelo). Se usa para deserializar comunicaciones serie, como el puerto RS-232 o UART."
+  },
+  {
+    sec: "Tema 5 — Circuitos Secuenciales",
+    q: "Un contador síncrono de 3 bits está en el estado 101. ¿Cuál será el siguiente estado?",
+    opts: ["100", "110", "111", "000"],
+    ans: 1,
+    exp: "101 en binario = 5 en decimal. El siguiente valor es 6 = 110 en binario. Un contador de 3 bits cuenta 000→001→010→011→100→101→110→111→000 y reinicia."
+  },
+  {
+    sec: "Tema 5 — Circuitos Secuenciales",
+    q: "¿Cuántos flip-flops se necesitan para construir un contador que cuente de 0 a 15?",
+    opts: ["3 flip-flops", "4 flip-flops", "8 flip-flops", "16 flip-flops"],
+    ans: 1,
+    exp: "Para contar hasta 15 se necesitan 4 bits (2⁴=16 estados: 0 a 15). Un flip-flop por bit → 4 flip-flops. Regla: n flip-flops permiten 2ⁿ estados."
+  },
+  // ── TEMA 6: Ensamblador ───────────────────────────────────────────────────
+  {
+    sec: "Tema 6 — Lenguaje Ensamblador",
+    q: "¿Qué instrucción x86 usarías para poner el registro AX a cero de la forma más eficiente?",
+    opts: ["MOV AX, 0", "SUB AX, AX", "AND AX, 0000h", "NOT AX"],
+    ans: 1,
+    exp: "XOR AX,AX o SUB AX,AX son más eficientes que MOV AX,0 porque generan un opcode más corto. SUB AX,AX hace AX=AX-AX=0. Es un patrón muy habitual en código ensamblador optimizado y en shellcode."
+  },
+  {
+    sec: "Tema 6 — Lenguaje Ensamblador",
+    q: "En el modelo de memoria de un programa, ¿en qué dirección crece la pila (stack)?",
+    opts: ["Hacia direcciones de memoria más altas (crecimiento ascendente).", "Hacia direcciones de memoria más bajas (crecimiento descendente).", "En ambas direcciones dependiendo del sistema operativo.", "No crece; tiene un tamaño fijo."],
+    ans: 1,
+    exp: "La pila en x86 crece hacia abajo: cada PUSH decrementa ESP y escribe. El heap crece hacia arriba. Que ambos crezcan en sentidos opuestos desde extremos distintos del espacio de memoria es la configuración estándar de los sistemas modernos."
+  },
+  {
+    sec: "Tema 6 — Lenguaje Ensamblador",
+    q: "Analiza el siguiente código. ¿Qué imprime en pantalla?\n\nMOV CX, 3\nMOV DL, 'A'\nBUCLE:\n  MOV AH, 02h\n  INT 21h\n  INC DL\n  LOOP BUCLE",
+    code: true,
+    opts: ["AAA", "ABC", "ABB", "CCC"],
+    ans: 1,
+    exp: "CX=3 → 3 iteraciones. DL empieza en 'A' (41h). Iteración 1: imprime 'A', INC DL→'B'. Iteración 2: imprime 'B', INC DL→'C'. Iteración 3: imprime 'C'. Resultado: ABC."
+  },
+  {
+    sec: "Tema 6 — Lenguaje Ensamblador",
+    q: "¿Qué hace la directiva TIMES en NASM?",
+    opts: ["Define el número máximo de iteraciones de un bucle LOOP.", "Repite una declaración de datos n veces, equivalente a escribirla n veces.", "Multiplica el valor de un registro por un número constante.", "Indica el tiempo de ejecución esperado de una instrucción."],
+    ans: 1,
+    exp: "TIMES n instrucción repite la instrucción n veces en el código fuente. Ejemplo: TIMES 8 DW 0 es lo mismo que DW 0,0,0,0,0,0,0,0. Es útil para inicializar buffers y arrays de forma compacta."
+  },
+  {
+    sec: "Tema 6 — Lenguaje Ensamblador",
+    q: "¿Cuál es la diferencia entre las funciones 01h y 08h de INT 21h?",
+    opts: ["01h lee un carácter con eco en pantalla; 08h lo lee sin mostrarlo.", "01h imprime y 08h lee.", "01h requiere que DL tenga el carácter; 08h lo lee de memoria.", "No hay diferencia funcional entre ambas."],
+    ans: 0,
+    exp: "Función 01h: lee carácter del teclado y lo muestra en pantalla (con eco). Función 08h: lee carácter pero NO lo muestra (sin eco). Se usa para contraseñas o menús donde no interesa que el usuario vea lo que teclea."
+  },
+];
+
+const answered = new Array(Q.length).fill(null);
+let submitted = false;
+
+function build() {
+  const container = document.getElementById('quiz');
+  container.innerHTML = '';
+  let lastSec = '';
+
+  Q.forEach((q, qi) => {
+    if (q.sec !== lastSec) {
+      lastSec = q.sec;
+      const div = document.createElement('div');
+      div.className = 'section-divider';
+      div.innerHTML = `<div class="section-divider-line"></div><div class="section-divider-label">${q.sec}</div><div class="section-divider-line"></div>`;
+      container.appendChild(div);
+    }
+
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = 'q' + qi;
+
+    const qlines = q.q.split('\n');
+    const qh = document.createElement('div');
+    qh.className = 'q-header';
+    qh.innerHTML = `<span class="q-num">${String(qi+1).padStart(2,'0')}</span><div class="q-text">${qlines[0]}</div>`;
+    card.appendChild(qh);
+
+    if (q.code && qlines.length > 1) {
+      const code = document.createElement('div');
+      code.className = 'q-code';
+      code.textContent = qlines.slice(1).join('\n').trim();
+      card.appendChild(code);
+    }
+
+    const opts = document.createElement('div');
+    opts.className = 'options';
+    ['A','B','C','D'].forEach((l, oi) => {
+      const opt = document.createElement('div');
+      opt.className = 'opt';
+      opt.id = `opt-${qi}-${oi}`;
+      opt.innerHTML = `<span class="opt-letter">${l}</span><span>${q.opts[oi]}</span>`;
+      opt.onclick = () => answer(qi, oi);
+      opts.appendChild(opt);
+    });
+    card.appendChild(opts);
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback';
+    fb.id = 'fb' + qi;
+    card.appendChild(fb);
+    container.appendChild(card);
+  });
+}
+
+function answer(qi, oi) {
+  if (submitted || answered[qi] !== null) return;
+  answered[qi] = oi;
+  const q = Q[qi];
+  q.opts.forEach((_, i) => {
+    const el = document.getElementById(`opt-${qi}-${i}`);
+    el.classList.add('disabled');
+    if (i === q.ans) el.classList.add('show-correct');
+    if (i === oi && oi !== q.ans) el.classList.add('wrong');
+    if (i === oi && oi === q.ans) el.classList.add('correct');
+  });
+  const ok = oi === q.ans;
+  const fb = document.getElementById('fb' + qi);
+  fb.innerHTML = `<strong>${ok ? '✓ Correcto.' : `✗ Incorrecto — la respuesta era ${'ABCD'[q.ans]}.`}</strong> ${q.exp}`;
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'fail');
+  updateProgress();
+  if (answered.filter(a => a !== null).length === Q.length)
+    document.getElementById('btn-submit').disabled = false;
+}
+
+function updateProgress() {
+  const done = answered.filter(a => a !== null).length;
+  const pct = Math.round(done / Q.length * 100);
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('prog-done').textContent = `${done} respondidas`;
+  document.getElementById('prog-pct').textContent = `${pct} %`;
+}
+
+function submit() {
+  submitted = true;
+  document.getElementById('btn-submit').disabled = true;
+  const ok = answered.filter((a,i) => a === Q[i].ans).length;
+  const pct = Math.round(ok / Q.length * 100);
+  const msg = ok <= 9 ? 'Hay que repasar bastante. Vuelve al temario y prueba de nuevo.'
+    : ok <= 16 ? 'Vas por buen camino. Algunos temas necesitan más atención.'
+    : ok <= 21 ? 'Buen nivel. Repasa los errores y estarás listo.'
+    : '¡Excelente dominio de la materia!';
+  document.getElementById('r-score').textContent = `${ok}/25`;
+  document.getElementById('r-msg').textContent = msg;
+  document.getElementById('r-ok').textContent = ok;
+  document.getElementById('r-ko').textContent = 25 - ok;
+  document.getElementById('r-pct').textContent = pct + '%';
+  const res = document.getElementById('results');
+  res.classList.add('show');
+  res.scrollIntoView({ behavior: 'smooth' });
+}
+
+function reset() {
+  answered.fill(null);
+  submitted = false;
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('btn-submit').disabled = true;
+  document.getElementById('prog').style.width = '0%';
+  document.getElementById('prog-done').textContent = '0 respondidas';
+  document.getElementById('prog-pct').textContent = '0 %';
+  build();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+build();
+</script>
+</body>
+</html>

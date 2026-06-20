@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Plataforma de Tests - Ordenada</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Encabezado fijo */
+        .main-header {
+            background: #1e3a5f;
+            color: white;
+            padding: 0.8rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .main-header h1 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .main-header h1::before {
+            content: "📚";
+            font-size: 1.8rem;
+        }
+        .main-header p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        /* Contenedor de pestañas */
+        .tabs-container {
+            background: white;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 0 1.5rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            z-index: 9;
+        }
+        .tabs-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            position: relative;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #2c4c6e;
+            border-radius: 0.8rem 0.8rem 0 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+        .tab-btn:hover {
+            background: #eef2fa;
+            color: #0f2b3f;
+        }
+        .tab-btn.active {
+            background: #f8fafc;
+            color: #1e4668;
+            border-bottom: 3px solid #ff8c42;
+            box-shadow: 0 -1px 5px rgba(0,0,0,0.02);
+        }
+
+        /* --- ESTILOS DEL DESPLEGABLE (DROPDOWN) --- */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            min-width: 220px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.15);
+            border-radius: 0 0 0.8rem 0.8rem;
+            z-index: 100;
+            border: 1px solid #cbd5e1;
+            border-top: none;
+        }
+        .dropdown-content .tab-btn {
+            width: 100%;
+            text-align: left;
+            border-radius: 0;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .dropdown-content .tab-btn:last-child {
+            border-radius: 0 0 0.8rem 0.8rem;
+            border-bottom: none;
+        }
+        /* Mostrar desplegable al pasar el ratón */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-btn::after {
+            content: " ▼";
+            font-size: 0.7rem;
+            margin-left: 4px;
+        }
+
+        /* Área donde se muestran los iframes */
+        .iframe-area {
+            flex: 1;
+            background: #eef2f7;
+            position: relative;
+            overflow: auto;
+            padding: 0;
+        }
+        .iframe-pane {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .iframe-pane.active-pane {
+            display: block;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        /* Mensaje de carga */
+        .loading-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.9);
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-weight: 500;
+            color: #1e4668;
+            pointer-events: none;
+            z-index: 5;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Footer */
+        .footer-bar {
+            background: #e2e8f0;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.7rem;
+            color: #2c5a7a;
+            border-top: 1px solid #cbd5e6;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 750px) {
+            .tab-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
+            .main-header h1 {
+                font-size: 1.3rem;
+            }
+            .dropdown-content {
+                min-width: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-header">
+        <h1>📖 Plataforma Unificada de Tests</h1>
+        <p>Selecciona cada prueba</p>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tabs-nav" id="tabsNav"></div>
+    </div>
+
+    <div class="iframe-area" id="iframeArea">
+        <div class="loading-placeholder" id="globalLoader" style="display: none;">⏳ Cargando test...</div>
+    </div>
+
+    <div class="footer-bar">
+        ⚡ Los tests se abren en su formato original | Si algún archivo no se encuentra, verifica la ruta y los nombres
+    </div>
+
+    <script>
+        // CONFIGURACIÓN REORGANIZADA POR CATEGORÍAS (COLORES)
+        const TESTS_CONFIG = [
+            // Pestaña principal fija
+            { id: "test_repaso", label: "📘 Test REPASO clase", file: "examenREPASO_PROFE.html", category: "main" },
+           
+            // Verdes
+            { id: "test1", label: "🟢 Test suelto 1", file: "preparacion_examen.html", category: "verde" },
+            { id: "test2", label: "🟢 Test suelto 2", file: "TEST-FDC.html", category: "verde" },
+            { id: "test3", label: "🟢 Test suelto 3", file: "test_fundamentos.html", category: "verde" },
+            
+            // Azules
+            { id: "test4", label: "🔵 Test II", file: "examen_fundamentos_II.html", category: "azul" },
+            { id: "test5", label: "🔵 Test III", file: "examen_fundamentos_III.html", category: "azul" },
+            { id: "test6", label: "🔵 Test IV", file: "examen_fundamentos_IV.html", category: "azul" },
+            { id: "test7", label: "🔵 Test V", file: "examen_fundamentos_V.html", category: "azul" },
+            { id: "test8", label: "🔵 Test VI", file: "examen_fundamentos_VI.html", category: "azul" },
+            { id: "test9", label: "🔵 Test VII", file: "examen_fundamentos_VII.html", category: "azul" },
+            { id: "test10", label: "🔵 Test VIII", file: "examen_fundamentos_VIII.html", category: "azul" },
+            { id: "test11", label: "🔵 Test IX", file: "examen_fundamentos_IX.html", category: "azul" },
+          
+            // Amarillos
+            { id: "test12", label: "🟡 Test 1", file: "test_FdC_v1.html", category: "amarillo" },
+            { id: "test13", label: "🟡 Test 2", file: "test_FdC_v2.html", category: "amarillo" },
+            { id: "test14", label: "🟡 Test 3", file: "test_FdC_v3.html", category: "amarillo" }
+        ];
+
+        const tabsNav = document.getElementById("tabsNav");
+        const iframeArea = document.getElementById("iframeArea");
+
+        tabsNav.innerHTML = "";
+        let activeTestId = TESTS_CONFIG[0].id;
+
+        // 1. Renderizar pestaña fija inicial (main)
+        TESTS_CONFIG.forEach((test) => {
+            if (test.category === "main") {
+                const btn = document.createElement("button");
+                btn.className = "tab-btn";
+                if (test.id === activeTestId) btn.classList.add("active");
+                btn.setAttribute("data-test-id", test.id);
+                btn.innerHTML = test.label;
+                btn.addEventListener("click", () => switchToTest(test.id));
+                tabsNav.appendChild(btn);
+            }
+        });
+
+        // Definición de los nuevos desplegables configurables
+        const dropdownsConfig = [
+            { key: "verde", title: "📁 Tests Verdes" },
+            { key: "azul", title: "📁 Tests Azules" },
+            { key: "amarillo", title: "📁 Tests Amarillos" }
+        ];
+
+        // Objeto para guardar referencias a los botones de los menús
+        const dropdownButtonsRefs = {};
+
+        // 2. Crear los 3 desplegables dinámicamente
+        dropdownsConfig.forEach(drop => {
+            const dropdownDiv = document.createElement("div");
+            dropdownDiv.className = "dropdown";
+
+            const dropdownBtn = document.createElement("button");
+            dropdownBtn.className = "tab-btn dropdown-btn";
+            dropdownBtn.innerHTML = drop.title;
+            dropdownDiv.appendChild(dropdownBtn);
+            
+            dropdownButtonsRefs[drop.key] = dropdownBtn;
+
+            const dropdownContent = document.createElement("div");
+            dropdownContent.className = "dropdown-content";
+
+            // Llenar este desplegable con sus tests específicos
+            TESTS_CONFIG.forEach((test) => {
+                if (test.category === drop.key) {
+                    const btn = document.createElement("button");
+                    btn.className = "tab-btn";
+                    btn.setAttribute("data-test-id", test.id);
+                    btn.innerHTML = test.label;
+                    btn.addEventListener("click", () => {
+                        switchToTest(test.id);
+                    });
+                    dropdownContent.appendChild(btn);
+                }
+            });
+
+            dropdownDiv.appendChild(dropdownContent);
+            tabsNav.appendChild(dropdownDiv);
+        });
+
+        // 3. Inicializar todos los panes e iframes correspondientes
+        TESTS_CONFIG.forEach((test) => {
+            const pane = document.createElement("div");
+            pane.className = "iframe-pane";
+            pane.id = `pane_${test.id}`;
+            if (test.id === activeTestId) pane.classList.add("active-pane");
+
+            const iframe = document.createElement("iframe");
+            iframe.id = `iframe_${test.id}`;
+            iframe.title = `Test: ${test.label}`;
+            iframe.src = test.file;
+            iframe.setAttribute("loading", "eager");
+
+            iframe.onerror = () => {
+                const fallbackMsg = document.createElement("div");
+                fallbackMsg.className = "loading-placeholder";
+                fallbackMsg.style.position = "relative";
+                fallbackMsg.style.margin = "2rem";
+                fallbackMsg.style.backgroundColor = "#fff0e0";
+                fallbackMsg.style.borderLeft = "5px solid #dc3545";
+                fallbackMsg.innerHTML = `<strong>⚠️ Error al cargar ${test.file}</strong><br>Verifica que el archivo exista en la ruta especificada.`;
+                iframe.style.display = "none";
+                pane.appendChild(fallbackMsg);
+            };
+
+            pane.appendChild(iframe);
+            iframeArea.appendChild(pane);
+        });
+
+        // Gestionar el cambio de vista y marcas activas
+        function switchToTest(testId) {
+            activeTestId = testId;
+            const currentTest = TESTS_CONFIG.find(t => t.id === testId);
+
+            // Remover la clase activa de todos los botones
+            const allBtns = document.querySelectorAll(".tab-btn");
+            allBtns.forEach(btn => btn.classList.remove("active"));
+
+            if (currentTest) {
+                if (currentTest.category === "main") {
+                    const activeMainBtn = tabsNav.querySelector(`[data-test-id="${testId}"]`);
+                    if (activeMainBtn) activeMainBtn.classList.add("active");
+                } else {
+                    const parentDropdownBtn = dropdownButtonsRefs[currentTest.category];
+                    if (parentDropdownBtn) parentDropdownBtn.classList.add("active");
+
+                    const activeSubBtn = document.querySelector(`.dropdown-content [data-test-id="${testId}"]`);
+                    if (activeSubBtn) activeSubBtn.classList.add("active");
+                }
+            }
+
+            // Cambiar la visualización de los paneles de iframe (CORREGIDO)
+            const allPanes = document.querySelectorAll(".iframe-pane");
+            allPanes.forEach(pane => {
+                if (pane.id === `pane_${testId}`) {
+                    pane.classList.add("active-pane");
+                } else {
+                    pane.classList.remove("active-pane");
+                }
+            });
+        }
+
+        // Verificación en segundo plano por consola
+        async function checkTestFiles() {
+            for (const test of TESTS_CONFIG) {
+                try {
+                    const response = await fetch(test.file, { method: 'HEAD', cache: 'no-cache' });
+                    if (!response.ok) console.warn(`⚠️ Archivo no encontrado: ${test.file}`);
+                } catch (err) {
+                    console.warn(`❌ Error de verificación en ${test.file}`);
+                }
+            }
+        }
+        setTimeout(() => checkTestFiles(), 500);
+    </script>
+</body>
+</html>

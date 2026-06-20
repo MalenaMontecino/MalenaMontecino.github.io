@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen IX — Fundamentos de Computadores</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #160a0a;
+    --paper: #faf5f2;
+    --accent: #7a1f1f;
+    --accent2: #1a6b8a;
+    --muted: #8a7070;
+    --correct: #1a6b3c;
+    --wrong: #b5451b;
+    --rule: #e0cdc8;
+    --chip-bg: #f2e6e2;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--paper); color: var(--ink); min-height: 100vh; padding: 0 0 80px; }
+
+  header { background: var(--accent); color: var(--paper); padding: 40px 48px 32px; position: relative; overflow: hidden; }
+  header::after { content: 'IX'; position: absolute; right: 32px; bottom: -10px; font-family: var(--serif); font-size: 120px; opacity: .08; line-height: 1; pointer-events: none; }
+  .header-inner { position: relative; max-width: 820px; margin: 0 auto; }
+  .header-tag { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: rgba(250,245,242,.55); margin-bottom: 12px; }
+  h1 { font-family: var(--serif); font-size: clamp(26px,5vw,46px); line-height: 1.1; margin-bottom: 8px; }
+  .header-sub { font-size: 14px; color: rgba(250,245,242,.5); font-weight: 300; margin-bottom: 28px; }
+  .meta-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 3px; padding: 4px 12px; font-size: 12px; font-family: var(--mono); }
+  .pill.warn { background: rgba(255,200,150,.15); border-color: rgba(255,200,150,.3); color: #ffd8b8; }
+
+  .progress-bar-wrap { background: var(--accent); padding: 0 48px 18px; }
+  .progress-bar-inner { max-width: 820px; margin: 0 auto; }
+  .progress-track { height: 2px; background: rgba(255,255,255,.18); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent2); border-radius: 2px; width: 0%; transition: width .4s ease; }
+  .progress-label { font-size: 11px; font-family: var(--mono); color: rgba(250,245,242,.35); margin-top: 7px; display: flex; justify-content: space-between; }
+
+  main { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+
+  .section-divider { display: flex; align-items: center; gap: 14px; margin: 48px 0 22px; }
+  .section-divider-line { flex: 1; height: 1px; background: var(--rule); }
+  .section-divider-label { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+
+  .q-card { background: white; border: 1px solid var(--rule); border-radius: 6px; margin-bottom: 14px; overflow: hidden; transition: box-shadow .2s; }
+  .q-card:hover { box-shadow: 0 3px 18px rgba(0,0,0,.07); }
+  .q-header { display: flex; align-items: flex-start; gap: 14px; padding: 20px 22px 0; }
+  .q-num { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--accent); background: #f4e6e2; border: 1px solid #d4a8a0; border-radius: 3px; padding: 2px 8px; white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
+  .q-text { font-size: 15px; font-weight: 500; line-height: 1.5; color: var(--ink); padding-bottom: 14px; }
+  .q-table { margin: 0 22px 14px; border-collapse: collapse; font-family: var(--mono); font-size: 13px; }
+  .q-table th { background: var(--accent); color: white; padding: 6px 18px; text-align: center; font-weight: 500; }
+  .q-table td { padding: 6px 18px; text-align: center; border-bottom: 1px solid var(--rule); color: #333; }
+  .q-table tr:nth-child(even) td { background: #faf2ee; }
+  .q-code { font-family: var(--mono); font-size: 13px; background: #1a0a0a; color: #e0c8c0; border-radius: 5px; padding: 12px 16px; margin: 0 22px 14px; white-space: pre; overflow-x: auto; line-height: 1.7; border-left: 3px solid var(--accent2); }
+
+  .options { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .opt { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: 5px; border: 1.5px solid transparent; cursor: pointer; transition: all .15s; font-size: 14px; line-height: 1.45; background: var(--chip-bg); }
+  .opt:hover { border-color: var(--accent); background: #ecd8d0; }
+  .opt-letter { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--muted); min-width: 18px; margin-top: 1px; flex-shrink: 0; }
+  .opt.correct { border-color: var(--correct) !important; background: #e8f4ee !important; }
+  .opt.correct .opt-letter { color: var(--correct) !important; font-weight: 700; }
+  .opt.wrong { border-color: var(--wrong) !important; background: #fdf0eb !important; }
+  .opt.wrong .opt-letter { color: var(--wrong) !important; font-weight: 700; }
+  .opt.show-correct { border-color: var(--correct) !important; background: #e8f4ee !important; }
+  .opt.show-correct .opt-letter { color: var(--correct) !important; }
+  .opt.disabled { cursor: default; pointer-events: none; }
+
+  .feedback { margin: 0 14px 14px; padding: 10px 14px; border-radius: 5px; font-size: 13px; line-height: 1.6; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #e8f4ee; border: 1px solid #9fcfb4; color: #0d4d28; }
+  .feedback.fail { background: #fdf0eb; border: 1px solid #e8b49a; color: #7a2e0a; }
+  .feedback strong { font-weight: 600; }
+
+  .results { display: none; background: var(--ink); color: var(--paper); border-radius: 8px; padding: 40px; margin: 40px 0; text-align: center; position: relative; overflow: hidden; }
+  .results::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, rgba(122,31,31,.5) 0%, transparent 60%); }
+  .results.show { display: block; }
+  .results-inner { position: relative; }
+  .results-score { font-family: var(--serif); font-size: 80px; line-height: 1; color: #e09a8a; margin-bottom: 2px; }
+  .results-label { font-size: 12px; color: rgba(250,245,242,.4); font-family: var(--mono); margin-bottom: 20px; letter-spacing: .06em; }
+  .results-msg { font-size: 16px; font-weight: 300; color: rgba(250,245,242,.8); margin-bottom: 28px; line-height: 1.55; }
+  .results-breakdown { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-bottom: 28px; }
+  .breakdown-item { text-align: center; }
+  .breakdown-num { font-family: var(--serif); font-size: 32px; }
+  .breakdown-num.g { color: #6fcf97; }
+  .breakdown-num.r { color: #eb8c6a; }
+  .breakdown-sub { font-size: 10px; font-family: var(--mono); color: rgba(250,245,242,.35); text-transform: uppercase; letter-spacing: .1em; margin-top: 2px; }
+
+  .btn-submit { display: block; width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 5px; font-family: var(--sans); font-size: 14px; font-weight: 600; cursor: pointer; margin: 24px 0 0; transition: background .15s; letter-spacing: .02em; }
+  .btn-submit:hover { background: #5c1414; }
+  .btn-submit:disabled { background: var(--muted); cursor: default; }
+  .btn-reset { display: inline-block; padding: 10px 24px; background: rgba(255,255,255,.08); color: var(--paper); border: 1px solid rgba(255,255,255,.18); border-radius: 5px; font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s; }
+  .btn-reset:hover { background: rgba(255,255,255,.15); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-tag">Simulacro de examen · Serie IX · Nivel difícil</div>
+    <h1>Fundamentos de Computadores</h1>
+    <div class="header-sub">Solo ejercicios de cálculo · Sin preguntas de teoría · Grado en Ciberseguridad — VIU</div>
+    <div class="meta-pills">
+      <span class="pill">25 preguntas</span>
+      <span class="pill warn">⚠ Nivel difícil</span>
+      <span class="pill">Karnaugh, JK, MUX, ASM, numeración</span>
+    </div>
+  </div>
+</header>
+<div class="progress-bar-wrap">
+  <div class="progress-bar-inner">
+    <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    <div class="progress-label">
+      <span id="prog-done">0 respondidas</span>
+      <span id="prog-pct">0 %</span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div id="quiz"></div>
+  <button class="btn-submit" id="btn-submit" disabled onclick="submit()">Ver resultados</button>
+  <div class="results" id="results">
+    <div class="results-inner">
+      <div class="results-score" id="r-score">—</div>
+      <div class="results-label">respuestas correctas de 25</div>
+      <div class="results-msg" id="r-msg"></div>
+      <div class="results-breakdown">
+        <div class="breakdown-item"><div class="breakdown-num g" id="r-ok">—</div><div class="breakdown-sub">Correctas</div></div>
+        <div class="breakdown-item"><div class="breakdown-num r" id="r-ko">—</div><div class="breakdown-sub">Incorrectas</div></div>
+        <div class="breakdown-item"><div class="breakdown-num" id="r-pct">—</div><div class="breakdown-sub">Porcentaje</div></div>
+      </div>
+      <button class="btn-reset" onclick="reset()">↺ Intentarlo de nuevo</button>
+    </div>
+  </div>
+</main>
+
+<script>
+const Q = [
+  // ── NUMERACIÓN AVANZADA ──────────────────────────────────────────────────
+  {
+    sec: "Sistemas de Numeración — Avanzado",
+    q: "¿Cuánto vale en decimal el número hexadecimal 2E7?",
+    opts: ["743", "745", "747", "751"],
+    ans: 0,
+    exp: "2×16² + E×16¹ + 7×16⁰ = 2×256 + 14×16 + 7×1 = 512+224+7 = 743. Recuerda que E en hex vale 14 en decimal. Verificación en binario: 2E7h = 0010 1110 0111 = 512+128+64+32+4+2+1 = 743 ✓"
+  },
+  {
+    sec: "Sistemas de Numeración — Avanzado",
+    q: "Convierte 233 decimal a binario.",
+    opts: ["11101001", "11101000", "11101011", "11100001"],
+    ans: 0,
+    exp: "233÷2=116 r1 → 116÷2=58 r0 → 58÷2=29 r0 → 29÷2=14 r1 → 14÷2=7 r0 → 7÷2=3 r1 → 3÷2=1 r1 → 1÷2=0 r1. Leyendo de abajo a arriba: 11101001. Verificación: 128+64+32+8+1=233 ✓"
+  },
+  {
+    sec: "Sistemas de Numeración — Avanzado",
+    q: "¿Cuál es el resultado de sumar 1011₂ + 0111₂?",
+    opts: ["10010", "10001", "10000", "11000"],
+    ans: 0,
+    exp: "1011 (11) + 0111 (7) = 18 en decimal = 10010 en binario. Verificación bit a bit con acarreo: 1+1=10(acarreo 1), 1+1+1(acarreo)=11(acarreo 1), 0+1+1(acarreo)=10(acarreo 1), 1+0+1(acarreo)=10. Resultado: 10010."
+  },
+  {
+    sec: "Sistemas de Numeración — Avanzado",
+    q: "¿Cuál es la resta 10110₂ - 01101₂?",
+    opts: ["01001", "01010", "01011", "01000"],
+    ans: 0,
+    exp: "10110 (22 decimal) - 01101 (13 decimal) = 9 decimal = 01001 en binario. Verificación: 01001 = 8+1 = 9 ✓. Truco rápido: convierte ambos a decimal, resta, y convierte el resultado de vuelta a binario."
+  },
+  // ── KARNAUGH AVANZADO ─────────────────────────────────────────────────────
+  {
+    sec: "Karnaugh — Avanzado",
+    q: "F(A,B,C,D) = Σm(1,3,5,7,9,11,13,15). ¿Cuál es la expresión simplificada?",
+    opts: ["F = D", "F = C+D", "F = C·D", "F = A+D"],
+    ans: 0,
+    exp: "Son 8 minitérminos, todos impares. Escribe los 4 bits de cada uno: en TODOS ellos D=1 (bit menos significativo). A, B y C varían en todas las combinaciones posibles. El grupo de 8 elimina 3 variables, dejando solo D. F = D."
+  },
+  {
+    sec: "Karnaugh — Avanzado",
+    q: "F(A,B,C,D) = Σm(0,1,2,3,4,5,6,7). ¿Cuál es la expresión simplificada?",
+    opts: ["F = A", "F = Ā", "F = B", "F = B̄"],
+    ans: 1,
+    exp: "Los minitérminos 0-7 en binario de 4 bits son 0000 a 0111 — en todos ellos A=0 (el bit más significativo). B, C, D varían completamente. El grupo de 8 elimina 3 variables, dejando solo Ā. F = Ā."
+  },
+  {
+    sec: "Karnaugh — Avanzado",
+    q: "F(A,B,C,D) = Σm(4,5,6,7,12,13,14,15). ¿Cuál es la expresión simplificada?",
+    opts: ["F = A", "F = B", "F = A+B", "F = A·B"],
+    ans: 1,
+    exp: "m₄=0100 hasta m₇=0111, y m₁₂=1100 hasta m₁₅=1111. En todos ellos B=1 (segundo bit). A varía (0 y 1), C y D varían completamente. El grupo de 8 elimina 3 variables, dejando F = B."
+  },
+  {
+    sec: "Karnaugh — Avanzado",
+    q: "F(A,B,C,D) = Σm(0,4,8,12,2,6,10,14). ¿Cuál es la expresión simplificada?",
+    opts: ["F = D", "F = D̄", "F = C", "F = C̄"],
+    ans: 1,
+    exp: "Ordenando: 0,2,4,6,8,10,12,14 son todos los números pares. En binario, todos tienen D=0 (bit menos significativo siempre 0 en pares). A, B, C varían completamente. El grupo de 8 elimina 3 variables, dejando F = D̄."
+  },
+  {
+    sec: "Karnaugh — Avanzado",
+    q: "F(A,B,C) = Σm(0,1,2,3,4,5,6,7). ¿Cuál es la expresión simplificada?",
+    opts: ["F = 0", "F = 1", "F = A·B·C", "Depende de la implementación"],
+    ans: 1,
+    exp: "Con 3 variables hay 2³=8 minitérminos posibles (0 a 7). Si TODOS están en la suma, la función vale 1 para cualquier combinación de entrada. F = 1 (constante), no necesita ninguna compuerta."
+  },
+  // ── MUX/DECODER COMPLEJOS ─────────────────────────────────────────────────
+  {
+    sec: "Combinacionales — Casos complejos",
+    q: "Un MUX 16×1 tiene S₃=1, S₂=0, S₁=1, S₀=1. ¿Qué entrada pasa a la salida?",
+    opts: ["I₁₀", "I₁₁", "I₁₂", "I₁₃"],
+    ans: 1,
+    exp: "S₃S₂S₁S₀ = 1011 en binario = 8+0+2+1 = 11 en decimal → pasa I₁₁. Con 16 entradas se necesitan 4 bits de selección (2⁴=16). Misma regla siempre: convierte a decimal y ese es el subíndice."
+  },
+  {
+    sec: "Combinacionales — Casos complejos",
+    q: "Un decodificador 5×32 recibe la entrada 10110. ¿Qué salida se activa?",
+    opts: ["S20", "S21", "S22", "S23"],
+    ans: 2,
+    exp: "10110 en binario: 1×16 + 0×8 + 1×4 + 1×2 + 0×1 = 16+4+2 = 22 en decimal → se activa S22. Con 5 bits de entrada hay 2⁵=32 salidas posibles (S0 a S31), y el valor decimal de la entrada determina cuál se activa."
+  },
+  {
+    sec: "Combinacionales — Casos complejos",
+    q: "Un codificador 16→4 tiene activa la entrada I₁₃. ¿Cuál es la salida O₃O₂O₁O₀?",
+    opts: ["1100", "1101", "1110", "1011"],
+    ans: 1,
+    exp: "I₁₃ tiene índice 13. 13 en binario con 4 bits = 1101 (8+4+0+1=13). Por tanto O₃O₂O₁O₀ = 1101. Regla constante: el subíndice de la entrada activa convertido a binario."
+  },
+  {
+    sec: "Combinacionales — Casos complejos",
+    q: "Dos sumadores completos de 1 bit están encadenados (Cout del primero → Cin del segundo) para sumar A=01, B=01 (2 bits cada uno). ¿Cuál es el resultado de 01+01?",
+    opts: ["10", "11", "00", "01"],
+    ans: 0,
+    exp: "01 (1 decimal) + 01 (1 decimal) = 2 decimal = 10 en binario. Etapa 0 (bit menos significativo): A=1,B=1,Cin=0 → S=0,Cout=1. Etapa 1: A=0,B=0,Cin=1(del anterior) → S=1,Cout=0. Resultado final: 10."
+  },
+  // ── FF-JK / FF-D AVANZADOS ────────────────────────────────────────────────
+  {
+    sec: "Flip-flops — Trazado avanzado",
+    q: "FF-JK con Q inicial = 0. ¿Cuál es la secuencia completa de Q?\n(00=Mantiene · 01=Reset · 10=Set · 11=Toggle)",
+    table: { headers: ["Pulso","J","K"], rows: [["1","1","0"],["2","1","1"],["3","0","1"],["4","1","0"],["5","1","1"]] },
+    opts: ["Q: 1, 0, 0, 1, 0", "Q: 1, 0, 0, 1, 1", "Q: 1, 1, 0, 1, 0", "Q: 0, 1, 0, 1, 0"],
+    ans: 0,
+    exp: "P1: Set→Q=1. P2: Toggle→Q era 1, invierte→Q=0. P3: Reset→Q=0 (ya era 0). P4: Set→Q=1. P5: Toggle→Q era 1, invierte→Q=0. Secuencia: 1,0,0,1,0."
+  },
+  {
+    sec: "Flip-flops — Trazado avanzado",
+    q: "FF-D con Q inicial = 0. ¿Cuál es la secuencia completa de Q en este trazado de 6 pulsos?",
+    table: { headers: ["Pulso","D"], rows: [["1","1"],["2","1"],["3","0"],["4","1"],["5","0"],["6","0"]] },
+    opts: ["Q: 1,1,0,1,0,0", "Q: 0,1,1,0,1,0", "Q: 1,0,1,0,0,1", "Q: 0,0,1,0,1,1"],
+    ans: 0,
+    exp: "FF-D: Q es siempre idéntico a D. La secuencia de D es 1,1,0,1,0,0 → Q es exactamente 1,1,0,1,0,0. No hay trampa: simplemente copia la columna D entera."
+  },
+  {
+    sec: "Flip-flops — Trazado avanzado",
+    q: "FF-JK con Q inicial = 1. Tras CINCO Toggles consecutivos (J=K=1 en todos los pulsos), ¿cuál es Q final?",
+    opts: ["Q final = 1", "Q final = 0", "Q final = indeterminado", "Depende de la frecuencia del reloj"],
+    ans: 1,
+    exp: "Cada Toggle invierte Q. Con Q inicial=1: tras 1 toggle→0, tras 2→1, tras 3→0, tras 4→1, tras 5→0. Con un número IMPAR de toggles, Q termina invertido respecto al inicial. Q inicial=1 → Q final=0. Regla: número impar de toggles invierte, número par lo deja igual."
+  },
+  {
+    sec: "Flip-flops — Trazado avanzado",
+    q: "Dos FF-JK están en cascada formando un contador de 2 bits (Q1 Q0), ambos con J=K=1 permanentemente y el CLK del segundo conectado al Cout del primero. Si el estado actual es Q1Q0=01, ¿cuál es el siguiente estado tras un pulso de reloj?",
+    opts: ["00", "10", "11", "01"],
+    ans: 1,
+    exp: "Es un contador binario: 01 (1 decimal) + 1 = 10 (2 decimal). El contador de 2 bits con FF-JK en Toggle permanente simplemente incrementa en cada pulso: 00→01→10→11→00. Desde 01, el siguiente es 10."
+  },
+  // ── ENSAMBLADOR COMPLEJO ──────────────────────────────────────────────────
+  {
+    sec: "Ensamblador — Trazado complejo",
+    q: "¿Qué valor final tiene AL tras ejecutar este código?\n\nMOV AL, 05h\nMOV BL, 03h\nADD AL, BL\nSUB AL, 02h\nADD AL, BL",
+    code: true,
+    opts: ["09h", "0Bh", "06h", "08h"],
+    ans: 0,
+    exp: "AL=05h. ADD AL,BL → AL=05h+03h=08h. SUB AL,02h → AL=08h-02h=06h. ADD AL,BL → AL=06h+03h=09h. Resultado final: AL=09h. Hay que ir actualizando AL paso a paso, BL nunca cambia (siempre 03h)."
+  },
+  {
+    sec: "Ensamblador — Trazado complejo",
+    q: "¿Qué imprime este programa con un bucle anidado conceptual?\n\nMOV CX, 3\nMOV DL, 'X'\nBUCLE:\n  MOV AH, 02h\n  INT 21h\n  MOV AH, 02h\n  INT 21h\n  INC DL\n  LOOP BUCLE",
+    code: true,
+    opts: ["XXYYZZ", "XXYYZ", "XYXYXY", "XXXYYY"],
+    ans: 0,
+    exp: "Cada iteración imprime DL DOS veces (hay dos bloques MOV AH,02h/INT 21h) y luego incrementa DL una vez. Iter 1: imprime 'X','X', INC→'Y'. Iter 2: imprime 'Y','Y', INC→'Z'. Iter 3: imprime 'Z','Z'. Resultado: XXYYZZ."
+  },
+  {
+    sec: "Ensamblador — Trazado complejo",
+    q: "¿Qué valor queda en AL tras este código?\n\nMOV AL, 'm'\nAND AL, 0DFh\nOR AL, 20h",
+    code: true,
+    opts: ["6Dh ('m' sin cambios)", "4Dh ('M')", "6Dh", "00h"],
+    ans: 0,
+    exp: "'m'=6Dh=0110 1101. AND 0DFh (1101 1111) → 0100 1101=4Dh='M' (mayúscula). Luego OR 20h (0010 0000) → 0100 1101 OR 0010 0000 = 0110 1101=6Dh='m' (vuelve a minúscula). El AND convierte a mayúscula y el OR posterior la devuelve a minúscula — se anulan mutuamente. Resultado final: 6Dh, la 'm' original."
+  },
+  {
+    sec: "Ensamblador — Trazado complejo",
+    q: "¿Qué valor tiene CX tras ejecutar 'SUB CX,CX' seguido de tres 'LOOP etiqueta' consecutivos que SÍ se ejecutan (la etiqueta apunta a una instrucción anterior)?",
+    opts: ["CX = 0xFFFD", "CX = 0xFFFC", "CX = 0x0003", "CX = 0xFFFE"],
+    ans: 0,
+    exp: "SUB CX,CX pone CX=0. Cada LOOP decrementa CX ANTES de comprobar. Primer LOOP: CX=0→decrementa→0xFFFF (desbordamiento circular en 16 bits), como no es 0 sigue. Segundo LOOP: 0xFFFF→0xFFFE. Tercer LOOP: 0xFFFE→0xFFFD. CX final = 0xFFFD."
+  },
+  {
+    sec: "Ensamblador — Trazado complejo",
+    q: "¿Qué imprime este programa con XOR?\n\nMOV AL, 'A'\nXOR AL, 20h\nMOV DL, AL\nMOV AH, 02h\nINT 21h",
+    code: true,
+    opts: ["a (minúscula)", "A (mayúscula sin cambio)", "espacio en blanco", "carácter no imprimible"],
+    ans: 0,
+    exp: "'A'=41h=0100 0001. XOR con 20h (0010 0000): 0100 0001 XOR 0010 0000 = 0110 0001 = 61h = 'a'. El XOR con 20h alterna entre mayúscula y minúscula: si era mayúscula la convierte en minúscula, y viceversa, porque invierte exactamente el bit 5."
+  },
+  // ── ÁLGEBRA AVANZADA ──────────────────────────────────────────────────────
+  {
+    sec: "Álgebra de Boole — Avanzado",
+    q: "Simplifica completamente: F = (A+B)·(A+B̄)",
+    opts: ["F = A", "F = B", "F = A+B", "F = A·B"],
+    ans: 0,
+    exp: "Aplicando distributiva inversa: (A+B)·(A+B̄) = A+B·B̄ = A+0 = A. Es el dual de la absorción inversa que vimos antes (A+ĀB=A+B). Aquí con producto de sumas el resultado se reduce a A."
+  },
+  {
+    sec: "Álgebra de Boole — Avanzado",
+    q: "Simplifica: F = A·B·C + A·B·C̄",
+    opts: ["F = A·B", "F = B·C", "F = A·C", "F = A+B"],
+    ans: 0,
+    exp: "Factor común A·B: F = A·B·(C+C̄). Por complemento, C+C̄=1. Resultado: F = A·B·1 = A·B. Lo común entre los dos términos es A·B; C y C̄ se cancelan entre sí porque su OR siempre vale 1."
+  },
+];
+
+const answered = new Array(Q.length).fill(null);
+let submitted = false;
+
+function build() {
+  const c = document.getElementById('quiz');
+  c.innerHTML = '';
+  let lastSec = '';
+  Q.forEach((q, qi) => {
+    if (q.sec !== lastSec) {
+      lastSec = q.sec;
+      const d = document.createElement('div');
+      d.className = 'section-divider';
+      d.innerHTML = `<div class="section-divider-line"></div><div class="section-divider-label">${q.sec}</div><div class="section-divider-line"></div>`;
+      c.appendChild(d);
+    }
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    const qlines = q.q.split('\n');
+    const qh = document.createElement('div');
+    qh.className = 'q-header';
+    qh.innerHTML = `<span class="q-num">${String(qi+1).padStart(2,'0')}</span><div class="q-text">${qlines[0]}</div>`;
+    card.appendChild(qh);
+
+    if (q.table) {
+      const tbl = document.createElement('table');
+      tbl.className = 'q-table';
+      const thead = document.createElement('thead');
+      const hrow = document.createElement('tr');
+      q.table.headers.forEach(h => { const th = document.createElement('th'); th.textContent = h; hrow.appendChild(th); });
+      thead.appendChild(hrow);
+      tbl.appendChild(thead);
+      const tbody = document.createElement('tbody');
+      q.table.rows.forEach(r => {
+        const tr = document.createElement('tr');
+        r.forEach(cell => { const td = document.createElement('td'); td.textContent = cell; tr.appendChild(td); });
+        tbody.appendChild(tr);
+      });
+      tbl.appendChild(tbody);
+      card.appendChild(tbl);
+    }
+
+    if (q.code && qlines.length > 1) {
+      const code = document.createElement('div');
+      code.className = 'q-code';
+      code.textContent = qlines.slice(1).join('\n').trim();
+      card.appendChild(code);
+    }
+
+    const opts = document.createElement('div');
+    opts.className = 'options';
+    ['A','B','C','D'].forEach((l, oi) => {
+      const opt = document.createElement('div');
+      opt.className = 'opt';
+      opt.id = `opt-${qi}-${oi}`;
+      opt.innerHTML = `<span class="opt-letter">${l}</span><span>${q.opts[oi]}</span>`;
+      opt.onclick = () => answer(qi, oi);
+      opts.appendChild(opt);
+    });
+    card.appendChild(opts);
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback';
+    fb.id = 'fb' + qi;
+    card.appendChild(fb);
+    c.appendChild(card);
+  });
+}
+
+function answer(qi, oi) {
+  if (submitted || answered[qi] !== null) return;
+  answered[qi] = oi;
+  const q = Q[qi];
+  q.opts.forEach((_, i) => {
+    const el = document.getElementById(`opt-${qi}-${i}`);
+    el.classList.add('disabled');
+    if (i === q.ans) el.classList.add('show-correct');
+    if (i === oi && oi !== q.ans) el.classList.add('wrong');
+    if (i === oi && oi === q.ans) el.classList.add('correct');
+  });
+  const ok = oi === q.ans;
+  const fb = document.getElementById('fb' + qi);
+  fb.innerHTML = `<strong>${ok ? '✓ Correcto.' : `✗ Incorrecto — la respuesta era ${'ABCD'[q.ans]}.`}</strong> ${q.exp}`;
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'fail');
+  const done = answered.filter(a => a !== null).length;
+  const pct = Math.round(done / Q.length * 100);
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('prog-done').textContent = `${done} respondidas`;
+  document.getElementById('prog-pct').textContent = `${pct} %`;
+  if (done === Q.length) document.getElementById('btn-submit').disabled = false;
+}
+
+function submit() {
+  submitted = true;
+  document.getElementById('btn-submit').disabled = true;
+  const ok = answered.filter((a,i) => a === Q[i].ans).length;
+  const pct = Math.round(ok / Q.length * 100);
+  const msg = ok <= 9  ? 'Este nivel es exigente — no te desanimes. Vuelve a repasar los trucos y dale otra vuelta.'
+    : ok <= 16 ? 'Buen esfuerzo en un examen difícil. Hay margen de mejora pero vas bien.'
+    : ok <= 21 ? 'Muy buen nivel para la dificultad de este examen.'
+    : '¡Impresionante! Has dominado un examen deliberadamente difícil.';
+  document.getElementById('r-score').textContent = `${ok}/25`;
+  document.getElementById('r-msg').textContent = msg;
+  document.getElementById('r-ok').textContent = ok;
+  document.getElementById('r-ko').textContent = 25 - ok;
+  document.getElementById('r-pct').textContent = pct + '%';
+  const res = document.getElementById('results');
+  res.classList.add('show');
+  res.scrollIntoView({ behavior: 'smooth' });
+}
+
+function reset() {
+  answered.fill(null);
+  submitted = false;
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('btn-submit').disabled = true;
+  document.getElementById('prog').style.width = '0%';
+  document.getElementById('prog-done').textContent = '0 respondidas';
+  document.getElementById('prog-pct').textContent = '0 %';
+  build();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+build();
+</script>
+</body>
+</html>

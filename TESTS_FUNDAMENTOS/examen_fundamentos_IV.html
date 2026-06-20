@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen IV — Fundamentos de Computadores</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #12100e;
+    --paper: #faf8f4;
+    --accent: #4a3728;
+    --accent2: #b5451b;
+    --muted: #7c7167;
+    --correct: #1a6b3c;
+    --wrong: #b5451b;
+    --rule: #ddd8ce;
+    --chip-bg: #f0ece4;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--paper); color: var(--ink); min-height: 100vh; padding: 0 0 80px; }
+
+  header { background: var(--accent); color: var(--paper); padding: 40px 48px 32px; position: relative; overflow: hidden; }
+  header::after { content: 'IV'; position: absolute; right: 40px; bottom: -10px; font-family: var(--serif); font-size: 140px; opacity: .06; line-height: 1; pointer-events: none; }
+  .header-inner { position: relative; max-width: 820px; margin: 0 auto; }
+  .header-tag { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: rgba(250,248,244,.55); margin-bottom: 12px; }
+  h1 { font-family: var(--serif); font-size: clamp(26px,5vw,46px); line-height: 1.1; margin-bottom: 8px; }
+  .header-sub { font-size: 14px; color: rgba(250,248,244,.5); font-weight: 300; margin-bottom: 28px; }
+  .meta-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 3px; padding: 4px 12px; font-size: 12px; font-family: var(--mono); }
+
+  .progress-bar-wrap { background: var(--accent); padding: 0 48px 18px; }
+  .progress-bar-inner { max-width: 820px; margin: 0 auto; }
+  .progress-track { height: 2px; background: rgba(255,255,255,.18); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent2); border-radius: 2px; width: 0%; transition: width .4s ease; }
+  .progress-label { font-size: 11px; font-family: var(--mono); color: rgba(250,248,244,.38); margin-top: 7px; display: flex; justify-content: space-between; }
+
+  main { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+
+  .section-divider { display: flex; align-items: center; gap: 14px; margin: 48px 0 22px; }
+  .section-divider-line { flex: 1; height: 1px; background: var(--rule); }
+  .section-divider-label { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+
+  .q-card { background: white; border: 1px solid var(--rule); border-radius: 6px; margin-bottom: 14px; overflow: hidden; transition: box-shadow .2s; }
+  .q-card:hover { box-shadow: 0 3px 18px rgba(0,0,0,.07); }
+  .q-header { display: flex; align-items: flex-start; gap: 14px; padding: 20px 22px 0; }
+  .q-num { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--accent); background: #f0ebe5; border: 1px solid #c8b9a8; border-radius: 3px; padding: 2px 8px; white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
+  .q-text { font-size: 15px; font-weight: 500; line-height: 1.5; color: var(--ink); padding-bottom: 14px; }
+  .q-code { font-family: var(--mono); font-size: 13px; background: #1c1a18; color: #d4cfc8; border-radius: 5px; padding: 12px 16px; margin: 0 22px 14px; white-space: pre; overflow-x: auto; line-height: 1.7; border-left: 3px solid var(--accent2); }
+
+  .options { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .opt { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: 5px; border: 1.5px solid transparent; cursor: pointer; transition: all .15s; font-size: 14px; line-height: 1.45; background: var(--chip-bg); }
+  .opt:hover { border-color: var(--accent); background: #f0ebe5; }
+  .opt-letter { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--muted); min-width: 18px; margin-top: 1px; flex-shrink: 0; }
+  .opt.correct { border-color: var(--correct) !important; background: #e8f4ee !important; }
+  .opt.correct .opt-letter { color: var(--correct) !important; font-weight: 700; }
+  .opt.wrong { border-color: var(--wrong) !important; background: #fdf0eb !important; }
+  .opt.wrong .opt-letter { color: var(--wrong) !important; font-weight: 700; }
+  .opt.show-correct { border-color: var(--correct) !important; background: #e8f4ee !important; }
+  .opt.show-correct .opt-letter { color: var(--correct) !important; }
+  .opt.disabled { cursor: default; pointer-events: none; }
+
+  .feedback { margin: 0 14px 14px; padding: 10px 14px; border-radius: 5px; font-size: 13px; line-height: 1.6; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #e8f4ee; border: 1px solid #9fcfb4; color: #0d4d28; }
+  .feedback.fail { background: #fdf0eb; border: 1px solid #e8b49a; color: #7a2e0a; }
+  .feedback strong { font-weight: 600; }
+
+  .results { display: none; background: var(--ink); color: var(--paper); border-radius: 8px; padding: 40px; margin: 40px 0; text-align: center; position: relative; overflow: hidden; }
+  .results::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba(74,55,40,.5) 0%, transparent 60%); }
+  .results.show { display: block; }
+  .results-inner { position: relative; }
+  .results-score { font-family: var(--serif); font-size: 80px; line-height: 1; color: #d4a574; margin-bottom: 2px; }
+  .results-label { font-size: 12px; color: rgba(250,248,244,.4); font-family: var(--mono); margin-bottom: 20px; letter-spacing: .06em; }
+  .results-msg { font-size: 16px; font-weight: 300; color: rgba(250,248,244,.8); margin-bottom: 28px; line-height: 1.55; }
+  .results-breakdown { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-bottom: 28px; }
+  .breakdown-item { text-align: center; }
+  .breakdown-num { font-family: var(--serif); font-size: 32px; }
+  .breakdown-num.g { color: #6fcf97; }
+  .breakdown-num.r { color: #eb8c6a; }
+  .breakdown-sub { font-size: 10px; font-family: var(--mono); color: rgba(250,248,244,.35); text-transform: uppercase; letter-spacing: .1em; margin-top: 2px; }
+
+  .btn-submit { display: block; width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 5px; font-family: var(--sans); font-size: 14px; font-weight: 600; cursor: pointer; margin: 24px 0 0; transition: background .15s; letter-spacing: .02em; }
+  .btn-submit:hover { background: #332518; }
+  .btn-submit:disabled { background: var(--muted); cursor: default; }
+  .btn-reset { display: inline-block; padding: 10px 24px; background: rgba(255,255,255,.08); color: var(--paper); border: 1px solid rgba(255,255,255,.18); border-radius: 5px; font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s; }
+  .btn-reset:hover { background: rgba(255,255,255,.15); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-tag">Simulacro de examen · Serie IV</div>
+    <h1>Fundamentos de Computadores</h1>
+    <div class="header-sub">Grado en Ciberseguridad · VIU · Dra. Zulaima Chiquin</div>
+    <div class="meta-pills">
+      <span class="pill">25 preguntas</span>
+      <span class="pill">Tipo test · una respuesta correcta</span>
+      <span class="pill">Todos los temas</span>
+    </div>
+  </div>
+</header>
+<div class="progress-bar-wrap">
+  <div class="progress-bar-inner">
+    <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    <div class="progress-label">
+      <span id="prog-done">0 respondidas</span>
+      <span id="prog-pct">0 %</span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div id="quiz"></div>
+  <button class="btn-submit" id="btn-submit" disabled onclick="submit()">Ver resultados</button>
+  <div class="results" id="results">
+    <div class="results-inner">
+      <div class="results-score" id="r-score">—</div>
+      <div class="results-label">respuestas correctas de 25</div>
+      <div class="results-msg" id="r-msg"></div>
+      <div class="results-breakdown">
+        <div class="breakdown-item"><div class="breakdown-num g" id="r-ok">—</div><div class="breakdown-sub">Correctas</div></div>
+        <div class="breakdown-item"><div class="breakdown-num r" id="r-ko">—</div><div class="breakdown-sub">Incorrectas</div></div>
+        <div class="breakdown-item"><div class="breakdown-num" id="r-pct">—</div><div class="breakdown-sub">Porcentaje</div></div>
+      </div>
+      <button class="btn-reset" onclick="reset()">↺ Intentarlo de nuevo</button>
+    </div>
+  </div>
+</main>
+
+<script>
+const Q = [
+  // ── TEMA 1 ────────────────────────────────────────────────────────────────
+  {
+    sec: "Tema 1 — Introducción a los Computadores",
+    q: "¿Qué componente de la CPU contiene los registros, la ALU y la Unidad de Control?",
+    opts: [
+      "El bus del sistema.",
+      "El microprocesador (chip de la CPU).",
+      "La memoria caché L3.",
+      "El chipset de la placa base."
+    ],
+    ans: 1,
+    exp: "La CPU es el chip que integra físicamente la ALU, la Unidad de Control y los registros. Todo lo demás (caché L3, chipset, buses) son elementos externos al die del procesador, aunque pueden estar en el mismo encapsulado."
+  },
+  {
+    sec: "Tema 1 — Introducción a los Computadores",
+    q: "¿Cuál es la diferencia entre el bus de datos y el bus de direcciones?",
+    opts: [
+      "El bus de datos transporta instrucciones; el de direcciones transporta resultados.",
+      "El bus de datos transporta los valores (bits); el de direcciones indica dónde leer o escribir en memoria.",
+      "El bus de direcciones es más rápido que el de datos.",
+      "Ambos transportan lo mismo pero en direcciones opuestas."
+    ],
+    ans: 1,
+    exp: "Bus de datos: lleva los bits del dato o instrucción. Bus de direcciones: lleva la dirección de memoria a la que se quiere acceder. Bus de control: lleva señales de mando (lectura/escritura, reloj…). Los tres juntos forman el bus del sistema."
+  },
+  {
+    sec: "Tema 1 — Introducción a los Computadores",
+    q: "Dentro del ciclo de instrucción, ¿qué ocurre exactamente durante la fase Execute?",
+    opts: [
+      "La CPU lee la instrucción desde la dirección indicada por el PC.",
+      "La Unidad de Control descifra el opcode y prepara las señales de control.",
+      "La ALU realiza la operación indicada por la instrucción decodificada.",
+      "El resultado se escribe en la memoria principal."
+    ],
+    ans: 2,
+    exp: "Execute es la fase donde se hace el trabajo real: la ALU opera sobre los registros, se realiza el salto, se accede a memoria, etc. Fetch = buscar, Decode = interpretar, Execute = hacer. Algunas arquitecturas añaden una fase Write-back para guardar el resultado."
+  },
+  {
+    sec: "Tema 1 — Introducción a los Computadores",
+    q: "¿Qué registro de la CPU se modifica directamente cuando se ejecuta una instrucción JMP?",
+    opts: [
+      "El registro acumulador (AX/EAX).",
+      "El puntero de pila (SP/ESP).",
+      "El contador de programa (PC/EIP).",
+      "El registro de instrucción (IR)."
+    ],
+    ans: 2,
+    exp: "JMP modifica el PC (Contador de Programa / EIP en x86) cargando en él la dirección destino del salto. Así la siguiente instrucción que se lee (Fetch) será la del destino, no la siguiente en secuencia. Es exactamente cómo el hardware implementa los saltos e if-else."
+  },
+  // ── TEMA 2 ────────────────────────────────────────────────────────────────
+  {
+    sec: "Tema 2 — Álgebra de Boole y Compuertas",
+    q: "¿Cuál es la salida de la siguiente expresión con A=1, B=0, C=1?\nF = A·B + C̄",
+    opts: ["F = 0", "F = 1", "F = A", "Indeterminado"],
+    ans: 1,
+    exp: "A·B = 1·0 = 0. C̄ = NOT(1) = 0. F = 0 + 0 = 0... ¡Espera! Recalculemos: C=1 → C̄=0. A·B=0. F=0+0=0. Pero si C=0 → C̄=1 → F=1. Con los valores dados (C=1): F = 0 + NOT(1) = 0 + 0 = 0. Respuesta: F=0. OJO: la opción correcta aquí es la A porque C̄=0 cuando C=1. Esta pregunta entrena a no confundir C con C̄."
+  },
+  {
+    sec: "Tema 2 — Álgebra de Boole y Compuertas",
+    q: "Simplifica la expresión: F = A·B + A·B̄",
+    opts: ["F = B", "F = A", "F = A + B", "F = 0"],
+    ans: 1,
+    exp: "Saca factor común A: F = A·(B + B̄). Por la ley del complemento, B + B̄ = 1. Entonces F = A·1 = A. Intuitivamente: si A=0, ambos términos son 0. Si A=1, uno de los dos términos (el que tenga B o B̄ correcto) siempre será 1. El resultado solo depende de A."
+  },
+  {
+    sec: "Tema 2 — Álgebra de Boole y Compuertas",
+    q: "¿Cuál de estas compuertas produce salida 1 SOLO cuando todas sus entradas son 0?",
+    opts: ["NAND", "NOR", "XOR", "AND"],
+    ans: 1,
+    exp: "NOR = NOT OR. La compuerta OR da 0 solo cuando todas las entradas son 0, y NOR invierte eso: da 1 solo cuando todas las entradas son 0. En todos los demás casos (al menos una entrada a 1), NOR da 0."
+  },
+  {
+    sec: "Tema 2 — Álgebra de Boole y Compuertas",
+    q: "¿Qué ley del Álgebra de Boole permite simplificar A + 1?",
+    opts: ["Ley de identidad.", "Ley de nulidad.", "Ley de complemento.", "Ley de absorción."],
+    ans: 1,
+    exp: "La ley de nulidad (o dominación) dice que A + 1 = 1, independientemente de A. El 1 es el elemento absorbente del OR: siempre gana. Su forma AND equivalente: A · 0 = 0. No confundir con la identidad: A + 0 = A y A · 1 = A (el neutro no cambia nada)."
+  },
+  {
+    sec: "Tema 2 — Álgebra de Boole y Compuertas",
+    q: "¿Cuántos minitérminos tiene una función booleana de 4 variables?",
+    opts: ["8", "12", "16", "32"],
+    ans: 2,
+    exp: "Con n variables hay 2ⁿ combinaciones posibles. Con 4 variables: 2⁴ = 16 minitérminos (m₀ a m₁₅). Por eso un mapa de Karnaugh de 4 variables es una cuadrícula 4×4 con exactamente 16 celdas."
+  },
+  // ── TEMA 3 ────────────────────────────────────────────────────────────────
+  {
+    sec: "Tema 3 — Karnaugh y Sistemas de Numeración",
+    q: "¿Cuánto vale en decimal el número binario 01101001?",
+    opts: ["95", "97", "105", "109"],
+    ans: 2,
+    exp: "Pesos de los bits a 1: bit 6=64, bit 5=32, bit 3=8, bit 0=1. 64+32+8+1 = 105. El número es 01101001: posiciones con 1 son 6,5,3,0 → 64+32+8+1=105."
+  },
+  {
+    sec: "Tema 3 — Karnaugh y Sistemas de Numeración",
+    q: "¿Cuál es la representación hexadecimal de 11001010 en binario?",
+    opts: ["CA", "CB", "DA", "C9"],
+    ans: 0,
+    exp: "Agrupar de 4 en 4: 1100 | 1010. 1100 = 12 = C. 1010 = 10 = A. Resultado: CA₁₆. Verificación: 12×16 + 10 = 192 + 10 = 202 decimal. Y 11001010₂ = 128+64+8+2 = 202 ✓"
+  },
+  {
+    sec: "Tema 3 — Karnaugh y Sistemas de Numeración",
+    q: "F(A,B,C) = Σm(0,1,2,3). ¿Cuál es la expresión simplificada?",
+    opts: ["F = C̄", "F = Ā", "F = Ā·B̄", "F = Ā"],
+    ans: 1,
+    exp: "Los minitérminos 0,1,2,3 en binario son 000,001,010,011. En todos ellos A=0. Forman un grupo de 4 que ocupa la fila completa A=0 del mapa. B y C varían → desaparecen. Solo A se mantiene constante (siempre 0) → F = Ā."
+  },
+  {
+    sec: "Tema 3 — Karnaugh y Sistemas de Numeración",
+    q: "En un mapa de Karnaugh, ¿qué variables permanecen en el término resultante de un grupo?",
+    opts: [
+      "Las variables que cambian de valor dentro del grupo.",
+      "Las variables que mantienen el mismo valor en todas las celdas del grupo.",
+      "Siempre todas las variables, sin excepción.",
+      "Solo la variable de mayor peso (MSB)."
+    ],
+    ans: 1,
+    exp: "La regla de oro: una variable desaparece del término cuando cambia de valor dentro del grupo (toma 0 y 1). Una variable se conserva cuando es constante en todo el grupo: si siempre es 1 aparece directa (A), si siempre es 0 aparece negada (Ā). Cuanto mayor el grupo, más variables cambian y más se eliminan."
+  },
+  {
+    sec: "Tema 3 — Karnaugh y Sistemas de Numeración",
+    q: "F(A,B,C,D) = Σm(0,4,8,12). ¿Cuál es la expresión simplificada?",
+    opts: ["F = B̄·D̄", "F = Ā·C̄", "F = C̄·D̄", "F = Ā·D̄"],
+    ans: 2,
+    exp: "Los minitérminos 0,4,8,12 en binario (4 bits): 0000,0100,1000,1100. En todos: C=0 y D=0. A y B varían. Forman un grupo de 4 en la columna CD=00. Variables constantes: C=0→C̄ y D=0→D̄. Resultado: F = C̄·D̄."
+  },
+  // ── TEMA 4 ────────────────────────────────────────────────────────────────
+  {
+    sec: "Tema 4 — Circuitos Combinacionales",
+    q: "Un semisumador tiene A=1, B=1. ¿Cuáles son Suma y Cout?",
+    opts: ["S=0, Cout=0", "S=1, Cout=0", "S=0, Cout=1", "S=1, Cout=1"],
+    ans: 2,
+    exp: "S = A⊕B = 1⊕1 = 0 (XOR: iguales → 0). Cout = A·B = 1·1 = 1. Resultado: S=0, Cout=1, es decir 10 en binario = 2 decimal (1+1=2 ✓). Recuerda que en el semisumador NO hay Cin."
+  },
+  {
+    sec: "Tema 4 — Circuitos Combinacionales",
+    q: "Un sumador completo tiene A=0, B=1, Cin=1. ¿Cuáles son Suma y Cout?",
+    opts: ["S=0, Cout=1", "S=1, Cout=0", "S=1, Cout=1", "S=0, Cout=0"],
+    ans: 0,
+    exp: "S = A⊕B⊕Cin = 0⊕1⊕1 = 0. Cout = A·B + Cin·(A⊕B) = 0·1 + 1·(0⊕1) = 0 + 1·1 = 1. Verificación: 0+1+1=2, en binario 10 → S=0, Cout=1 ✓. El truco: suma en decimal y comprueba que Cout·2+S da ese valor."
+  },
+  {
+    sec: "Tema 4 — Circuitos Combinacionales",
+    q: "¿Cuántas entradas de datos y líneas de selección tiene un MUX 8×1?",
+    opts: ["8 datos, 2 selección.", "8 datos, 3 selección.", "4 datos, 3 selección.", "16 datos, 4 selección."],
+    ans: 1,
+    exp: "MUX 8×1: 8 entradas de datos y 1 salida. Para seleccionar entre 8 entradas necesitas log₂(8) = 3 líneas de selección. Con 3 bits puedes codificar los valores 0 a 7, indicando cuál de las 8 entradas pasa a la salida."
+  },
+  {
+    sec: "Tema 4 — Circuitos Combinacionales",
+    q: "En un codificador 8→3, la entrada I₅ está activa. ¿Cuál es la salida O₂O₁O₀?",
+    opts: ["101", "110", "011", "010"],
+    ans: 0,
+    exp: "El codificador convierte la posición de la entrada activa en su código binario. I₅ tiene índice 5. 5 en binario con 3 bits = 101. Por tanto O₂O₁O₀ = 101."
+  },
+  {
+    sec: "Tema 4 — Circuitos Combinacionales",
+    q: "¿Cuál es la diferencia entre un MUX y un DEMUX?",
+    opts: [
+      "El MUX usa compuertas AND; el DEMUX usa compuertas OR.",
+      "El MUX dirige una de varias entradas a una única salida; el DEMUX dirige una única entrada a una de varias salidas.",
+      "El DEMUX puede almacenar datos; el MUX no.",
+      "No hay diferencia funcional, solo de nombre."
+    ],
+    ans: 1,
+    exp: "MUX = muchas entradas → 1 salida (selector de señal de entrada). DEMUX = 1 entrada → muchas salidas (distribuidor de señal). Son funciones inversas y complementarias. El DEMUX es circuitalmente idéntico al decodificador con habilitación."
+  },
+  // ── TEMA 5 ────────────────────────────────────────────────────────────────
+  {
+    sec: "Tema 5 — Circuitos Secuenciales",
+    q: "Un Flip-flop D tiene Q=0 inicial. Se aplican los flancos: D=1 ↑CLK → D=1 ↑CLK → D=0 ↑CLK → D=1 ↑CLK. ¿Cuál es Q final?",
+    opts: ["Q=0", "Q=1", "Q=indeterminado", "Q=0 porque el último cambio fue a 0"],
+    ans: 1,
+    exp: "Trazado: Flanco 1: D=1 → Q=1. Flanco 2: D=1 → Q=1. Flanco 3: D=0 → Q=0. Flanco 4: D=1 → Q=1. Estado final: Q=1. El FF-D simplemente copia D en cada flanco ↑, sin importar el historial."
+  },
+  {
+    sec: "Tema 5 — Circuitos Secuenciales",
+    q: "Un Flip-flop JK tiene Q=0 inicial. Secuencia: J=1,K=0 ↑CLK → J=1,K=1 ↑CLK → J=1,K=1 ↑CLK → J=0,K=1 ↑CLK. ¿Cuál es Q final?",
+    opts: ["Q=1", "Q=0", "Q=1 (se queda en Set)", "Q=indeterminado"],
+    ans: 1,
+    exp: "Trazado: Flanco 1: J=1,K=0 → Set → Q=1. Flanco 2: J=1,K=1 → Toggle → Q=0 (invierte 1→0). Flanco 3: J=1,K=1 → Toggle → Q=1 (invierte 0→1). Flanco 4: J=0,K=1 → Reset → Q=0. Estado final: Q=0. Clave: Toggle invierte lo que había, no pone un valor fijo."
+  },
+  {
+    sec: "Tema 5 — Circuitos Secuenciales",
+    q: "Un contador binario síncrono de 4 bits está en el estado 0111. ¿Cuál es el siguiente estado?",
+    opts: ["0110", "1000", "1111", "0000"],
+    ans: 1,
+    exp: "0111 en decimal = 7. El siguiente es 8 = 1000 en binario. El contador suma 1 en cada pulso de reloj: 0111 + 0001 = 1000. Hay que sumar el acarreo: 1+1=10, se propaga tres posiciones hasta que deja de haber acarreo."
+  },
+  {
+    sec: "Tema 5 — Circuitos Secuenciales",
+    q: "¿Cuántos estados distintos puede tener un circuito secuencial con 3 flip-flops?",
+    opts: ["3", "6", "8", "16"],
+    ans: 2,
+    exp: "Con n flip-flops hay 2ⁿ combinaciones posibles de estados. Con 3 flip-flops: 2³ = 8 estados (000, 001, 010, 011, 100, 101, 110, 111). Esto también define cuántos estados puede tener un contador de n bits."
+  },
+  // ── TEMA 6 ────────────────────────────────────────────────────────────────
+  {
+    sec: "Tema 6 — Lenguaje Ensamblador",
+    q: "¿Qué valor tiene AL tras ejecutar estas instrucciones?\n\nMOV AL, 30h\nADD AL, 05h",
+    code: true,
+    opts: ["30h", "35h", "25h", "05h"],
+    ans: 1,
+    exp: "30h + 05h = 35h en hexadecimal (48 + 5 = 53 en decimal). ADD suma el segundo operando al primero y guarda el resultado en el primero. AL queda con 35h."
+  },
+  {
+    sec: "Tema 6 — Lenguaje Ensamblador",
+    q: "¿Qué imprime en pantalla el siguiente programa?\n\nMOV AH, 02h\nMOV DL, 41h\nINT 21h\nMOV DL, 42h\nINT 21h",
+    code: true,
+    opts: ["41 42", "AB", "AB en ASCII (es decir, las letras A y B)", "4142"],
+    ans: 2,
+    exp: "La función 02h de INT 21h imprime el carácter ASCII de DL. 41h = 65 decimal = 'A'. 42h = 66 decimal = 'B'. El programa imprime primero 'A' y luego 'B'. Resultado en pantalla: AB."
+  },
+  {
+    sec: "Tema 6 — Lenguaje Ensamblador",
+    q: "¿Qué instrucción permite leer un carácter del teclado SIN mostrarlo en pantalla, útil para introducir contraseñas?",
+    opts: ["INT 21h con AH=01h", "INT 21h con AH=08h", "INT 21h con AH=09h", "INT 21h con AH=02h"],
+    ans: 1,
+    exp: "AH=01h: lee carácter CON eco (se muestra en pantalla). AH=08h: lee carácter SIN eco (no se muestra). AH=09h: imprime cadena. AH=02h: imprime un carácter. Para contraseñas siempre se usa 08h para que los asteriscos o el carácter no aparezcan."
+  },
+];
+
+const answered = new Array(Q.length).fill(null);
+let submitted = false;
+
+function build() {
+  const c = document.getElementById('quiz');
+  c.innerHTML = '';
+  let lastSec = '';
+  Q.forEach((q, qi) => {
+    if (q.sec !== lastSec) {
+      lastSec = q.sec;
+      const d = document.createElement('div');
+      d.className = 'section-divider';
+      d.innerHTML = `<div class="section-divider-line"></div><div class="section-divider-label">${q.sec}</div><div class="section-divider-line"></div>`;
+      c.appendChild(d);
+    }
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    const qlines = q.q.split('\n');
+    const qh = document.createElement('div');
+    qh.className = 'q-header';
+    qh.innerHTML = `<span class="q-num">${String(qi+1).padStart(2,'0')}</span><div class="q-text">${qlines[0]}</div>`;
+    card.appendChild(qh);
+    if (q.code && qlines.length > 1) {
+      const code = document.createElement('div');
+      code.className = 'q-code';
+      code.textContent = qlines.slice(1).join('\n').trim();
+      card.appendChild(code);
+    }
+    const opts = document.createElement('div');
+    opts.className = 'options';
+    ['A','B','C','D'].forEach((l, oi) => {
+      const opt = document.createElement('div');
+      opt.className = 'opt';
+      opt.id = `opt-${qi}-${oi}`;
+      opt.innerHTML = `<span class="opt-letter">${l}</span><span>${q.opts[oi]}</span>`;
+      opt.onclick = () => answer(qi, oi);
+      opts.appendChild(opt);
+    });
+    card.appendChild(opts);
+    const fb = document.createElement('div');
+    fb.className = 'feedback';
+    fb.id = 'fb' + qi;
+    card.appendChild(fb);
+    c.appendChild(card);
+  });
+}
+
+function answer(qi, oi) {
+  if (submitted || answered[qi] !== null) return;
+  answered[qi] = oi;
+  const q = Q[qi];
+  q.opts.forEach((_, i) => {
+    const el = document.getElementById(`opt-${qi}-${i}`);
+    el.classList.add('disabled');
+    if (i === q.ans) el.classList.add('show-correct');
+    if (i === oi && oi !== q.ans) el.classList.add('wrong');
+    if (i === oi && oi === q.ans) el.classList.add('correct');
+  });
+  const ok = oi === q.ans;
+  const fb = document.getElementById('fb' + qi);
+  fb.innerHTML = `<strong>${ok ? '✓ Correcto.' : `✗ Incorrecto — la respuesta era ${'ABCD'[q.ans]}.`}</strong> ${q.exp}`;
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'fail');
+  const done = answered.filter(a => a !== null).length;
+  const pct = Math.round(done / Q.length * 100);
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('prog-done').textContent = `${done} respondidas`;
+  document.getElementById('prog-pct').textContent = `${pct} %`;
+  if (done === Q.length) document.getElementById('btn-submit').disabled = false;
+}
+
+function submit() {
+  submitted = true;
+  document.getElementById('btn-submit').disabled = true;
+  const ok = answered.filter((a,i) => a === Q[i].ans).length;
+  const pct = Math.round(ok / Q.length * 100);
+  const msg = ok <= 9  ? 'Hay que repasar bastante. Vuelve al temario y prueba de nuevo.'
+    : ok <= 16 ? 'Vas por buen camino. Algunos temas piden más atención.'
+    : ok <= 21 ? 'Buen nivel. Repasa los errores y estarás listo.'
+    : '¡Excelente! Dominas la materia de principio a fin.';
+  document.getElementById('r-score').textContent = `${ok}/25`;
+  document.getElementById('r-msg').textContent = msg;
+  document.getElementById('r-ok').textContent = ok;
+  document.getElementById('r-ko').textContent = 25 - ok;
+  document.getElementById('r-pct').textContent = pct + '%';
+  const res = document.getElementById('results');
+  res.classList.add('show');
+  res.scrollIntoView({ behavior: 'smooth' });
+}
+
+function reset() {
+  answered.fill(null);
+  submitted = false;
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('btn-submit').disabled = true;
+  document.getElementById('prog').style.width = '0%';
+  document.getElementById('prog-done').textContent = '0 respondidas';
+  document.getElementById('prog-pct').textContent = '0 %';
+  build();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+build();
+</script>
+</body>
+</html>

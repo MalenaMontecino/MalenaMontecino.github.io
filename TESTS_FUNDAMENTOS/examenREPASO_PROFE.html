@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Test: Fundamentos de Computadores | Lógica, Sistemas y Ensamblador</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #e9f0f5 0%, #d9e2ec 100%);
+      margin: 0;
+      padding: 24px 20px;
+    }
+
+    .test-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 2rem;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    /* cabecera con contador */
+    .stats-bar {
+      background: #1e2f3e;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 15px;
+      border-bottom: 4px solid #ffb74d;
+    }
+
+    .stats-card {
+      display: flex;
+      gap: 1.8rem;
+      background: #0f1a24;
+      padding: 0.5rem 1.5rem;
+      border-radius: 60px;
+    }
+
+    .stat {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .stat span:first-child {
+      color: #b0d4ff;
+      margin-right: 8px;
+    }
+
+    .stat span:last-child {
+      font-weight: 800;
+      font-size: 1.4rem;
+      background: #2c4c6c;
+      padding: 0.1rem 0.6rem;
+      border-radius: 40px;
+      margin-left: 6px;
+    }
+
+    .reset-btn {
+      background: #ffb74d;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: bold;
+      color: #1e2f3e;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .reset-btn:hover {
+      background: #ffa01e;
+      transform: scale(0.97);
+    }
+
+    /* preguntas */
+    .questions-area {
+      padding: 1.8rem 2rem 2.5rem 2rem;
+      background: #fefefe;
+    }
+
+    .question-card {
+      background: #d0e0f0;
+      border-left: 8px solid #3a7ca5;
+      margin-bottom: 2rem;
+      padding: 1rem 1.5rem 1.3rem 1.5rem;
+      border-radius: 1.2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      transition: 0.1s;
+    }
+
+    .q-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .q-num {
+      background: #2c5a7a;
+      color: white;
+      padding: 0.2rem 0.7rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+    }
+
+    .q-text {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #1c2c38;
+      line-height: 1.4;
+      margin: 0.5rem 0 0.8rem 0;
+    }
+
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 0.8rem 0 0.4rem 0;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #eef2f7;
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: 0.1s;
+      border: 1px solid transparent;
+    }
+
+    .option.selected {
+      background: #cde5fb;
+      border-color: #2c7ab1;
+      box-shadow: 0 0 0 2px rgba(44, 122, 177, 0.2);
+    }
+
+    .option input {
+      margin: 0;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #2c7ab1;
+    }
+
+    .option label {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: #1f3b4a;
+      cursor: pointer;
+    }
+
+    .feedback {
+      font-size: 0.8rem;
+      margin-top: 0.6rem;
+      padding: 0.2rem 0;
+      font-weight: 500;
+    }
+
+    .feedback.correct {
+      color: #0f6e3f;
+    }
+
+    .feedback.incorrect {
+      color: #bc3900;
+    }
+
+    hr {
+      margin: 0.5rem 0;
+      border-color: #e2e8f0;
+    }
+
+    .footer-buttons {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 700px) {
+      .stats-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .stats-card {
+        justify-content: space-between;
+      }
+      .questions-area {
+        padding: 1.2rem;
+      }
+      .options {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="test-container">
+  <div class="stats-bar">
+    <div class="stats-card">
+      <div class="stat"><span>📋 Preguntas:</span><span id="total-count">24</span></div>
+      <div class="stat"><span>✅ Correctas:</span><span id="correct-count">0</span></div>
+      <div class="stat"><span>❌ Incorrectas:</span><span id="incorrect-count">0</span></div>
+    </div>
+    <button class="reset-btn" id="resetTest">🔄 Reiniciar test</button>
+  </div>
+
+  <div class="questions-area" id="questions-container"></div>
+</div>
+
+<script>
+  // ===================== BASE DE DATOS DE PREGUNTAS Y RESPUESTAS =====================
+  // Basado en el archivo "Guia de estudio preguntas.pdf" y "Respuestas test repaso.txt"
+  // Extraídas 24 preguntas completas (temas 2,3,4,1,5). Todas las respuestas segun soluciones.
+  const questionsData = [
+    { // 1
+      text: "¿Cuál es la puerta lógica cuya salida es '0' únicamente cuando todas sus entradas están en nivel alto ('1')?",
+      options: ["A) AND", "B) NOR", "C) NAND", "D) XOR"],
+      correct: "C) NAND"
+    },
+    { // 2
+      text: "Utilizando las leyes del Álgebra de Boole, ¿a qué expresión es equivalente A+ A*B?",
+      options: ["A) A + B", "B) A", "C) B", "D) AB"],
+      correct: "A) A + B"
+    },
+    { // 3
+      text: "En un Mapa de Karnaugh de 4 variables, ¿qué resulta de agrupar 8 celdas adyacentes con valor '1'?",
+      options: ["A) Un término con 2 variables.", "B) Un término con 1 sola variable.", "C) Un término con 3 variables.", "D) Una función constante igual a 1."],
+      correct: "B) Un término con 1 sola variable."
+    },
+    { // 4
+      text: "¿Cuál es la representación en binario del número decimal 25?",
+      options: ["A) 10101", "B) 11100", "C) 11001", "D) 11011"],
+      correct: "C) 11001"
+    },
+    { // 5
+      text: "¿Qué característica define primordialmente al Código Gray?",
+      options: ["A) Solo cambia un bit entre valores consecutivos.", "B) Es un código posicional pesado.", "C) Utiliza 4 bits para cada dígito decimal.", "D) No permite representación binaria."],
+      correct: "A) Solo cambia un bit entre valores consecutivos."
+    },
+    { // 6 (Tema3)
+      text: "¿Cuál de los siguientes dispositivos es un circuito exclusivamente combinacional?",
+      options: ["A) Registro de desplazamiento", "B) Multiplexor", "C) Contador síncrono", "D) Biestable tipo D."],
+      correct: "B) Multiplexor"
+    },
+    { // 7
+      text: "En un decodificador de 3 entradas y 8 salidas, ¿qué sucede si la entrada es el código binario 010?",
+      options: ["A) Se activa únicamente la salida número 2. (S2)", "B) Se activan las salidas S0 y S1 simultáneamente.", "C) Se activan todas las salidas excepto la S2.", "D) El dispositivo se apaga."],
+      correct: "A) Se activa únicamente la salida número 2. (S2)"
+    },
+    { // 8
+      text: "¿Qué diferencia técnica fundamental existe entre un semi-sumador (Half Adder) y un sumador completo (Full Adder)?",
+      options: ["A) El semi-sumador no genera acarreo.", "B) El sumador completo tiene una entrada para el acarreo previo (Cin).", "C) El sumador completo es secuencial.", "D) El semi-sumador suma 3 bits."],
+      correct: "B) El sumador completo tiene una entrada para el acarreo previo (Cin)."
+    },
+    { // 9
+      text: "¿Qué representa un 'minitérmino' en una función lógica?",
+      options: ["A) Un producto lógico que vale '1' para una sola combinación.", "B) Una suma que vale '0' para una sola combinación.", "C) La versión simplificada de la función.", "D) Una puerta lógica de tamaño reducido."],
+      correct: "A) Un producto lógico que vale '1' para una sola combinación."
+    },
+    { // 10
+      text: "¿Cuál es la función principal de la señal de reloj (Clock) en un sistema sincrónico?",
+      options: ["A) Proporcionar energía.", "B) Sincronizar el cambio de estado de los biestables.", "C) Borrar la memoria RAM.", "D) Aumentar la velocidad del bus."],
+      correct: "B) Sincronizar el cambio de estado de los biestables."
+    },
+    { // 11
+      text: "En un biestable tipo JK, ¿qué sucede si J=1 y K=1 durante el flanco de reloj?",
+      options: ["A) La salida se mantiene igual.", "B) La salida se pone a '0'.", "C) La salida conmuta al estado opuesto (Toggle).", "D) La salida entra en estado prohibido."],
+      correct: "C) La salida conmuta al estado opuesto (Toggle)."
+    },
+    { // 12
+      text: "¿Cuál es la diferencia operativa entre un Latch y un Flip-Flop?",
+      options: ["A) El Latch es sensible al nivel y el Flip-Flop al flanco.", "B) El Latch no tiene memoria.", "C) El Flip-Flop es analógico.", "D) No hay diferencia."],
+      correct: "A) El Latch es sensible al nivel y el Flip-Flop al flanco."
+    },
+    { // 13
+      text: "En un contador binario de 4 bits, ¿qué valor sigue al estado 1111 tras un pulso de reloj?",
+      options: ["A) 1000", "B) 0001", "C) 0000", "D) 1111 (se bloquea)."],
+      correct: "C) 0000"
+    },
+    { // 14
+      text: "¿Qué información define la Tabla de Estados de una FSM?",
+      options: ["A) El voltaje de los biestables.", "B) La relación entre estado actual, entradas y estado siguiente.", "C) La velocidad del reloj.", "D) La cantidad de compuertas AND."],
+      correct: "B) La relación entre estado actual, entradas y estado siguiente."
+    },
+    { // 15 TEMA 1
+      text: "¿Cuál es la premisa fundamental de la Arquitectura de Von Neumann?",
+      options: ["A) Datos e instrucciones comparten el mismo bus y memoria.", "B) Separación de memoria de datos e instrucciones.", "C) No usa CPU.", "D) Solo usa memoria ROM."],
+      correct: "A) Datos e instrucciones comparten el mismo bus y memoria."
+    },
+    { // 16
+      text: "¿Cuál es la función del Registro de Instrucción (IR)?",
+      options: ["A) Almacenar la dirección de la siguiente instrucción.", "B) Almacenar la instrucción que se está decodificando.", "C) Realizar sumas.", "D) Guardar datos del usuario."],
+      correct: "B) Almacenar la instrucción que se está decodificando."
+    },
+    { // 17
+      text: "¿Qué ocurre durante la fase de 'Fetch' (Búsqueda) del ciclo de instrucción?",
+      options: ["A) Se ejecuta la operación.", "B) La CPU trae la instrucción desde la memoria a la CPU.", "C) Se borra el registro PC.", "D) Se apaga el bus de datos."],
+      correct: "B) La CPU trae la instrucción desde la memoria a la CPU."
+    },
+    { // 18
+      text: "¿Qué determina el ancho del bus de datos?",
+      options: ["A) La cantidad de memoria direccionable.", "B) La cantidad de bits transferidos simultáneamente.", "C) La velocidad del ventilador.", "D) La capacidad del disco duro."],
+      correct: "B) La cantidad de bits transferidos simultáneamente."
+    },
+    { // 19
+      text: "¿Por qué los registros de la CPU son más rápidos que la RAM?",
+      options: ["A) Están integrados en la CPU y no usan buses externos.", "B) Son magnéticos.", "C) Son más grandes.", "D) No son volátiles."],
+      correct: "A) Están integrados en la CPU y no usan buses externos."
+    },
+    { // 20
+      text: "¿Qué representa la 'Localidad Temporal'?",
+      options: ["A) Cercanía física de datos.", "B) Tendencia a reutilizar un dato accedido recientemente.", "C) El tiempo de acceso al disco.", "D) La caducidad de la garantía."],
+      correct: "B) Tendencia a reutilizar un dato accedido recientemente."
+    },
+    { // 21
+      text: "¿Cuál es la función de la ALU?",
+      options: ["A) Decodificar instrucciones.", "B) Realizar cálculos y comparaciones.", "C) Guardar archivos.", "D) Controlar el monitor."],
+      correct: "B) Realizar cálculos y comparaciones."
+    },
+    { // 22 Tema 5 ensamblador
+      text: "Considere el siguiente fragmento de código en ensamblador x86 (sintaxis NASM): mov ax, 5 / mov bx, 5 / cmp ax, bx / je destino. ¿Qué registros internos o banderas se modifican críticamente con la instrucción 'cmp ax, bx' para que el salto 'je' sea efectivo?",
+      options: ["A) Se realiza una resta interna (AX - BX) sin alterar los registros destino, y se activa la Bandera de Cero (ZF = 1).", "B) El registro AX se pone en 0 de forma automática y se activa la Bandera de Acarreo (CF = 1).", "C) El registro BX se incrementa de forma transparente para forzar la igualdad y se apaga ZF.", "D) Se realiza una resta interna (AX - BX) sin alterar los registros destino, y se activa la Bandera de Cero (ZF = 0)."],
+      correct: "A) Se realiza una resta interna (AX - BX) sin alterar los registros destino, y se activa la Bandera de Cero (ZF = 1)."
+    },
+    { // 23
+      text: "Se ejecuta la siguiente secuencia de instrucciones aritméticas en un procesador x86: mov al, 0xFE / add al, 0x03. ¿Qué valor hexadecimal definitivo quedará almacenado en el registro de 8 bits AL tras la operación?",
+      options: ["A) 0x01.", "B) 0x101", "C) 0x00.", "D) 0xFF"],
+      correct: "A) 0x01."
+    },
+    { // 24
+      text: "Suponga que un programa en ensamblador ejecuta la instrucción 'sub cx, cx' con el objetivo de inicializar el registro, e inmediatamente después se introduce un bucle controlado por la instrucción primitiva 'loop'. ¿Qué impacto tiene esta estructura en el flujo de ejecución del procesador?",
+      options: ["A) El registro CX se establece en 0x0000; al procesar 'loop', este decrementa CX pasando a valer 0xFFFF (en 16 bits), forzando que el bucle itere de forma masiva 65,536 veces.", "B) El bucle se omite de forma instantánea por la CPU sin llegar a ejecutar ni una sola vez su bloque interno de instrucciones.", "C) Se dispara de manera inmediata una excepción por desbordamiento aritmético crítico que detiene la ejecución del sistema operativo.", "D) La CPU entra en un estado de bucle infinito puro de hardware que bloquea por completo las líneas del bus de control."],
+      correct: "A) El registro CX se establece en 0x0000; al procesar 'loop', este decrementa CX pasando a valer 0xFFFF (en 16 bits), forzando que el bucle itere de forma masiva 65,536 veces."
+    }
+  ];
+
+  // Estado de respuestas del usuario: almacena el texto de opción seleccionada (string) o null
+  let userAnswers = new Array(questionsData.length).fill(null);
+  // Almacenar si cada pregunta ya fue evaluada para mostrar feedback de acierto/error consistente
+  // Se recalcula dinámicamente con función computeStats, pero guardamos respuestas.
+
+  // Renderizar todo el test
+  function renderTest() {
+    const container = document.getElementById('questions-container');
+    if (!container) return;
+    let html = '';
+    questionsData.forEach((q, idx) => {
+      const selectedValue = userAnswers[idx];
+      // Determinar si la respuesta es correcta (si hay selección)
+      let isCorrect = null;
+      if (selectedValue !== null) {
+        isCorrect = (selectedValue === q.correct);
+      }
+      // clase extra opcional para borde feedback
+      html += `
+        <div class="question-card" data-qidx="${idx}">
+          <div class="q-title">
+            <span class="q-num">Pregunta ${idx+1}</span>
+          </div>
+          <div class="q-text">${escapeHtml(q.text)}</div>
+          <div class="options" id="options-${idx}">
+      `;
+      // generar opciones
+      q.options.forEach(opt => {
+        const checkedAttr = (selectedValue === opt) ? 'checked' : '';
+        html += `
+          <div class="option ${selectedValue === opt ? 'selected' : ''}" data-opt-text="${escapeHtml(opt)}" data-idx="${idx}" data-opt="${escapeHtml(opt)}">
+            <input type="radio" name="q${idx}" value="${escapeHtml(opt)}" id="q${idx}_${escapeHtml(opt).replace(/\s/g, '')}" ${checkedAttr}>
+            <label for="q${idx}_${escapeHtml(opt).replace(/\s/g, '')}">${escapeHtml(opt)}</label>
+          </div>
+        `;
+      });
+      html += `</div><div class="feedback" id="fb-${idx}"></div><hr>`;
+      html += `</div>`;
+    });
+    container.innerHTML = html;
+
+    // Agregar event listeners a los radios
+    for (let i = 0; i < questionsData.length; i++) {
+      const radios = document.querySelectorAll(`input[name="q${i}"]`);
+      radios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          const selectedOptionText = e.target.value;
+          // Actualizar estado
+          userAnswers[i] = selectedOptionText;
+          // Re-renderizar parcialmente el feedback y actualizar estadísticas, pero sin reconstruir todas las opciones (para mantener UI fluida)
+          updateSingleQuestionUI(i);
+          updateStatsAndCounters();
+        });
+      });
+    }
+    // inicializar feedbacks y resaltados después del primer render
+    for (let i = 0; i < questionsData.length; i++) {
+      updateSingleQuestionUI(i);
+    }
+    updateStatsAndCounters();
+  }
+
+  // Actualizar una sola tarjeta (feedback y resaltado visual del radio activo y estilo de opción)
+  function updateSingleQuestionUI(idx) {
+    const selected = userAnswers[idx];
+    const question = questionsData[idx];
+    // actualizar clase selected visual en los divs .option
+    const containerDiv = document.querySelector(`.question-card[data-qidx="${idx}"]`);
+    if (!containerDiv) return;
+    const optionDivs = containerDiv.querySelectorAll('.option');
+    optionDivs.forEach(div => {
+      const optValue = div.getAttribute('data-opt');
+      if (optValue === selected) {
+        div.classList.add('selected');
+        // asegurar radio checked
+        const radio = div.querySelector('input[type="radio"]');
+        if (radio && !radio.checked && selected) radio.checked = true;
+      } else {
+        div.classList.remove('selected');
+      }
+    });
+    // manejar feedback
+    const feedbackDiv = document.getElementById(`fb-${idx}`);
+    if (feedbackDiv) {
+      if (selected === null) {
+        feedbackDiv.innerHTML = '';
+        feedbackDiv.className = 'feedback';
+      } else {
+        const isCorrect = (selected === question.correct);
+        if (isCorrect) {
+          feedbackDiv.innerHTML = '✓ Respuesta correcta.';
+          feedbackDiv.className = 'feedback correct';
+        } else {
+          feedbackDiv.innerHTML = `✗ Incorrecto. Respuesta correcta: ${escapeHtml(question.correct)}`;
+          feedbackDiv.className = 'feedback incorrect';
+        }
+      }
+    }
+  }
+
+  // Calcular estadísticas y actualizar contadores (correctas, incorrectas)
+  function updateStatsAndCounters() {
+    let correct = 0;
+    let incorrect = 0;
+    for (let i = 0; i < questionsData.length; i++) {
+      const ans = userAnswers[i];
+      if (ans !== null) {
+        if (ans === questionsData[i].correct) {
+          correct++;
+        } else {
+          incorrect++;
+        }
+      }
+    }
+    const total = questionsData.length;
+    document.getElementById('total-count').innerText = total;
+    document.getElementById('correct-count').innerText = correct;
+    document.getElementById('incorrect-count').innerText = incorrect;
+  }
+
+  // Reiniciar todas las respuestas
+  function resetTest() {
+    userAnswers = new Array(questionsData.length).fill(null);
+    renderTest(); // reconstruye todo limpio
+  }
+
+  // Utilidad para evitar inyección XSS
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+      return c;
+    });
+  }
+
+  // Inicializar cuando cargue el DOM
+  document.addEventListener('DOMContentLoaded', () => {
+    renderTest();
+    const resetBtn = document.getElementById('resetTest');
+    if (resetBtn) resetBtn.addEventListener('click', resetTest);
+  });
+</script>
+</body>
+</html>
