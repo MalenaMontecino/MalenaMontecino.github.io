@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de Autoevaluación - Tema 4</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        h2 {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+        /* Marcador fijo en la parte superior */
+        .marcador-container {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            padding: 15px;
+            border-bottom: 2px solid #2980b9;
+            margin-bottom: 30px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .marcador {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .marcador div {
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        .total { background-color: #e8f4f8; color: #2980b9; }
+        .bien { background-color: #d4edda; color: #155724; }
+        .mal { background-color: #f8d7da; color: #721c24; }
+
+        .pregunta {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .pregunta-texto {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        .opciones {
+            list-style: none;
+            padding: 0;
+        }
+        .opcion-item {
+            margin-bottom: 8px;
+        }
+        .opcion-label {
+            display: block;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .opcion-label:hover {
+            background: #e9ecef;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.1);
+        }
+        /* Clases para feedback visual */
+        .correcta {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724 !important;
+            font-weight: bold;
+        }
+        .incorrecta {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24 !important;
+        }
+        .deshabilitada {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cuestionario de Autoevaluación</h1>
+    <h2>Tema 4: Enrutamiento, RouterOS y Protocolos de Capa 3</h2>
+
+    <div class="marcador-container">
+        <div class="marcador">
+            <div class="total">Respondidas: <span id="respondadas">0</span> / 15</div>
+            <div class="bien">Bien: <span id="correctas">0</span></div>
+            <div class="mal">Mal: <span id="incorrectas">0</span></div>
+        </div>
+    </div>
+
+    <form id="quizForm">
+        <div class="pregunta" id="p1">
+            <div class="pregunta-texto">1. ¿Qué aplicación nativa de MikroTik permite la gestión visual de protocolos desde la capa 3 a la 7 en tiempo real?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="a"> A) Cisco CLI.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="b"> B) WinBox.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="c"> C) VirtualBox.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="d"> D) RouterOS CHR.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p2">
+            <div class="pregunta-texto">2. ¿En qué capa del modelo OSI se lleva a cabo principalmente el proceso de encaminamiento IP (Routing)?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="a"> A) Capa 1: Física.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="b"> B) Capa 2: Enlace de Datos.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="c"> C) Capa 3: Red.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="d"> D) Capa 4: Transporte.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p3">
+            <div class="pregunta-texto">3. Si un host necesita enviar un paquete a una red externa (fuera de su dominio de broadcast), ¿a qué dirección IP debe enviarlo?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="a"> A) A la dirección de loopback (127.0.0.1).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="b"> B) A su puerta de enlace (Gateway).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="c"> C) A la dirección de broadcast limitado (255.255.255.255).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="d"> D) Directamente a la dirección MAC del servidor de destino.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p4">
+            <div class="pregunta-texto">4. Cuando un router consulta su tabla de enrutamiento y encuentra varias rutas posibles para un mismo destino, ¿cuál seleccionará?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="a"> A) La ruta que aparezca primero en la tabla por orden alfabético.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="b"> B) La ruta con la distancia métrica más alta.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="c"> C) La ruta más específica (la que tenga el prefijo de red más largo).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="d"> D) El modelo flag de dinámica (D) sobre la estática (S).</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p5">
+            <div class="pregunta-texto">5. En la tabla de rutas de un sistema RouterOS, ¿qué indica el Flag "A"?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="a"> A) Ruta Aprendida.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="b"> B) Ruta Activa.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="c"> C) Ruta de Área OSPF.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="d"> D) Ruta Automática.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p6">
+            <div class="pregunta-texto">6. ¿Qué notación se utiliza para representar la "Ruta por defecto" (Default Gateway) en una tabla de rutas IPv4?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="a"> A) 127.0.0.0/8.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="b"> B) 169.254.0.0/16.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="c"> C) 255.255.255.255/32.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="d"> D) 0.0.0.0/0.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p7">
+            <div class="pregunta-texto">7. ¿Cuál es el flag que etiqueta a las rutas que han sido introducidas manualmente por el administrador de la red?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="a"> A) D (Dinámica).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="b"> B) C (Conectada).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="c"> C) S (Estática).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="d"> D) I (Inválida).</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p8">
+            <div class="pregunta-texto">8. ¿Qué parámetro se utiliza para dar prioridad a una ruta sobre otra cuando ambas apuntan al mismo destino (Dst-Address)?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="a"> A) TTL.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="b"> B) Distancia.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="c"> C) Scope.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="d"> D) Gateway.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p9">
+            <div class="pregunta-texto">9. ¿Cuál es la función principal del campo TTL (Time to Live) en la cabecera de un paquete IP?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="a"> A) Aumentar la velocidad de transmisión en cada salto.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="b"> B) Identificar el protocolo de la capa de transporte (TCP/UDP).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="c"> C) Evitar que los paquetes circulen infinitamente en bucles de red.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="d"> D) Traducir direcciones IP privadas a públicas.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p10">
+            <div class="pregunta-texto">10. ¿Qué permite el mecanismo ECMP (Equal Cost Multi Path)?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="a"> A) Cifrar el tráfico entre routers de distintos fabricantes.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="b"> B) Tener más de un Gateway para un mismo destino, permitiendo balanceo de carga.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="c"> C) Reducir el TTL de los paquetes a cero automáticamente.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="d"> D) Conectar switches de capa 2 mediante el protocolo BGP.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p11">
+            <div class="pregunta-texto">11. ¿Qué tipo de NAT se utiliza normalmente para que los dispositivos de una red local privada puedan acceder a Internet?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="a"> A) Destination NAT (dst-nat).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="b"> B) Source NAT (src-nat).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="c"> C) Static NAT 1:1.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="d"> D) Firewall Filter Rules.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p12">
+            <div class="pregunta-texto">12. ¿Con qué periodicidad realiza comprobaciones el "Check-Gateway" para verificar si un siguiente salto es alcanzable?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="a"> A) Cada 1 segundo.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="b"> B) Cada 5 segundos.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="c"> C) Cada 10 segundos.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="d"> D) Cada 60 segundos.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p13">
+            <div class="pregunta-texto">13. ¿En qué se basa el protocolo dinámico OSPF para calcular la ruta más rápida hacia un destino?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="a"> A) En el número total de saltos (routers intermedios).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="b"> B) En el "Costo", que depende del ancho de banda de los enlaces.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="c"> C) En la dirección MAC del gateway más cercano.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="d"> D) Exclusivamente en la distancia configurada por el usuario.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p14">
+            <div class="pregunta-texto">14. Dentro de la jerarquía de OSPF, ¿cómo se llama el área central obligatoria a la que deben conectarse todas las demás áreas?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="a"> A) Área 0 (Backbone).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="b"> B) Área Stub (Ciega).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="c"> C) Sistema Autónomo (AS).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="d"> D) Área Estándar.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p15">
+            <div class="pregunta-texto">15. ¿Qué protocolo es el responsable principal del enrutamiento entre Sistemas Autónomos (AS) en el Internet global?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="a"> A) OSPF.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="b"> B) RIP v2.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="c"> C) IS-IS.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="d"> D) BGP.</label></li>
+            </ul>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Respuestas proporcionadas en la plantilla del usuario
+    const respuestasCorrectas = {
+        q1: 'b',
+        q2: 'c',
+        q3: 'b',
+        q4: 'c',
+        q5: 'b',
+        q6: 'd',
+        q7: 'c',
+        q8: 'b',
+        q9: 'c',
+        q10: 'b',
+        q11: 'b',
+        q12: 'c',
+        q13: 'b',
+        q14: 'c', // Se conserva la asignada en la plantilla provista por el usuario
+        q15: 'd'
+    };
+
+    let respondidas = 0;
+    let correctas = 0;
+    let incorrectas = 0;
+
+    const inputs = document.querySelectorAll('input[type="radio"]');
+
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const nombrePregunta = this.name;
+            const valorSeleccionado = this.value;
+            const respuestaCorrecta = respuestasCorrectas[nombrePregunta];
+            
+            const numPregunta = nombrePregunta.replace('q', '');
+            const bloquePregunta = document.getElementById('p' + numPregunta);
+            
+            // Inhabilitar las opciones de esta pregunta
+            const opcionesPregunta = bloquePregunta.querySelectorAll('input[type="radio"]');
+            opcionesPregunta.forEach(opt => {
+                opt.disabled = true;
+                opt.parentElement.classList.add('deshabilitada');
+            });
+
+            // Lógica de corrección y coloreado básico
+            if (valorSeleccionado === respuestaCorrecta) {
+                correctas++;
+                this.parentElement.classList.add('correcta');
+            } else {
+                incorrectas++;
+                this.parentElement.classList.add('incorrecta');
+                // Revelar la alternativa correcta de apoyo al estudio
+                opcionesPregunta.forEach(opt => {
+                    if (opt.value === respuestaCorrecta) {
+                        opt.parentElement.classList.add('correcta');
+                    }
+                });
+            }
+
+            // Actualizar el panel superior
+            respondidas++;
+            document.getElementById('respondadas').innerText = respondidas;
+            document.getElementById('correctas').innerText = correctas;
+            document.getElementById('incorrectas').innerText = incorrectas;
+        });
+    });
+</script>
+
+</body>
+</html>

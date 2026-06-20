@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de Autoevaluación - Tema 2</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        h2 {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+        .seccion-titulo {
+            background-color: #34495e;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+        /* Marcador fijo en la parte superior */
+        .marcador-container {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            padding: 15px;
+            border-bottom: 2px solid #2980b9;
+            margin-bottom: 30px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .marcador {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .marcador div {
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        .total { background-color: #e8f4f8; color: #2980b9; }
+        .bien { background-color: #d4edda; color: #155724; }
+        .mal { background-color: #f8d7da; color: #721c24; }
+
+        .pregunta {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .pregunta-texto {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        .opciones {
+            list-style: none;
+            padding: 0;
+        }
+        .opcion-item {
+            margin-bottom: 8px;
+        }
+        .opcion-label {
+            display: block;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .opcion-label:hover {
+            background: #e9ecef;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.1);
+        }
+        /* Clases para el feedback del resultado */
+        .correcta {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724 !important;
+            font-weight: bold;
+        }
+        .incorrecta {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24 !important;
+        }
+        .deshabilitada {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cuestionario de Autoevaluación</h1>
+    <h2>Tema 2: Capa de Enlace de Datos y Conmutación</h2>
+
+    <div class="marcador-container">
+        <div class="marcador">
+            <div class="total">Respondidas: <span id="respondadas">0</span> / 15</div>
+            <div class="bien">Bien: <span id="correctas">0</span></div>
+            <div class="mal">Mal: <span id="incorrectas">0</span></div>
+        </div>
+    </div>
+
+    <form id="quizForm">
+        <div class="pregunta" id="p1">
+            <div class="pregunta-texto">1. ¿Cómo se denomina la unidad de datos (PDU) específica de la Capa 2 o de enlace?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="a"> A) Segmento.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="b"> B) Paquete.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="c"> C) Trama.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="d"> D) Bits.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p2">
+            <div class="pregunta-texto">2. ¿Cuál es una característica fundamental de las direcciones MAC?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="a"> A) Son direcciones lógicas que cambian según la red.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="b"> B) Son enrutables entre diferentes redes de Internet.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="c"> C) Son identificadores físicos únicos grabados por el fabricante.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="d"> D) Se expresan siempre en formato binario de 32 bits.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p3">
+            <div class="pregunta-texto">3. En una arquitectura de red Peer to Peer (P2P):</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="a"> A) Los clientes dependen siempre de un servidor central de datos.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="b"> B) Existe un punto único de fallo que colapsa toda la comunicación.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="c"> C) El servidor es el único que puede ofrecer servicios de red.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="d"> D) Todos los nodos pueden actuar como cliente y servidor simultáneamente.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p4">
+            <div class="pregunta-texto">4. ¿Qué acción realiza un switch si recibe una trama con una dirección MAC de destino que no figura en su tabla de conmutación?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="a"> A) Descarta la trama automáticamente por seguridad.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="b"> B) Realiza un proceso de "flooding" o inundación por todos los puertos menos el de origen.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="c"> C) Envía una petición ARP al router para localizar al host.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="d"> D) Almacena la trama hasta que el host de destino se identifique.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p5">
+            <div class="pregunta-texto">5. ¿Qué dispositivo tiene la capacidad de separar dominios de colisión en cada uno de sus puertos pero propaga los dominios de broadcast?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="a"> A) Hub (Concentrador).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="b"> B) Switch (Conmutador).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="c"> C) Router (Encaminador).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="d"> D) Conversor de medios.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p6">
+            <div class="pregunta-texto">6. ¿Cuál es la función principal del protocolo ARP en una red local?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="a"> A) Evitar la formación de bucles lógicos en la topología.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="b"> B) Segmentar la red física en varias redes virtuales.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="c"> C) Relacionar una dirección IP conocida con su dirección MAC física correspondiente.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="d"> D) Asignar direcciones IP automáticas a los nuevos hosts que se conectan.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p7">
+            <div class="pregunta-texto">7. ¿Qué protocolo se encarga de evitar tormentas de broadcast desactivando enlaces redundantes en una red de switches?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="a"> A) Ethernet (802.3).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="b"> B) STP (Spanning Tree Protocol).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="c"> C) 802.1Q (VLAN Tagging).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="d"> D) Q-in-Q.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p8">
+            <div class="pregunta-texto">8. En el etiquetado de VLANs (estándar 802.1Q), ¿cuántos bytes se añaden a la cabecera Ethernet para identificar la red virtual?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="a"> A) 2 bytes.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="b"> B) 4 bytes.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="c"> C) 6 bytes.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="d"> D) 8 bytes.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p9">
+            <div class="pregunta-texto">9. ¿Qué diferencia a un puerto en modo "Trunk" de uno en modo "Access"?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="a"> A) El puerto Trunk solo permite tráfico de una única VLAN sin etiqueta.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="b"> B) El puerto Trunk puede transportar tráfico de múltiples VLANs mediante etiquetas (tagged).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="c"> C) El puerto Access es el que se utiliza para interconectar dos routers.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="d"> D) El modo Access permite encapsular una VLAN dentro de otra (Q-in-Q).</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p10">
+            <div class="pregunta-texto">10. ¿Qué información es capaz de analizar un switch convencional de Capa 2 para tomar decisiones de reenvío?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="a"> A) Las direcciones MAC origen y destino de la trama Ethernet.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="b"> B) Las direcciones IP origen y destino del paquete.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="c"> C) El puerto de la aplicación (como el puerto 80 para web).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="d"> D) El contenido cifrado de los datos del usuario.</label></li>
+            </ul>
+        </div>
+
+        <div class="seccion-titulo">Ampliación del Cuestionario - Tema 2 (Secciones 5 y 6)</div>
+
+        <div class="pregunta" id="p11">
+            <div class="pregunta-texto">11. ¿Qué característica define principalmente a la capa 2 en las redes domésticas actuales?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="a"> A) El uso de segmentación compleja mediante múltiples VLANs por habitación.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="b"> B) La implementación de enrutamiento dinámico entre los dispositivos finales.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="c"> C) Un diseño de red simple y plano con un único dominio de broadcast.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="d"> D) La eliminación total del tráfico ARP para mejorar la velocidad.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p12">
+            <div class="pregunta-texto">12. En el ámbito de los proveedores de servicios (ISP), ¿cómo se suele gestionar el tráfico de los clientes en la capa de acceso?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="a"> A) Conectando a todos los usuarios en un único dominio de colisión masivo.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="b"> B) Utilizando una VLAN específica por cada cliente o tipo de servicio (Internet, TV, voz).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="c"> C) Prohibiendo el uso de direcciones MAC en la red de fibra.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="d"> D) Configurando todos los puertos de la OLT en modo "Untagged" global.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p13">
+            <div class="pregunta-texto">13. ¿Cuál de estos fallos se describe como un problema típico de capa 2 donde una dirección MAC oscila constantemente entre diferentes puertos de un switch?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="a"> A) Tormenta de broadcast.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="b"> B) Saturación de enlaces por QoS.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="c"> C) MAC flapping.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="d"> D) Inundación de tramas Unicast.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p14">
+            <div class="pregunta-texto">14. Según las fuentes, ¿cuál es la principal razón por la que la Capa 2 se considera insegura por naturaleza?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="a"> A) Porque las direcciones MAC no pueden ser modificadas por el usuario.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="b"> B) Porque el uso de broadcast expone la información a cualquier nodo del dominio y falta autenticación nativa.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="c"> C) Porque los switches no son capaces de leer las direcciones IP de los paquetes.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="d"> D) Porque los cables de red no permiten el cifrado de datos en la capa física.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p15">
+            <div class="pregunta-texto">15. ¿Qué dispositivo actúa como la frontera definitiva para separar y limitar los dominios de broadcast en una red?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="a"> A) Switch de Capa 2 (L2).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="b"> B) Bridge o puente de red.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="c"> C) Router (Capa 3).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="d"> D) Hub o concentrador de puertos.</label></li>
+            </ul>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Diccionario con la plantilla de respuestas correctas
+    const respuestasCorrectas = {
+        q1: 'c', q2: 'c', q3: 'd', q4: 'b', q5: 'b',
+        q6: 'c', q7: 'b', q8: 'b', q9: 'b', q10: 'a',
+        q11: 'c', q12: 'b', q13: 'c', q14: 'b', q15: 'c'
+    };
+
+    let respondidas = 0;
+    let correctas = 0;
+    let incorrectas = 0;
+
+    // Capturar todos los radio buttons del formulario
+    const inputs = document.querySelectorAll('input[type="radio"]');
+
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const nombrePregunta = this.name; // Ej: "q1"
+            const valorSeleccionado = this.value; // Ej: "a", "b", "c", "d"
+            const respuestaCorrecta = respuestasCorrectas[nombrePregunta];
+            
+            // Obtener el div contenedor de la pregunta
+            const numPregunta = nombrePregunta.replace('q', '');
+            const bloquePregunta = document.getElementById('p' + numPregunta);
+            
+            // Bloquear las opciones de esta pregunta para evitar cambios
+            const opcionesPregunta = bloquePregunta.querySelectorAll('input[type="radio"]');
+            opcionesPregunta.forEach(opt => {
+                opt.disabled = true;
+                opt.parentElement.classList.add('deshabilitada');
+            });
+
+            // Comprobación de acierto/error
+            if (valorSeleccionado === respuestaCorrecta) {
+                correctas++;
+                this.parentElement.classList.add('correcta');
+            } else {
+                incorrectas++;
+                this.parentElement.classList.add('incorrecta');
+                // Revelar la opción correcta en verde para ayudar al estudio
+                opcionesPregunta.forEach(opt => {
+                    if (opt.value === respuestaCorrecta) {
+                        opt.parentElement.classList.add('correcta');
+                    }
+                });
+            }
+
+            // Actualizar contadores del marcador superior
+            respondidas++;
+            document.getElementById('respondadas').innerText = respondidas;
+            document.getElementById('correctas').innerText = correctas;
+            document.getElementById('incorrectas').innerText = incorrectas;
+        });
+    });
+</script>
+
+</body>
+</html>

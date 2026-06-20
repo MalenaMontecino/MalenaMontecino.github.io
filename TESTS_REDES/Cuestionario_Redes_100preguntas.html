@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cuestionario · Redes · Grado en Ciberseguridad</title>
+<style>
+  :root{
+    --bg:#0f1419;
+    --card:#1a212b;
+    --card-border:#2a3441;
+    --text:#e8edf2;
+    --text-dim:#9aa7b5;
+    --accent:#3b82f6;
+    --accent2:#8b5cf6;
+    --green:#22c55e;
+    --green-bg:rgba(34,197,94,0.14);
+    --red:#ef4444;
+    --red-bg:rgba(239,68,68,0.14);
+    --amber:#f59e0b;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1200px 800px at 50% -200px, #1b2330 0%, var(--bg) 60%);
+    color:var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding-bottom:80px;
+    min-height:100vh;
+  }
+  header{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter: blur(14px);
+    background:rgba(15,20,25,0.88);
+    border-bottom:1px solid var(--card-border);
+    padding:14px 16px 12px;
+  }
+  .title{
+    font-size:15px; font-weight:700; letter-spacing:.2px;
+    color:var(--text); margin:0 0 10px 0; text-align:center;
+  }
+  .title small{display:block; font-weight:400; color:var(--text-dim); font-size:12px; margin-top:2px;}
+  .stats{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:720px; margin:0 auto;
+  }
+  .stat{
+    background:var(--card); border:1px solid var(--card-border); border-radius:14px;
+    padding:8px 6px; text-align:center;
+  }
+  .stat .num{font-size:18px; font-weight:800; line-height:1.1;}
+  .stat .lbl{font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.4px; margin-top:2px;}
+  .stat.progress .num{color:var(--accent);}
+  .stat.ok .num{color:var(--green);}
+  .stat.bad .num{color:var(--red);}
+  .barwrap{max-width:720px; margin:10px auto 0; height:8px; background:#222b36; border-radius:6px; overflow:hidden;}
+  .bar{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .35s ease;}
+
+  main{max-width:760px; margin:0 auto; padding:18px 14px 10px;}
+
+  .qcard{
+    background:var(--card); border:1px solid var(--card-border); border-radius:18px;
+    padding:16px; margin-bottom:16px; transition:border-color .25s, background .25s;
+  }
+  .qcard.correct{border-color:var(--green); background:linear-gradient(0deg, var(--green-bg), var(--green-bg)), var(--card);}
+  .qcard.incorrect{border-color:var(--red); background:linear-gradient(0deg, var(--red-bg), var(--red-bg)), var(--card);}
+
+  .qmeta{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+  .qnum{font-size:12px; font-weight:700; color:var(--text-dim);}
+  .qtag{font-size:10px; font-weight:700; padding:3px 8px; border-radius:99px; background:rgba(139,92,246,0.18); color:#c4b5fd; letter-spacing:.3px;}
+  .qtext{font-size:16px; font-weight:600; line-height:1.4; margin:2px 0 12px;}
+
+  .opt{
+    display:flex; align-items:flex-start; gap:10px;
+    border:1.5px solid var(--card-border); border-radius:12px;
+    padding:11px 12px; margin-bottom:8px; cursor:pointer;
+    -webkit-user-select:none; user-select:none;
+    transition:border-color .15s, background .15s;
+  }
+  .opt:active{background:rgba(255,255,255,0.04);}
+  .opt.selected{border-color:var(--accent); background:rgba(59,130,246,0.10);}
+  .opt.locked{cursor:default;}
+  .opt.show-correct{border-color:var(--green); background:var(--green-bg);}
+  .opt.show-wrong{border-color:var(--red); background:var(--red-bg);}
+
+  .checkmark{
+    flex:0 0 20px; width:20px; height:20px; margin-top:1px;
+    border-radius:6px; border:2px solid #4b5868;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:transparent;
+  }
+  .opt.single .checkmark{border-radius:50%;}
+  .opt.selected .checkmark{border-color:var(--accent); background:var(--accent); color:white;}
+  .opt.show-correct .checkmark{border-color:var(--green); background:var(--green); color:white;}
+  .opt.show-wrong .checkmark{border-color:var(--red); background:var(--red); color:white;}
+  .opttext{font-size:14.5px; line-height:1.35; color:var(--text);}
+
+  .multihint{font-size:11.5px; color:var(--amber); font-weight:700; margin:-4px 0 12px; display:flex; align-items:center; gap:5px;}
+
+  .actions{display:flex; gap:10px; margin-top:4px;}
+  .btn{
+    flex:1; border:none; border-radius:12px; padding:12px 14px; font-size:14.5px; font-weight:700;
+    background:var(--accent); color:white; cursor:pointer;
+  }
+  .btn:disabled{opacity:.35;}
+  .btn.secondary{background:#2a3441; color:var(--text-dim);}
+
+  .feedback{
+    margin-top:12px; padding:12px 13px; border-radius:12px; font-size:13.5px; line-height:1.45;
+  }
+  .feedback.ok{background:var(--green-bg); color:#86efac; border:1px solid rgba(34,197,94,0.35);}
+  .feedback.bad{background:var(--red-bg); color:#fca5a5; border:1px solid rgba(239,68,68,0.35);}
+  .feedback b{display:block; margin-bottom:3px; font-size:13px;}
+
+  .footer-final{
+    max-width:760px; margin:10px auto 30px; padding:20px; text-align:center;
+    background:var(--card); border:1px solid var(--card-border); border-radius:18px;
+  }
+  .footer-final h2{margin:0 0 6px; font-size:18px;}
+  .footer-final p{color:var(--text-dim); font-size:13px; margin:0 0 14px;}
+  .resetbtn{
+    border:1px solid var(--card-border); background:transparent; color:var(--text-dim);
+    border-radius:12px; padding:10px 18px; font-size:13px; font-weight:700; cursor:pointer;
+  }
+  .jump{
+    position:fixed; right:14px; bottom:18px; z-index:60;
+    background:var(--accent); color:white; border:none; border-radius:50%;
+    width:50px; height:50px; font-size:20px; box-shadow:0 6px 18px rgba(59,130,246,0.4);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="title">Cuestionario de Redes
+    <small>Grado en Ciberseguridad · 100 preguntas</small>
+  </p>
+  <div class="stats">
+    <div class="stat progress"><div class="num" id="statProgress">0%</div><div class="lbl">Progreso</div></div>
+    <div class="stat ok"><div class="num" id="statOk">0%</div><div class="lbl">Aciertos</div></div>
+    <div class="stat bad"><div class="num" id="statBad">0%</div><div class="lbl">Fallos</div></div>
+  </div>
+  <div class="barwrap"><div class="bar" id="progressBar"></div></div>
+</header>
+
+<main id="quiz"></main>
+
+<div class="footer-final" id="finalBox" style="display:none;">
+  <h2 id="finalTitle">¡Cuestionario completado!</h2>
+  <p id="finalSub"></p>
+  <button class="resetbtn" onclick="resetQuiz()">Reiniciar cuestionario</button>
+</div>
+
+<button class="jump" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="Subir arriba">↑</button>
+
+<script>
+const QUESTIONS = [{"q": "¿Cuántas capas hay en el modelo OSI y en el modelo TCP/IP?", "opts": ["7 en OSI y 5 en TCP/IP", "4 en OSI y 7 en TCP/IP", "7 en OSI y 4 en TCP/IP", "8 en OSI y 4 en TCP/IP"], "correct": [2], "multi": false, "explain": "El temario indica que OSI divide la comunicación en siete capas, mientras que TCP/IP agrupa esas mismas funciones en cuatro capas."}, {"q": "Si hablamos de Ethernet, hablamos de:", "opts": ["Solo el cable de cobre UTP con conectores RJ45", "Tanto de cable de cobre UTP como de fibra de todo tipo", "De cable de cobre UTP y fibra multimodo, no monomodo", "De cable de cobre como de fibra, multimodo o monomodo, y del estándar PoE"], "correct": [3], "multi": false, "explain": "El temario aclara que Ethernet abarca tanto cobre UTP como fibra óptica (multimodo o monomodo) y también el estándar PoE."}, {"q": "Ethernet es el protocolo que define:", "opts": ["Funcionamiento de cable de cobre y cable de fibra óptica", "Funcionamiento de cable de cobre y fibra óptica, así como WiFi y WiMAX", "Funcionamiento de cables (cobre y fibra óptica) y WiFi, no WiMAX", "Solo el funcionamiento del cable de cobre"], "correct": [0], "multi": false, "explain": "Ethernet (IEEE 802.3) define el funcionamiento de los medios cableados, cobre y fibra óptica; WiFi y WiMAX son estándares distintos (802.11 y 802.16)."}, {"q": "Qué afecta negativamente a la comunicación mediante radiofrecuencia:", "opts": ["Alta atenuación, bien por exceso de distancia o por frecuencia baja", "Distancia corta, equipos muy cerca y/o frecuencia baja", "Distancia alta, equipos muy lejanos y/o frecuencia alta", "Alta atenuación y/o interferencias"], "correct": [3], "multi": false, "explain": "El temario señala que la atenuación afecta a la radiofrecuencia, y junto a ella las interferencias son el otro factor que degrada la comunicación inalámbrica."}, {"q": "En el uso del espectro radioeléctrico para enlaces de radiofrecuencia se regula:", "opts": ["Potencia de transmisión y DFS", "DFS y frecuencias usables", "Potencia de transmisión/recepción y frecuencias usables", "Potencia de transmisión, frecuencias usables y DFS"], "correct": [3], "multi": false, "explain": "La regulación del espectro radioeléctrico abarca la potencia de transmisión/recepción, las frecuencias usables y el DFS (selección dinámica de frecuencia para evitar radares)."}, {"q": "Las direcciones MAC son:", "opts": ["Enrutables entre redes", "Aparecen en la trama de datos, una de origen y una de destino", "La dirección física que tiene cada equipo en la capa de red", "Solo se pueden incorporar en fibra óptica"], "correct": [1], "multi": false, "explain": "El temario indica que las direcciones MAC aparecen en la trama (capa 2), con una dirección de origen y una de destino, y no son enrutables entre redes."}, {"q": "¿Cuántos hosts utilizables tiene una subred /26 en IPv4?", "opts": ["30", "62", "126", "254"], "correct": [1], "multi": false, "explain": "Una subred /26 deja 6 bits de host: 2⁶ − 2 = 62 hosts utilizables, restando la dirección de red y la de broadcast."}, {"q": "Quiero obtener al menos 8 subredes en la red base 192.168.10.0/24. ¿Qué prefijo mínimo necesito?", "opts": ["/25", "/26", "/27", "/28"], "correct": [2], "multi": false, "explain": "Para obtener al menos 8 subredes (2³=8) se necesitan 3 bits adicionales sobre /24, resultando en un prefijo /27."}, {"q": "¿Cuál es la red de 10.1.5.123/20?", "opts": ["10.1.0.0", "10.1.16.0", "10.1.5.0", "10.1.4.0"], "correct": [0], "multi": false, "explain": "Con prefijo /20 el tercer octeto se agrupa en bloques de 16; como 5 está entre 0 y 15, la red resultante es 10.1.0.0."}, {"q": "Si necesito una subred para 50 hosts, ¿qué prefijo mínimo necesito?", "opts": ["/27", "/26", "/25", "/24"], "correct": [1], "multi": false, "explain": "Con /27 solo hay 2⁵−2=30 hosts, insuficiente; con /26 hay 2⁶−2=62 hosts, suficiente para 50 equipos, siendo el prefijo mínimo válido."}, {"q": "Selecciona las DOS afirmaciones correctas sobre TCP y UDP (selecciona 2 respuestas):", "opts": ["TCP es orientado a conexión y UDP no", "UDP es más rápido pero no garantiza entrega ni orden", "TCP nunca se usa para servicios web", "UDP siempre cifra los datos transmitidos"], "correct": [0, 1], "multi": true, "explain": "El temario indica que TCP es orientado a conexión y garantiza entrega, mientras que UDP es más rápido pero no garantiza ni entrega ni orden."}, {"q": "¿Cuál de las siguientes es una simplificación válida para la dirección IPv6 original 2001:0db8:0000:0000:0000:ff00:0042:8329?", "opts": ["2001:db8::ff00:42:8329", "2001:db8:0:0:0:ff00:42:8329", "2001::db8:ff00:42:8329", "2001:db8:::ff00:42:8329"], "correct": [0], "multi": false, "explain": "La simplificación válida elimina ceros a la izquierda y comprime el único bloque de ceros consecutivos con '::', resultando en 2001:db8::ff00:42:8329."}, {"q": "¿Qué modelo refleja mejor la implementación real de las redes actuales?", "opts": ["El modelo OSI de siete capas", "El modelo TCP/IP de cuatro capas", "Ambos modelos por igual", "Ninguno, son solo teoría"], "correct": [1], "multi": false, "explain": "El temario afirma que TCP/IP refleja la implementación real, mientras que OSI facilita el análisis conceptual de la comunicación."}, {"q": "¿Qué capa del modelo TCP/IP agrupa las funciones de las capas física y de enlace de OSI?", "opts": ["Capa de transporte", "Capa de Internet", "Capa de acceso a red", "Capa de aplicación"], "correct": [2], "multi": false, "explain": "El modelo TCP/IP se organiza en capa de acceso a red, capa de Internet, capa de transporte y capa de aplicación."}, {"q": "Según el temario, ¿qué unidad de datos maneja la capa de Transporte?", "opts": ["Bits", "Tramas", "Segmentos", "Paquetes"], "correct": [2], "multi": false, "explain": "Cada capa maneja una unidad de datos distinta: aplicación usa datos, transporte usa segmentos, red usa paquetes y enlace usa tramas."}, {"q": "¿Qué unidad de datos corresponde a la capa de Red?", "opts": ["Trama", "Paquete", "Segmento", "Bit"], "correct": [1], "multi": false, "explain": "El temario especifica que la capa de Red maneja paquetes, mientras que la capa de Enlace maneja tramas y la Física maneja bits."}, {"q": "¿Qué unidad de datos corresponde a la capa de Enlace de datos?", "opts": ["Datos", "Segmento", "Trama", "Paquete"], "correct": [2], "multi": false, "explain": "El temario especifica que la unidad de datos de la capa 2 (Enlace) es la trama, que encapsula el paquete de capa 3."}, {"q": "Durante la encapsulación de datos, ¿en qué host se genera el proceso?", "opts": ["En el host origen de la comunicación", "En el host destino de la comunicación", "En cualquier router intermedio", "En el servidor DNS de la red"], "correct": [0], "multi": false, "explain": "El temario indica que la encapsulación ocurre en el host origen, mientras que la desencapsulación es el proceso inverso en el destino."}, {"q": "¿Qué ocurre durante la desencapsulación de datos en el destino?", "opts": ["Cada capa añade su propia cabecera", "Cada capa elimina su información y los datos ascienden por la pila", "Los datos se cifran capa a capa", "Se genera una nueva trama Ethernet"], "correct": [1], "multi": false, "explain": "El temario describe la desencapsulación como el proceso inverso a la encapsulación, donde cada capa elimina su información y los datos ascienden por la pila."}, {"q": "¿Qué diferencia existe entre cobre, fibra y radio como medios de transmisión?", "opts": ["Cobre es económico pero limitado en distancia; fibra ofrece alta velocidad y baja latencia; radio es flexible pero sensible a interferencias", "Cobre es el medio más rápido siempre disponible", "Fibra es el medio más barato del mercado", "Radio nunca sufre interferencias de ningún tipo"], "correct": [0], "multi": false, "explain": "El temario resume que cada medio tiene usos concretos: cobre económico y limitado, fibra rápida con baja latencia, y radio flexible pero sensible a interferencias."}, {"q": "¿Qué son los módulos ópticos BiDi?", "opts": ["Módulos que permiten transmisión bidireccional usando una sola fibra con dos longitudes de onda", "Módulos que solo permiten recibir datos por fibra", "Conectores RJ45 especiales para fibra óptica", "Cables de cobre con doble blindaje"], "correct": [0], "multi": false, "explain": "Los módulos BiDi permiten transmisión bidireccional utilizando una sola fibra, empleando dos longitudes de onda distintas para reducir el número de fibras necesarias."}, {"q": "¿Qué longitudes de onda se mencionan como más comunes en fibra óptica?", "opts": ["850 nm, 1310 nm y 1550 nm", "100 nm, 200 nm y 300 nm", "1000 nm, 2000 nm y 3000 nm", "10 nm, 50 nm y 90 nm"], "correct": [0], "multi": false, "explain": "El temario indica que las longitudes de onda más comunes en fibra óptica son 850 nm, 1310 nm y 1550 nm, según el tipo de enlace."}, {"q": "¿Qué es un Hub y su relación con la capa física?", "opts": ["Dispositivo de capa 1 que replica la señal a todos los puertos sin filtrar tráfico", "Dispositivo de capa 3 que enruta paquetes entre redes", "Dispositivo de capa 7 que filtra aplicaciones", "Dispositivo de capa 2 que aprende direcciones MAC"], "correct": [0], "multi": false, "explain": "El Hub es un dispositivo de capa 1 que no interpreta tramas ni direcciones, simplemente replica la señal a todos los puertos sin filtrar tráfico."}, {"q": "¿Cuál de los siguientes es un problema típico de la capa física?", "opts": ["Cables dañados, interferencias eléctricas o conectores defectuosos", "Tablas de rutas mal configuradas", "Registros DNS incorrectos", "Reglas de firewall mal definidas"], "correct": [0], "multi": false, "explain": "El temario lista como problemas típicos de la capa 1 los cables dañados, interferencias eléctricas, conectores defectuosos y exceso de distancia."}, {"q": "¿Qué describe mejor la latencia en transmisión de datos?", "opts": ["La capacidad máxima de transmisión del medio", "El tiempo que tarda la señal en viajar de origen a destino", "La degradación de la señal por el medio", "El número de bits que caben en un paquete"], "correct": [1], "multi": false, "explain": "El temario diferencia ancho de banda (capacidad máxima), latencia (tiempo de viaje de la señal) y pérdidas (degradación de la señal)."}, {"q": "¿Cómo se identifican los dispositivos en la capa de Enlace de datos?", "opts": ["Mediante direcciones IP", "Mediante direcciones MAC", "Mediante números de puerto", "Mediante nombres de dominio"], "correct": [1], "multi": false, "explain": "La capa de Enlace de datos identifica los dispositivos mediante direcciones MAC, que son direcciones físicas asignadas normalmente por el fabricante."}, {"q": "¿Dónde se utilizan las direcciones MAC?", "opts": ["Dentro de la red local únicamente", "Para enrutar tráfico entre distintos países", "Como identificador único en Internet global", "Para resolver nombres de dominio"], "correct": [0], "multi": false, "explain": "El temario aclara que las direcciones MAC se utilizan dentro de la red local y no son enrutables entre redes distintas."}, {"q": "¿Qué función cumple la capa de Enlace de datos respecto al medio compartido?", "opts": ["Cifra todo el tráfico de la red", "Controla el acceso al medio compartido evitando colisiones", "Traduce nombres de dominio a IPs", "Calcula la ruta más corta entre routers"], "correct": [1], "multi": false, "explain": "El temario indica que la capa 2 gestiona el acceso al medio compartido para evitar colisiones entre transmisiones simultáneas."}, {"q": "¿Qué protocolo se usa para resolver una IP a su dirección MAC en una red local?", "opts": ["DNS", "DHCP", "ARP", "SNMP"], "correct": [2], "multi": false, "explain": "ARP (Address Resolution Protocol) resuelve direcciones IP a direcciones MAC dentro de una red local cuando un equipo necesita comunicarse con otra IP."}, {"q": "En una trama Ethernet capturada, ¿qué tipo de mensaje indica que un equipo pregunta '¿quién tiene esta IP?'", "opts": ["ARP Request", "ARP Reply", "DNS Query", "DHCP Discover"], "correct": [0], "multi": false, "explain": "Un ARP Request es el mensaje que lanza un equipo preguntando quién tiene una IP concreta; el ARP Reply es la respuesta con la MAC correspondiente."}, {"q": "Selecciona las DOS afirmaciones correctas sobre direcciones privadas RFC 1918 (selecciona 2 respuestas):", "opts": ["No son enrutables en Internet", "Permiten ahorrar direcciones públicas", "Son asignadas por la IANA a cada empresa", "Son siempre del rango 127.0.0.0/8"], "correct": [0, 1], "multi": true, "explain": "El temario explica que las direcciones privadas (RFC 1918) no son enrutables en Internet y permiten ahorrar direcciones públicas reutilizándose en redes privadas."}, {"q": "¿Qué diferencia principal existe entre un router y un switch?", "opts": ["El switch trabaja con IP y el router con MAC", "El switch trabaja con MAC dentro de una red y el router con IP entre redes distintas", "Ambos trabajan exclusivamente con direcciones IP", "Ambos reenvían exclusivamente tramas"], "correct": [1], "multi": false, "explain": "El temario resume que el switch trabaja con MAC y opera dentro de una red reenviando tramas, mientras que el router trabaja con IP y conecta redes distintas reenviando paquetes."}, {"q": "¿Qué hace un router al recibir un paquete IP?", "opts": ["Lo descarta automáticamente", "Analiza la IP de destino, consulta su tabla de rutas y reenvía el paquete", "Lo convierte en una trama ARP", "Lo reenvía sin analizar el destino"], "correct": [1], "multi": false, "explain": "El funcionamiento básico de un router es recibir el paquete, analizar la IP de destino, consultar su tabla de rutas y reenviarlo a la siguiente red."}, {"q": "¿Qué rango de direcciones IPv4 corresponde al loopback?", "opts": ["10.0.0.0/8", "127.0.0.0/8", "169.254.0.0/16", "192.168.0.0/16"], "correct": [1], "multi": false, "explain": "El temario indica que 127.0.0.0/8 está reservado para loopback, mientras que 169.254.0.0/16 se usa para autoconfiguración de enlace local."}, {"q": "¿Cuáles son los tres rangos de direcciones privadas definidos por RFC 1918?", "opts": ["10.0.0.0/8, 172.16.0.0/12 y 192.168.0.0/16", "8.0.0.0/8, 172.0.0.0/12 y 192.0.0.0/16", "10.0.0.0/16, 172.16.0.0/8 y 192.168.0.0/12", "127.0.0.0/8, 169.254.0.0/16 y 224.0.0.0/4"], "correct": [0], "multi": false, "explain": "El RFC 1918 define como direcciones privadas los rangos 10.0.0.0/8, 172.16.0.0/12 y 192.168.0.0/16, no enrutables en Internet."}, {"q": "¿Qué caracteriza a las direcciones IP públicas?", "opts": ["Son únicas a nivel global y enrutables en Internet", "Se reutilizan libremente en cualquier red privada", "Nunca requieren gestión por organismos oficiales", "Son siempre del rango 192.168.0.0/16"], "correct": [0], "multi": false, "explain": "El temario indica que las direcciones públicas son únicas a nivel global, asignadas por organismos oficiales y enrutables directamente en Internet."}, {"q": "¿Qué son las direcciones Bogon?", "opts": ["Direcciones IPv4 no válidas en Internet público, reservadas o no asignadas", "Direcciones IPv6 de uso exclusivo doméstico", "Direcciones MAC duplicadas en la red", "Direcciones IP asignadas dinámicamente por DHCP"], "correct": [0], "multi": false, "explain": "Las direcciones Bogon son rangos IPv4 reservados o no asignados que no deben aparecer como origen o destino público; su presencia indica mala configuración o tráfico anómalo."}, {"q": "¿A qué corresponde el rango 100.64.0.0/10 según el listado de Bogon?", "opts": ["Reserved for Loopback", "Reserved for Shared Address Space (RFC 6598)", "Reserved for Multicast", "Reserved for Private-Use Networks (RFC 1918)"], "correct": [1], "multi": false, "explain": "Según la tabla del temario, 100.64.0.0/10 está reservado para Shared Address Space conforme al RFC 6598."}, {"q": "¿Qué dirección representa el broadcast limitado en IPv4?", "opts": ["0.0.0.0", "127.0.0.1", "255.255.255.255", "169.254.0.1"], "correct": [2], "multi": false, "explain": "El temario indica que 255.255.255.255 está reservada para el broadcast limitado, conforme a los RFC 919 y RFC 922."}, {"q": "¿Qué dispositivo de capa 3 separa los dominios de broadcast entre subredes?", "opts": ["El switch", "El hub", "El router", "El access point"], "correct": [2], "multi": false, "explain": "El temario explica que cada subred es un dominio de broadcast y que el router bloquea los broadcasts entre redes distintas."}, {"q": "¿Qué es una interfaz de red respecto a las direcciones IP?", "opts": ["La IP se asigna al equipo completo, no a interfaces individuales", "La IP se asigna a interfaces, y cada interfaz pertenece a una subred", "Solo los routers pueden tener interfaces con IP", "Las interfaces nunca pueden tener más de una IP"], "correct": [1], "multi": false, "explain": "El temario aclara que la IP se asigna a interfaces, no al equipo, y que un host puede tener múltiples interfaces con su propia IP y máscara."}, {"q": "¿Qué es NAT en términos generales?", "opts": ["Un protocolo de resolución de nombres de dominio", "Una técnica que modifica direcciones IP o puertos de origen/destino", "Un protocolo de enrutamiento dinámico entre sistemas autónomos", "Un mecanismo de cifrado de tráfico web"], "correct": [1], "multi": false, "explain": "NAT (Network Address Translation) modifica la dirección IP o el puerto de origen y/o destino, permitiendo compartir IPs públicas o exponer servicios internos."}, {"q": "¿Qué uso se da habitualmente a las direcciones privadas en redes domésticas y empresariales?", "opts": ["Redes internas con direcciones privadas que requieren traducción para salir a Internet", "Acceso directo sin ningún tipo de traducción a Internet", "Sustituyen completamente a las direcciones públicas en todo el mundo", "Solo se usan en servidores DNS raíz"], "correct": [0], "multi": false, "explain": "El temario explica que las redes internas usan direcciones privadas, que requieren traducción (NAT) para poder salir a Internet a través de una IP pública."}, {"q": "¿Cuántas IP's hay en la subred 10.5.6.8/29?", "opts": ["4 IP's", "6 IP's", "8 IP's", "16 IP's"], "correct": [2], "multi": false, "explain": "Una subred /29 deja 3 bits de host: 2³=8 direcciones IP totales en la subred, incluyendo red y broadcast."}, {"q": "Tengo subredes /24 y quiero agrupar 16 de ellas en una sola ruta resumen. ¿Qué prefijo resultante obtengo?", "opts": ["/20", "/22", "/26", "/28"], "correct": [0], "multi": false, "explain": "Agrupar 16 subredes /24 implica quitar 4 bits (16=2⁴), por lo que el nuevo prefijo resumen es /20, muy usado en resumen de rutas."}, {"q": "Tengo subredes /26 y quiero agrupar 4 de ellas en un prefijo resumen. ¿Cuál sería el nuevo prefijo?", "opts": ["/22", "/24", "/28", "/30"], "correct": [1], "multi": false, "explain": "Agrupar 4 subredes /26 implica quitar 2 bits (4=2²), por lo que el nuevo prefijo resumen resultante es /24."}, {"q": "Necesito una subred para 7 hosts. ¿Qué prefijo mínimo necesito según el método del temario?", "opts": ["/26", "/27", "/28", "/29"], "correct": [2], "multi": false, "explain": "Con 4 bits de host, 2⁴−2=14 hosts es válido para 7 equipos, lo que corresponde a un prefijo /28 (32−4=28)."}, {"q": "¿Qué error común en subnetting puede provocar fallos de conectividad difíciles de diagnosticar?", "opts": ["Configurar máscaras de red incorrectas o subredes solapadas", "Usar siempre el mismo prefijo /24 en toda la red", "Documentar en exceso cada subred creada", "Utilizar IPv6 en lugar de IPv4"], "correct": [0], "multi": false, "explain": "El temario lista como errores comunes las máscaras incorrectas, subredes solapadas y el uso de direcciones de red o broadcast como si fueran utilizables."}, {"q": "¿Por qué fue necesario el desarrollo de IPv6?", "opts": ["Porque IPv4 tiene un espacio de direcciones limitado que se agotó", "Porque IPv4 no podía usarse en redes domésticas", "Porque IPv6 es más barato de implementar", "Porque IPv4 no soporta direcciones privadas"], "correct": [0], "multi": false, "explain": "El temario explica que el crecimiento de Internet agotó el espacio de direcciones de IPv4, siendo IPv6 un rediseño y no una simple ampliación."}, {"q": "¿Cuántos bits tiene una dirección IPv6?", "opts": ["32 bits", "64 bits", "128 bits", "256 bits"], "correct": [2], "multi": false, "explain": "El temario indica que las direcciones IPv6 tienen 128 bits, representados en ocho bloques hexadecimales de 16 bits cada uno."}, {"q": "Selecciona las DOS fases que SÍ forman parte del proceso DORA de DHCP (selecciona 2 respuestas):", "opts": ["Discover", "Acknowledge", "Authenticate", "Allocate"], "correct": [0, 1], "multi": true, "explain": "El proceso DORA se compone de Discover, Offer, Request y Acknowledge; 'Authenticate' y 'Allocate' no forman parte de este proceso."}, {"q": "¿Cuántas compresiones de ceros consecutivos ('::') se permiten en una dirección IPv6?", "opts": ["Tantas como bloques de ceros existan", "Solo una compresión por dirección", "Dos compresiones como máximo", "No se permite ninguna compresión"], "correct": [1], "multi": false, "explain": "El temario indica que solo se permite una compresión '::' por dirección IPv6 para evitar ambigüedad en la longitud de la dirección."}, {"q": "¿Qué elimina IPv6 respecto a IPv4 en cuanto a tipos de direcciones?", "opts": ["Elimina las direcciones multicast", "Elimina el broadcast, usando multicast y anycast", "Elimina las direcciones unicast", "Elimina la necesidad de prefijos CIDR"], "correct": [1], "multi": false, "explain": "El temario señala que IPv6 elimina el broadcast, apoyándose en su lugar en direcciones multicast y anycast."}, {"q": "¿Qué permite a un host IPv6 autoconfigurarse sin depender obligatoriamente de un servidor DHCP?", "opts": ["Las direcciones link-local automáticas y la autoconfiguración", "El uso exclusivo de NAT", "El protocolo ARP", "El registro DNS tipo MX"], "correct": [0], "multi": false, "explain": "El temario indica que IPv6 incorpora direcciones link-local automáticas y autoconfiguración de direcciones sin necesidad de un DHCP obligatorio."}, {"q": "¿Qué prefijo es habitual en redes IPv6?", "opts": ["/8", "/24", "/64", "/128"], "correct": [2], "multi": false, "explain": "El temario indica que /64 es el prefijo habitual en direcciones IPv6, dejando el resto de bits para el identificador de interfaz."}, {"q": "¿Qué ocurre si no hay coincidencia de destino en la tabla de rutas y tampoco existe ruta por defecto?", "opts": ["El paquete se reenvía igualmente por la primera interfaz", "Se produce un fallo de enrutamiento (network unreachable)", "El router lo convierte automáticamente en broadcast", "Se envía automáticamente por DHCP"], "correct": [1], "multi": false, "explain": "El temario indica que si no hay Default Route y no hay coincidencia de destino, se produce un fallo de enrutamiento de tipo 'network unreachable'."}, {"q": "Cuando hay dos o más rutas apuntando a una misma red, ¿cuál se utiliza?", "opts": ["La ruta menos específica siempre", "La ruta más específica", "La primera ruta creada cronológicamente", "La ruta con mayor distancia administrativa"], "correct": [1], "multi": false, "explain": "El temario explica que cuando hay varias rutas hacia una misma red, se utiliza la más específica, es decir, la de subred más pequeña."}, {"q": "¿Qué flag identifica a una ruta como Activa en RouterOS?", "opts": ["A", "C", "D", "S"], "correct": [0], "multi": false, "explain": "En RouterOS las rutas se etiquetan con flags: A indica Activa, C Conectada, D Dinámica y S Estática."}, {"q": "¿Qué tipo de ruta se crea automáticamente al configurar una IP Address en una interfaz?", "opts": ["Ruta estática", "Ruta conectada (DAC)", "Ruta aprendida por BGP", "Ruta blackhole"], "correct": [1], "multi": false, "explain": "El temario indica que las rutas conectadas (DAC) se crean a raíz de la configuración de IP Address, usando esa interfaz como Gateway."}, {"q": "¿Qué función cumple el Check-Gateway en una ruta?", "opts": ["Cifra el tráfico que pasa por esa ruta", "Comprueba periódicamente si el Gateway de la ruta es alcanzable", "Asigna direcciones IP automáticamente", "Filtra el tráfico por puerto de origen"], "correct": [1], "multi": false, "explain": "Check-Gateway comprueba periódicamente (cada 10 segundos) si el Gateway de una ruta es alcanzable, mediante ARP request o ICMP echo request."}, {"q": "¿Qué tipo de ruta descarta los paquetes en silencio sin avisar al origen?", "opts": ["Unreachable", "Prohibit", "Blackhole", "ECMP"], "correct": [2], "multi": false, "explain": "El temario distingue entre Blackhole (descarta en silencio), Prohibit (host prohibido) y Unreachable (host inalcanzable, con aviso)."}, {"q": "¿Qué parámetro permite dar prioridad a una ruta cuando existen varias hacia el mismo destino?", "opts": ["El Preferred Source", "La Distancia", "El TTL", "El Check-Gateway"], "correct": [1], "multi": false, "explain": "El temario indica que la Distancia permite priorizar rutas: si hay varias hacia el mismo destino, se usa la de menor distancia activa."}, {"q": "¿Qué es el TTL (Time To Live) en un paquete IP?", "opts": ["El tiempo de concesión de una IP por DHCP", "El límite de routers que un paquete puede atravesar antes de descartarse", "El tiempo de vida de una sesión TCP", "El tiempo que tarda en resolverse una consulta DNS"], "correct": [1], "multi": false, "explain": "El TTL es el límite de routers (saltos) que un paquete IP puede atravesar, evitando que quede atrapado en un bucle infinito por errores de configuración."}, {"q": "¿Qué protocolo de enrutamiento dinámico se basa en vector distancia, contando los saltos hasta el destino?", "opts": ["OSPF", "RIP", "BGP", "IS-IS"], "correct": [1], "multi": false, "explain": "El temario describe RIP v1/v2 como protocolo clásico de enrutamiento basado en vector distancia, que cuenta los saltos hasta el destino."}, {"q": "¿Qué algoritmo matemático utiliza OSPF para calcular la ruta más rápida?", "opts": ["Algoritmo de Dijkstra", "Algoritmo de Bellman-Ford", "Algoritmo RSA", "Algoritmo de Huffman"], "correct": [0], "multi": false, "explain": "OSPF está basado en estado de enlace y calcula la ruta más rápida mediante el algoritmo de Dijkstra, según el coste de los enlaces."}, {"q": "¿Qué hace el Source NAT (src-nat)?", "opts": ["Modifica la dirección o puerto de origen del paquete", "Modifica la dirección o puerto de destino del paquete", "Cifra el contenido del paquete", "Bloquea el tráfico saliente de la red"], "correct": [0], "multi": false, "explain": "El Source NAT modifica la dirección IP o el puerto de origen, usado típicamente para dar acceso a Internet desde una red con IPs privadas."}, {"q": "¿Qué hace el Destination NAT (dst-nat)?", "opts": ["Modifica la IP o puerto de destino para exponer un recurso interno", "Modifica únicamente el puerto de origen", "Elimina por completo las cabeceras del paquete", "Genera una nueva tabla de rutas"], "correct": [0], "multi": false, "explain": "El Destination NAT modifica la IP o puerto de destino, permitiendo que tráfico externo acceda a un recurso interno como un servidor web."}, {"q": "¿En qué tabla del firewall se implementa la funcionalidad de NAT en RouterOS?", "opts": ["Tabla FILTER", "Tabla NAT, con las cadenas srcnat y dstnat", "Tabla MANGLE", "Tabla RAW"], "correct": [1], "multi": false, "explain": "El temario indica que la funcionalidad de NAT se implementa en la tabla NAT del firewall, mediante las cadenas (chains) srcnat y dstnat."}, {"q": "¿Qué técnica permite que varias IPs privadas compartan una misma IP pública usando puertos distintos?", "opts": ["PAT (Port Address Translation)", "VRF (Virtual Routing Forwarding)", "ECMP", "Policy Routing"], "correct": [0], "multi": false, "explain": "PAT (Port Address Translation) permite que varias direcciones IP privadas compartan una misma IP pública diferenciándose por el puerto utilizado."}, {"q": "¿Cómo se procesan las reglas de NAT en RouterOS?", "opts": ["De forma aleatoria según la carga del router", "De forma secuencial hasta encontrar la primera coincidencia", "Solo se evalúa la última regla creada", "En paralelo, aplicando todas las reglas a la vez"], "correct": [1], "multi": false, "explain": "Las reglas de NAT funcionan con el principio if-then y se analizan de forma secuencial hasta encontrar la primera coincidencia."}, {"q": "Selecciona las DOS afirmaciones correctas sobre OSPF (selecciona 2 respuestas):", "opts": ["Es un protocolo IGP de estado de enlace", "Usa el algoritmo de Dijkstra para calcular rutas", "Es el protocolo usado entre Sistemas Autónomos en Internet", "No permite dividir la red en áreas"], "correct": [0, 1], "multi": true, "explain": "OSPF es un protocolo IGP basado en estado de enlace que usa el algoritmo de Dijkstra; el protocolo entre Sistemas Autónomos es BGP, no OSPF."}, {"q": "En un escenario de Red de ISP, ¿se suele aplicar NAT en el core de la red?", "opts": ["Sí, siempre se aplica NAT en el core", "No, el core trabaja con IPs públicas reales sin NAT", "Solo se aplica NAT los fines de semana", "Solo se aplica si hay menos de 100 usuarios"], "correct": [1], "multi": false, "explain": "El temario indica que en el escenario de Red de ISP no se usa NAT en el core, ya que se manejan IPs públicas reales."}, {"q": "¿Qué rango de puertos corresponde a los 'Puertos Bien Conocidos'?", "opts": ["0-1023", "1024-49151", "49152-65535", "0-65535"], "correct": [0], "multi": false, "explain": "El temario clasifica los puertos en Bien Conocidos (0-1023), Registrados (1024-49151) y Dinámicos/Efímeros (49152-65535)."}, {"q": "¿Qué puerto utiliza HTTPS por defecto?", "opts": ["21", "22", "80", "443"], "correct": [3], "multi": false, "explain": "El temario lista los puertos bien conocidos: 443 para HTTPS, 80 para HTTP, 22 para SSH y 21 para FTP."}, {"q": "¿Qué es un socket según el temario?", "opts": ["Solo el número de puerto de una aplicación", "La combinación de dirección IP y puerto, punto final de una comunicación", "Un protocolo exclusivo de capa de aplicación", "Una tabla de rutas estáticas"], "correct": [1], "multi": false, "explain": "Un socket se define como la combinación de dirección IP y puerto, siendo el punto final que identifica de forma única una conexión."}, {"q": "¿Qué problema resuelve el concepto de puerto en la capa de transporte?", "opts": ["El problema de la multiplexación, distinguir a qué aplicación pertenece cada paquete", "El problema de la resolución de nombres de dominio", "El problema del cifrado de extremo a extremo", "El problema de la asignación de direcciones MAC"], "correct": [0], "multi": false, "explain": "El puerto resuelve el problema de la multiplexación: permite que el sistema distinga qué paquetes recibidos pertenecen a cada aplicación en ejecución."}, {"q": "¿Qué característica distingue a TCP frente a UDP en cuanto a fiabilidad?", "opts": ["TCP es orientado a conexión y garantiza la entrega de los datos", "UDP siempre garantiza el orden de los paquetes", "TCP no establece ningún tipo de conexión previa", "UDP retransmite automáticamente los paquetes perdidos"], "correct": [0], "multi": false, "explain": "El temario describe TCP como protocolo de transporte orientado a conexión que garantiza que los datos lleguen completos, a diferencia de UDP."}, {"q": "¿Por qué se prefiere UDP en videollamadas y streaming en directo?", "opts": ["Porque es preferible un pequeño glitch a una congelación, y retransmitir datos antiguos no tiene sentido", "Porque UDP cifra mejor el tráfico que TCP", "Porque UDP nunca pierde paquetes", "Porque UDP requiere establecer una conexión previa más segura"], "correct": [0], "multi": false, "explain": "En streaming y VoIP es preferible un pequeño fallo visual a una congelación, ya que retransmitir un frame antiguo ya no tiene sentido en tiempo real."}, {"q": "¿Por qué DNS suele usar UDP para sus consultas habituales?", "opts": ["Porque las consultas son rápidas, de pregunta-respuesta, y no necesitan conexión previa", "Porque UDP es obligatorio para todo el tráfico de capa 7", "Porque TCP no puede transportar tráfico DNS", "Porque UDP cifra automáticamente las consultas"], "correct": [0], "multi": false, "explain": "El temario explica que DNS usa UDP por defecto porque las consultas son rápidas, de una pregunta y una respuesta, sin necesidad de conexión previa."}, {"q": "¿Qué puertos utiliza el protocolo DHCP en su funcionamiento sobre UDP?", "opts": ["Puerto 53 servidor y 67 cliente", "Puerto 67 servidor y 68 cliente", "Puerto 80 servidor y 443 cliente", "Puerto 22 servidor y 23 cliente"], "correct": [1], "multi": false, "explain": "El temario indica que DHCP funciona sobre UDP usando el puerto 67 para el servidor y el puerto 68 para el cliente."}, {"q": "¿Qué significa el acrónimo DORA en el proceso DHCP?", "opts": ["Discover, Offer, Request, Acknowledge", "Detect, Offer, Reply, Allow", "Discover, Open, Request, Accept", "Define, Offer, Request, Allocate"], "correct": [0], "multi": false, "explain": "DORA corresponde a las cuatro fases del proceso DHCP: Discover, Offer, Request y Acknowledge."}, {"q": "En el proceso DORA, ¿qué mensaje envía el cliente cuando aún no tiene IP?", "opts": ["DISCOVER, en broadcast usando 0.0.0.0 como origen", "ACKNOWLEDGE, confirmando la concesión", "OFFER, ofreciendo una IP disponible", "REQUEST, dirigido únicamente al servidor"], "correct": [0], "multi": false, "explain": "El cliente envía un DISCOVER en broadcast a 255.255.255.255, usando 0.0.0.0 como IP de origen porque todavía no tiene dirección asignada."}, {"q": "¿Qué ocurre en la fase OFFER del proceso DORA?", "opts": ["El cliente confirma que acepta la IP ofrecida", "El servidor responde proponiendo una IP disponible al cliente", "El servidor deniega la solicitud del cliente", "El cliente libera la IP que tenía asignada"], "correct": [1], "multi": false, "explain": "En la fase OFFER, el servidor DHCP responde al Discover proponiendo una IP disponible, por ejemplo 192.168.1.50."}, {"q": "¿Qué es el Lease Time (tiempo de concesión) en DHCP?", "opts": ["El tiempo que tarda el proceso DORA en completarse", "El periodo durante el cual la IP está 'alquilada' al cliente antes de tener que renovarla", "El tiempo de vida de un paquete en la red", "El tiempo que un router tarda en convergir"], "correct": [1], "multi": false, "explain": "El temario explica que las IPs no se asignan para siempre, sino que se 'alquilan' por un Lease Time, típicamente 24 horas, que debe renovarse."}, {"q": "¿Qué sucede si un cliente DHCP no renueva su concesión antes de que expire?", "opts": ["Mantiene la IP de forma indefinida sin renovar", "Pierde la IP y debe reiniciar el proceso DORA", "El servidor le asigna automáticamente una IP fija", "La red completa deja de funcionar"], "correct": [1], "multi": false, "explain": "Si el cliente no renueva antes de que expire el Lease Time, pierde la IP asignada y debe reiniciar todo el proceso DORA desde el Discover."}, {"q": "¿Qué configuraciones de red puede asignar un servidor DHCP además de la IP?", "opts": ["Solo la dirección IP, nada más", "Máscara, gateway, servidores DNS y más parámetros de red", "Únicamente la dirección MAC del cliente", "Solo las reglas de firewall"], "correct": [1], "multi": false, "explain": "El temario indica que DHCP asigna IP, máscara, gateway, servidores DNS y otros parámetros de configuración de red de forma automática."}, {"q": "¿Qué función cumple el protocolo DNS?", "opts": ["Traducir nombres legibles a direcciones IP", "Asignar IPs automáticamente a los clientes", "Cifrar el tráfico HTTP", "Filtrar el tráfico por puerto de origen"], "correct": [0], "multi": false, "explain": "DNS (Domain Name System) traduce nombres legibles, como www.google.com, a direcciones IP, actuando como la 'agenda telefónica' de Internet."}, {"q": "¿Cómo está organizada jerárquicamente la resolución DNS?", "opts": ["Root, TLD y servidores autoritativos", "Solo existen servidores autoritativos", "Root y servidores DHCP", "TLD y servidores SNMP"], "correct": [0], "multi": false, "explain": "El árbol DNS se organiza jerárquicamente en Root (raíz), TLD (dominios de primer nivel como .com o .es) y servidores autoritativos."}, {"q": "¿Qué diferencia hay entre una consulta DNS recursiva y una iterativa?", "opts": ["En la recursiva el cliente hace todo el trabajo de búsqueda paso a paso", "En la recursiva el router/resolver hace todo el trabajo y devuelve la respuesta final al cliente", "Ambas son exactamente iguales en todos los aspectos", "La iterativa nunca consulta servidores TLD"], "correct": [1], "multi": false, "explain": "En una consulta recursiva, el resolver (por ejemplo el router) hace todo el trabajo de búsqueda y devuelve la respuesta final al cliente."}, {"q": "¿Qué tipo de registro DNS asocia un nombre de dominio a una dirección IPv4?", "opts": ["Registro A", "Registro AAAA", "Registro CNAME", "Registro MX"], "correct": [0], "multi": false, "explain": "El registro A asocia un nombre a una dirección IPv4, mientras que el registro AAAA hace lo propio con direcciones IPv6."}, {"q": "Selecciona las DOS afirmaciones correctas sobre SNMP (selecciona 2 respuestas):", "opts": ["El Manager monitoriza y consulta periódicamente a los Agentes", "SNMPv3 añade cifrado y autenticación real", "SNMP mide el tráfico flujo a flujo como NetFlow", "El Agente nunca puede enviar alertas por sí solo"], "correct": [0, 1], "multi": true, "explain": "En SNMP el Manager consulta periódicamente a los Agentes, y SNMPv3 incorpora cifrado y autenticación real frente a versiones anteriores."}, {"q": "¿Qué tipo de registro DNS funciona como un alias hacia otro nombre de dominio?", "opts": ["Registro MX", "Registro TXT", "Registro CNAME", "Registro A"], "correct": [2], "multi": false, "explain": "El registro CNAME (Canonical Name) funciona como un alias, es decir, un nombre que apunta a otro nombre de dominio existente."}, {"q": "¿Qué tipo de registro DNS define el servidor de correo de un dominio?", "opts": ["Registro MX", "Registro AAAA", "Registro CNAME", "Registro TXT"], "correct": [0], "multi": false, "explain": "El registro MX (Mail Exchange) define qué servidor o servidores gestionan el correo electrónico de un dominio determinado."}, {"q": "¿Qué registros DNS de tipo TXT son críticos para la seguridad del correo electrónico?", "opts": ["SPF, DKIM y DMARC", "A, AAAA y CNAME", "NS, MX y PTR", "SOA, TTL y TXT genérico"], "correct": [0], "multi": false, "explain": "Los registros TXT se usan hoy de forma crítica en seguridad de email mediante SPF (servidores autorizados), DKIM (firma digital) y DMARC (política de fallos)."}, {"q": "¿Cuándo usa DNS el protocolo TCP en lugar de UDP?", "opts": ["Siempre, DNS nunca usa UDP", "Cuando la respuesta supera los 512 bytes o en transferencias de zona", "Solo cuando se consulta un registro tipo A", "Nunca, DNS solo funciona sobre UDP"], "correct": [1], "multi": false, "explain": "DNS usa TCP cuando la respuesta supera los 512 bytes, en transferencias de zona (backup DNS) y a veces con DNSSEC por el tamaño de las respuestas."}, {"q": "¿Qué papel cumple el Manager (NMS) en la arquitectura SNMP?", "opts": ["Es el software que responde a las consultas en cada dispositivo", "Es el servidor que monitoriza la red y hace consultas periódicas a los dispositivos", "Es el protocolo de cifrado usado en SNMPv3", "Es el servidor DHCP central de la red"], "correct": [1], "multi": false, "explain": "En la arquitectura Manager-Agente, el Manager (NMS) es el servidor que monitoriza la red realizando consultas periódicas a los dispositivos."}, {"q": "¿Qué es un MIB en el contexto de SNMP?", "opts": ["Una base de datos jerárquica que define qué parámetros se pueden consultar", "Un protocolo de cifrado de la versión 3 de SNMP", "Un tipo de registro DNS", "Un identificador único de cada interfaz de red"], "correct": [0], "multi": false, "explain": "MIB (Management Information Base) es una base de datos jerárquica que define qué parámetros pueden consultarse, cada uno con un OID único."}, {"q": "¿Qué operación SNMP permite a un Agente enviar una alerta sin que se la pidan?", "opts": ["GET", "SET", "TRAP", "GET-BULK"], "correct": [2], "multi": false, "explain": "La operación TRAP permite que el Agente envíe una alerta al Manager de forma espontánea, sin que este se la haya solicitado previamente."}, {"q": "¿Qué versión de SNMP introduce cifrado y autenticación real?", "opts": ["SNMPv1", "SNMPv2c", "SNMPv3", "SNMPv4"], "correct": [2], "multi": false, "explain": "SNMPv3, publicada en 2002, añade cifrado y autenticación real, siendo obligatoria en entornos con altos requisitos de seguridad."}, {"q": "¿Qué método de autenticación utilizan SNMPv1 y SNMPv2c?", "opts": ["Certificados digitales X.509", "Community strings (cadenas de comunidad)", "Autenticación Kerberos", "Tokens OAuth"], "correct": [1], "multi": false, "explain": "El temario indica que tanto SNMPv1 como SNMPv2c utilizan 'community strings' como mecanismo de autenticación, sin cifrado real."}];
+
+const state = QUESTIONS.map(()=>({selected:[], checked:false, correct:null}));
+
+function letters(){ return ['A','B','C','D']; }
+
+function render(){
+  const quiz = document.getElementById('quiz');
+  quiz.innerHTML = '';
+  QUESTIONS.forEach((q, qi)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.id = 'q'+qi;
+    const st = state[qi];
+    if(st.checked){ card.classList.add(st.correct ? 'correct' : 'incorrect'); }
+
+    const meta = document.createElement('div');
+    meta.className='qmeta';
+    meta.innerHTML = `<span class="qnum">Pregunta ${qi+1} / ${QUESTIONS.length}</span>` +
+      (q.multi ? `<span class="qtag">MULTIRRESPUESTA</span>` : '');
+    card.appendChild(meta);
+
+    const qt = document.createElement('div');
+    qt.className='qtext';
+    qt.textContent = q.q;
+    card.appendChild(qt);
+
+    if(q.multi){
+      const hint = document.createElement('div');
+      hint.className='multihint';
+      hint.innerHTML = '⚠️ Selecciona exactamente 2 respuestas correctas';
+      card.appendChild(hint);
+    }
+
+    q.opts.forEach((optText, oi)=>{
+      const opt = document.createElement('div');
+      opt.className = 'opt ' + (q.multi ? 'multi':'single');
+      if(st.selected.includes(oi)) opt.classList.add('selected');
+      if(st.checked){
+        opt.classList.add('locked');
+        const isCorrectOpt = q.correct.includes(oi);
+        const wasSelected = st.selected.includes(oi);
+        if(isCorrectOpt) opt.classList.add('show-correct');
+        else if(wasSelected && !isCorrectOpt) opt.classList.add('show-wrong');
+      }
+      opt.onclick = ()=> toggleOption(qi, oi);
+
+      const mark = document.createElement('div');
+      mark.className='checkmark';
+      let markContent = '';
+      if(st.checked){
+        const isCorrectOpt = q.correct.includes(oi);
+        const wasSelected = st.selected.includes(oi);
+        if(isCorrectOpt) markContent = '✓';
+        else if(wasSelected) markContent = '✕';
+      } else if(st.selected.includes(oi)){
+        markContent = q.multi ? '✓' : '●';
+      }
+      mark.textContent = markContent;
+      opt.appendChild(mark);
+
+      const txt = document.createElement('div');
+      txt.className='opttext';
+      txt.textContent = `${letters()[oi]}) ${optText}`;
+      opt.appendChild(txt);
+
+      card.appendChild(opt);
+    });
+
+    const actions = document.createElement('div');
+    actions.className='actions';
+    if(!st.checked){
+      const need = q.multi ? 2 : 1;
+      const btn = document.createElement('button');
+      btn.className='btn';
+      btn.textContent='Comprobar';
+      btn.disabled = st.selected.length !== need;
+      btn.onclick = ()=> checkAnswer(qi);
+      actions.appendChild(btn);
+    } else {
+      const btn = document.createElement('button');
+      btn.className='btn secondary';
+      btn.textContent='Reintentar esta pregunta';
+      btn.onclick = ()=> retryQuestion(qi);
+      actions.appendChild(btn);
+    }
+    card.appendChild(actions);
+
+    if(st.checked){
+      const fb = document.createElement('div');
+      fb.className = 'feedback ' + (st.correct ? 'ok':'bad');
+      if(st.correct){
+        fb.innerHTML = `<b>✅ ¡Correcto!</b> Bien hecho.`;
+      } else {
+        fb.innerHTML = `<b>❌ Respuesta incorrecta</b> ${q.explain}`;
+      }
+      card.appendChild(fb);
+    }
+
+    quiz.appendChild(card);
+  });
+
+  document.getElementById('finalBox').style.display = (answeredCount()===QUESTIONS.length) ? 'block':'none';
+  if(answeredCount()===QUESTIONS.length){
+    const correct = QUESTIONS.filter((q,i)=>state[i].correct).length;
+    document.getElementById('finalSub').textContent =
+      `Has respondido ${QUESTIONS.length} de ${QUESTIONS.length} preguntas. Aciertos: ${correct} · Fallos: ${QUESTIONS.length-correct} (${Math.round(correct/QUESTIONS.length*100)}%).`;
+  }
+
+  updateStats();
+}
+
+function toggleOption(qi, oi){
+  const st = state[qi];
+  if(st.checked) return;
+  const q = QUESTIONS[qi];
+  if(q.multi){
+    const idx = st.selected.indexOf(oi);
+    if(idx>=0){ st.selected.splice(idx,1); }
+    else {
+      if(st.selected.length>=2) st.selected.shift();
+      st.selected.push(oi);
+    }
+  } else {
+    st.selected = [oi];
+  }
+  render();
+  document.getElementById('q'+qi).scrollIntoView({block:'nearest', behavior:'smooth'});
+}
+
+function checkAnswer(qi){
+  const st = state[qi];
+  const q = QUESTIONS[qi];
+  const sel = [...st.selected].sort().join(',');
+  const cor = [...q.correct].sort().join(',');
+  st.correct = (sel === cor);
+  st.checked = true;
+  render();
+  setTimeout(()=>{
+    const el = document.getElementById('q'+qi);
+    if(el) el.scrollIntoView({block:'center', behavior:'smooth'});
+  }, 60);
+}
+
+function retryQuestion(qi){
+  state[qi] = {selected:[], checked:false, correct:null};
+  render();
+}
+
+function answeredCount(){ return state.filter(s=>s.checked).length; }
+
+function updateStats(){
+  const answered = answeredCount();
+  const correct = state.filter(s=>s.checked && s.correct).length;
+  const incorrect = answered - correct;
+  const total = QUESTIONS.length;
+
+  const progressPct = Math.round((answered/total)*100);
+  const okPct = answered>0 ? Math.round((correct/answered)*100) : 0;
+  const badPct = answered>0 ? Math.round((incorrect/answered)*100) : 0;
+
+  document.getElementById('statProgress').textContent = `${answered}/${total} (${progressPct}%)`;
+  document.getElementById('statOk').textContent = `${okPct}%`;
+  document.getElementById('statBad').textContent = `${badPct}%`;
+  document.getElementById('progressBar').style.width = progressPct + '%';
+}
+
+function resetQuiz(){
+  if(!confirm('¿Seguro que quieres reiniciar todo el cuestionario? Se perderá el progreso actual.')) return;
+  for(let i=0;i<state.length;i++){ state[i] = {selected:[], checked:false, correct:null}; }
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>

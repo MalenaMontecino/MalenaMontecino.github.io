@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de Autoevaluación - Tema 5</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        h2 {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+        /* Marcador fijo en la parte superior */
+        .marcador-container {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            padding: 15px;
+            border-bottom: 2px solid #2980b9;
+            margin-bottom: 30px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .marcador {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .marcador div {
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        .total { background-color: #e8f4f8; color: #2980b9; }
+        .bien { background-color: #d4edda; color: #155724; }
+        .mal { background-color: #f8d7da; color: #721c24; }
+
+        .pregunta {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .pregunta-texto {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        .opciones {
+            list-style: none;
+            padding: 0;
+        }
+        .opcion-item {
+            margin-bottom: 8px;
+        }
+        .opcion-label {
+            display: block;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .opcion-label:hover {
+            background: #e9ecef;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.1);
+        }
+        /* Clases para feedback visual */
+        .correcta {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724 !important;
+            font-weight: bold;
+        }
+        .incorrecta {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24 !important;
+        }
+        .deshabilitada {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cuestionario de Autoevaluación</h1>
+    <h2>Tema 5: Capa de Transporte y Protocolos de Aplicación</h2>
+
+    <div class="marcador-container">
+        <div class="marcador">
+            <div class="total">Respondidas: <span id="respondadas">0</span> / 15</div>
+            <div class="bien">Bien: <span id="correctas">0</span></div>
+            <div class="mal">Mal: <span id="incorrectas">0</span></div>
+        </div>
+    </div>
+
+    <form id="quizForm">
+        <div class="pregunta" id="p1">
+            <div class="pregunta-texto">1. ¿Qué unidad de datos (PDU) se utiliza específicamente cuando la información se encuentra en la capa de Transporte?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="a"> A) Paquete</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="b"> B) Trama</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="c"> C) Segmento</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="d"> D) Bit</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p2">
+            <div class="pregunta-texto">2. ¿Cuál es el rango de los denominados "Puertos Bien Conocidos" (Well-known ports) regulados por la IANA?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="a"> A) 0 - 1023</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="b"> B) 1024 - 49151</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="c"> C) 49152 - 65535</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="d"> D) 0 - 65535</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p3">
+            <div class="pregunta-texto">3. ¿Qué combinación de elementos define técnicamente a un "Socket" de red?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="a"> A) Dirección MAC + Dirección IP</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="b"> B) Dirección IP + Número de Puerto</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="c"> C) Nombre de dominio + Dirección IP</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="d"> D) Número de Puerto + Protocolo</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p4">
+            <div class="pregunta-texto">4. ¿Cuál de las siguientes es una característica fundamental del protocolo TCP?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="a"> A) No garantiza que los datos lleguen en el orden correcto.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="b"> B) Es un protocolo sin conexión (connectionless) que prioriza la velocidad.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="c"> C) Implementa una retransmisión automática si detecta que se han perdido datos.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="d"> D) Su cabecera es muy pequeña, de apenas 8 bytes.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p5">
+            <div class="pregunta-texto">5. Durante el "3-Way Handshake" de TCP, ¿qué flag envía el servidor al cliente para aceptar la solicitud de conexión?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="a"> A) SYN</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="b"> B) ACK</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="c"> C) SYN-ACK</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="d"> D) FIN</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p6">
+            <div class="pregunta-texto">6. ¿Qué mecanismo utiliza TCP para evitar que un emisor rápido sature la capacidad de recepción de un host más lento?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="a"> A) Multiplexación por puertos dinámicos</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="b"> B) Ventana deslizante (Control de Flujo)</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="c"> C) Proceso de descubrimiento DORA</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="d"> D) Resolución jerárquica de nombres</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p7">
+            <div class="pregunta-texto">7. ¿Por qué el protocolo UDP es el más adecuado para servicios como VoIP o streaming de vídeo en directo?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="a"> A) Porque garantiza la entrega absoluta de cada byte sin errores.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="b"> B) Porque su filosofía de "dispara y olvida" evita retrasos por acuses de recibo.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="c"> C) Porque establece una conexión formal y segura antes de transmitir.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="d"> D) Porque permite reordenar los paquetes que llegan desordenados.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p8">
+            <div class="pregunta-texto">8. ¿Qué puerto bien conocido utiliza el protocolo SSH para el acceso remoto seguro?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="a"> A) 80</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="b"> B) 443</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="c"> C) 22</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="d"> D) 25</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p9">
+            <div class="pregunta-texto">9. En el funcionamiento del protocolo DHCP, ¿qué significan las siglas del proceso "DORA"?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="a"> A) Discover, Order, Request, Access</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="b"> B) Discover, Offer, Request, Acknowledge</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="c"> C) Dynamic, Organized, Remote, Address</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="d"> D) DNS, OSI, Routing, Application</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p10">
+            <div class="pregunta-texto">10. Durante el paso "Discover" de DHCP, ¿cómo se comunica el cliente si aún no tiene una dirección IP asignada?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="a"> A) Envía un mensaje Unicast directo al Gateway.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="b"> B) Utiliza su dirección de Loopback (127.0.0.1).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="c"> C) Realiza un Broadcast a la dirección 255.255.255.255.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="d"> D) Consulta primero al servidor DNS de la red.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p11">
+            <div class="pregunta-texto">11. ¿Cuál es la función principal del sistema DNS en la red?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="a"> A) Asignar configuraciones de red automáticas a los dispositivos.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="b"> B) Traducir nombres de dominio legibles en direcciones IP.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="c"> C) Escanear y auditar la seguridad de los puertos abiertos.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="d"> D) Gestionar la ventana de recepción para evitar congestión.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p12">
+            <div class="pregunta-texto">12. ¿Qué tipo de registro DNS se utiliza para asociar un nombre de dominio con una dirección IPv6?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="a"> A) Registro A</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="b"> B) Registro MX</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="c"> C) Registro CNAME</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="d"> D) Registro AAAA</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p13">
+            <div class="pregunta-texto">13. ¿En qué situación el protocolo DNS utiliza transporte TCP (puerto 53) en lugar de UDP?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="a"> A) Para cualquier consulta de navegación web convencional.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="b"> B) Cuando la respuesta es superior a 512 bytes o hay transferencias de zona.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="c"> C) Únicamente cuando se realizan consultas desde dispositivos móviles.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="d"> D) Cuando se solicita un alias mediante un registro CNAME.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p14">
+            <div class="pregunta-texto">14. ¿Qué herramienta de diagnóstico permite realizar un escaneo rápido de puertos abiertos en un host remoto?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="a"> A) nslookup</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="b"> B) dig</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="c"> C) netcat (nc)</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="d"> D) ping</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p15">
+            <div class="pregunta-texto">15. En programación con Python, ¿qué constante de la librería socket indica que se va a utilizar el protocolo TCP?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="a"> A) AF_INET</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="b"> B) SOCK_STREAM</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="c"> C) SOCK_DGRAM</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="d"> D) bind()</label></li>
+            </ul>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Diccionario con las claves de respuesta correctas facilitadas por el usuario
+    const respuestasCorrectas = {
+        q1: 'c', q2: 'a', q3: 'b', q4: 'c', q5: 'c',
+        q6: 'b', q7: 'b', q8: 'c', q9: 'b', q10: 'c',
+        q11: 'b', q12: 'd', q13: 'b', q14: 'c', q15: 'b'
+    };
+
+    let respondidas = 0;
+    let correctas = 0;
+    let incorrectas = 0;
+
+    const inputs = document.querySelectorAll('input[type="radio"]');
+
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const nombrePregunta = this.name;
+            const valorSeleccionado = this.value;
+            const respuestaCorrecta = respuestasCorrectas[nombrePregunta];
+            
+            const numPregunta = nombrePregunta.replace('q', '');
+            const bloquePregunta = document.getElementById('p' + numPregunta);
+            
+            // Deshabilitar la pregunta una vez respondida
+            const opcionesPregunta = bloquePregunta.querySelectorAll('input[type="radio"]');
+            opcionesPregunta.forEach(opt => {
+                opt.disabled = true;
+                opt.parentElement.classList.add('deshabilitada');
+            });
+
+            // Validar acierto o error
+            if (valorSeleccionado === respuestaCorrecta) {
+                correctas++;
+                this.parentElement.classList.add('correcta');
+            } else {
+                incorrectas++;
+                this.parentElement.classList.add('incorrecta');
+                // Revelar la alternativa correcta de manera instructiva
+                opcionesPregunta.forEach(opt => {
+                    if (opt.value === respuestaCorrecta) {
+                        opt.parentElement.classList.add('correcta');
+                    }
+                });
+            }
+
+            // Actualizar el panel superior de estadísticas en tiempo real
+            respondidas++;
+            document.getElementById('respondadas').innerText = respondidas;
+            document.getElementById('correctas').innerText = correctas;
+            document.getElementById('incorrectas').innerText = incorrectas;
+        });
+    });
+</script>
+
+</body>
+</html>

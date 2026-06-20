@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de Autoevaluación - Tema 1</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        /* Marcador fijo en la parte superior */
+        .marcador-container {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            padding: 15px;
+            border-bottom: 2px solid #2980b9;
+            margin-bottom: 30px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .marcador {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .marcador div {
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        .total { background-color: #e8f4f8; color: #2980b9; }
+        .bien { background-color: #d4edda; color: #155724; }
+        .mal { background-color: #f8d7da; color: #721c24; }
+
+        .pregunta {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .pregunta-texto {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        .opciones {
+            list-style: none;
+            padding: 0;
+        }
+        .opcion-item {
+            margin-bottom: 8px;
+        }
+        .opcion-label {
+            display: block;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .opcion-label:hover {
+            background: #e9ecef;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.1);
+        }
+        /* Clases para feedback visual */
+        .correcta {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724 !important;
+            font-weight: bold;
+        }
+        .incorrecta {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24 !important;
+        }
+        .deshabilitada {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cuestionario de Autoevaluación - Tema 1</h1>
+
+    <div class="marcador-container">
+        <div class="marcador">
+            <div class="total">Respondidas: <span id="respondadas">0</span> / 10</div>
+            <div class="bien">Bien: <span id="correctas">0</span></div>
+            <div class="mal">Mal: <span id="incorrectas">0</span></div>
+        </div>
+    </div>
+
+    <form id="quizForm">
+        <div class="pregunta" id="p1">
+            <div class="pregunta-texto">1. ¿Cuál es la función principal de los dispositivos finales o "hosts" en una red?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="a"> A) Facilitar la comunicación sin generar información propia.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="b"> B) Generar y consumir la información que circula por la red.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="c"> C) Únicamente determinar la ruta que deben seguir los paquetes.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="d"> D) Convertir señales eléctricas en señales ópticas.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p2">
+            <div class="pregunta-texto">2. ¿Cómo se define Internet según los materiales de estudio?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="a"> A) Como una red única controlada por un organismo central.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="b"> B) Como una red de área metropolitana (MAN) de gran velocidad.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="c"> C) Como un conjunto de redes independientes (LAN, MAN, WAN) interconectadas.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="d"> D) Como un protocolo físico exclusivo para cables de fibra óptica.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p3">
+            <div class="pregunta-texto">3. En el modelo OSI, ¿cuál es la capa encargada del direccionamiento lógico y la determinación de la ruta (routing)?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="a"> A) Capa 2: Enlace de Datos.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="b"> B) Capa 3: Red.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="c"> C) Capa 4: Transporte.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="d"> D) Capa 1: Física.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p4">
+            <div class="pregunta-texto">4. ¿Qué diferencia principal existe entre el modelo OSI y el modelo TCP/IP en cuanto a su estructura?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="a"> A) OSI tiene 4 capas y TCP/IP tiene 7 capas.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="b"> B) Ambos modelos tienen exactamente el mismo número de capas.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="c"> C) OSI tiene 7 capas (modelo teórico) y TCP/IP tiene 4 capas (modelo práctico).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="d"> D) El modelo OSI solo se aplica a redes inalámbricas.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p5">
+            <div class="pregunta-texto">5. ¿Qué característica define a la fibra óptica frente a los cables de cobre?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="a"> A) Es más económica y fácil de instalar en distancias cortas.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="b"> B) Utiliza señales eléctricas para transmitir bits.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="c"> C) Es inmune a las interferencias electromagnéticas y permite mayores distancias.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="d"> D) Permite alimentar dispositivos mediante tecnología PoE.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p6">
+            <div class="pregunta-texto">6. ¿Qué tecnología permite transmitir energía eléctrica y datos simultáneamente por un cable de cobre?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="a"> A) WiMAX.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="b"> B) SFP+.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="c"> C) PoE (Power over Ethernet).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="d"> D) BiDi (Bidireccional).</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p7">
+            <div class="pregunta-texto">7. ¿Cuáles son los canales que no se solapan en la banda de 2,4 GHz de WiFi?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="a"> A) 1, 2 y 3.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="b"> B) 1, 6 y 11.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="c"> C) 36, 40 y 44.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="d"> D) Todos los canales de la banda de 2,4 GHz se solapan siempre.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p8">
+            <div class="pregunta-texto">8. ¿En qué capa del modelo OSI opera un Switch convencional?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="a"> A) Capa 1 (Física), porque replica la señal a todos los puertos.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="b"> B) Capa 2 (Enlace de Datos), ya que utiliza direcciones MAC.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="c"> C) Capa 3 (Red), ya que toma decisiones basadas en IP.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="d"> D) Capa 4 (Transporte), identificando puertos de aplicación.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p9">
+            <div class="pregunta-texto">9. ¿Cuál es la función de un Conversor de Medios?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="a"> A) Interconectar distintos medios físicos (ej. fibra a cobre) en la Capa 1.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="b"> B) Filtrar el tráfico de red mediante políticas de seguridad (Firewall).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="c"> C) Asignar direcciones IP dinámicas a los hosts.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="d"> D) Ampliar la cobertura de una señal WiFi sin cables.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p10">
+            <div class="pregunta-texto">10. ¿Qué dispositivo combina funciones de conmutación de red local y enrutamiento entre redes distintas?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="a"> A) Hub.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="b"> B) Bridge.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="c"> C) Switch L3 (Capa 3).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="d"> D) ONT (Optical Network Terminal).</label></li>
+            </ul>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Respuestas correctas proporcionadas
+    const respuestasCorrectas = {
+        q1: 'b',
+        q2: 'c',
+        q3: 'b',
+        q4: 'c',
+        q5: 'c',
+        q6: 'c',
+        q7: 'b',
+        q8: 'b',
+        q9: 'a',
+        q10: 'c'
+    };
+
+    let respondidas = 0;
+    let correctas = 0;
+    let incorrectas = 0;
+
+    // Seleccionamos todos los inputs tipo radio
+    const inputs = document.querySelectorAll('input[type="radio"]');
+
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const nombrePregunta = this.name;
+            const valorSeleccionado = this.value;
+            const respuestaCorrecta = respuestasCorrectas[nombrePregunta];
+            
+            // Contenedor de la pregunta actual para aplicar efectos visuales
+            const bloquePregunta = document.getElementById('p' + nombrePregunta.replace('q', ''));
+            
+            // Deshabilitar todas las opciones de esta pregunta para que no se pueda cambiar la respuesta
+            const opcionesPregunta = bloquePregunta.querySelectorAll('input[type="radio"]');
+            opcionesPregunta.forEach(opt => {
+                opt.disabled = true;
+                opt.parentElement.classList.add('deshabilitada');
+            });
+
+            // Validar la respuesta
+            if (valorSeleccionado === respuestaCorrecta) {
+                correctas++;
+                this.parentElement.classList.add('correcta');
+            } else {
+                incorrectas++;
+                this.parentElement.classList.add('incorrecta');
+                // Al fallar, también mostramos visualmente cuál era la respuesta correcta
+                opcionesPregunta.forEach(opt => {
+                    if (opt.value === respuestaCorrecta) {
+                        opt.parentElement.classList.add('correcta');
+                    }
+                });
+            }
+
+            // Actualizar contador superior
+            respondidas++;
+            document.getElementById('respondadas').innerText = respondidas;
+            document.getElementById('correctas').innerText = correctas;
+            document.getElementById('incorrectas').innerText = incorrectas;
+        });
+    });
+</script>
+
+</body>
+</html>

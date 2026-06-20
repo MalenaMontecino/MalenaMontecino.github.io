@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de Autoevaluación - Tema 6</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        h2 {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+        /* Marcador fijo en la parte superior */
+        .marcador-container {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            padding: 15px;
+            border-bottom: 2px solid #2980b9;
+            margin-bottom: 30px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .marcador {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .marcador div {
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        .total { background-color: #e8f4f8; color: #2980b9; }
+        .bien { background-color: #d4edda; color: #155724; }
+        .mal { background-color: #f8d7da; color: #721c24; }
+
+        .pregunta {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .pregunta-texto {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        .opciones {
+            list-style: none;
+            padding: 0;
+        }
+        .opcion-item {
+            margin-bottom: 8px;
+        }
+        .opcion-label {
+            display: block;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .opcion-label:hover {
+            background: #e9ecef;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.1);
+        }
+        /* Clases para feedback visual */
+        .correcta {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724 !important;
+            font-weight: bold;
+        }
+        .incorrecta {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24 !important;
+        }
+        .deshabilitada {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cuestionario de Autoevaluación</h1>
+    <h2>Tema 6: Monitorización de Redes y Troubleshooting</h2>
+
+    <div class="marcador-container">
+        <div class="marcador">
+            <div class="total">Respondidas: <span id="respondadas">0</span> / 15</div>
+            <div class="bien">Bien: <span id="correctas">0</span></div>
+            <div class="mal">Mal: <span id="incorrectas">0</span></div>
+        </div>
+    </div>
+
+    <form id="quizForm">
+        <div class="pregunta" id="p1">
+            <div class="pregunta-texto">1. ¿Cuál es la principal ventaja de un enfoque de monitorización proactivo frente a uno reactivo?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="a"> A) El coste de inversión inicial es menor.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="b"> B) Los usuarios son los encargados de reportar las fallas primero.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="c"> C) Se utilizan alertas automáticas para prevenir incidentes antes de que afecten al negocio.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q1" value="d"> D) No requiere el uso de datos históricos para la planificación.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p2">
+            <div class="pregunta-texto">2. Si un contrato de nivel de servicio (SLA) garantiza un "Uptime" del 99,99%, ¿cuál es el tiempo máximo de caída permitido al año?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="a"> A) 8,76 horas.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="b"> B) 52,6 minutos.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="c"> C) 24 horas.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q2" value="d"> D) 5,26 minutos.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p3">
+            <div class="pregunta-texto">3. ¿Qué protocolo es el estándar de la industria para monitorizar y gestionar dispositivos de red de forma remota?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="a"> A) NetFlow.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="b"> B) OSPF.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="c"> C) SNMP.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q3" value="d"> D) ICMP.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p4">
+            <div class="pregunta-texto">4. ¿Sobre qué protocolo de transporte y puertos opera por defecto SNMP para consultas y notificaciones?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="a"> A) TCP, puertos 80 y 443.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="b"> B) UDP, puertos 161 y 162.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="c"> C) UDP, puertos 53 y 67.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q4" value="d"> D) TCP, puertos 22 y 23.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p5">
+            <div class="pregunta-texto">5. En la arquitectura SNMP, ¿qué elemento es el software que corre en el dispositivo monitorizado y responde a las consultas?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="a"> A) Manager (NMS).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="b"> B) MIB.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="c"> C) Agente.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q5" value="d"> D) Trap.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p6">
+            <div class="pregunta-texto">6. ¿Cómo se denomina a la base de datos jerárquica que define qué parámetros se pueden consultar en un dispositivo mediante SNMP?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="a"> A) OID.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="b"> B) MIB (Management Information Base).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="c"> C) NetFlow Cache.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q6" value="d"> D) SLA.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p7">
+            <div class="pregunta-texto">7. ¿Qué operación de SNMP utiliza el Agente para enviar una alerta al Manager de forma espontánea, sin que se la hayan pedido?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="a"> A) GET.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="b"> B) SET.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="c"> C) TRAP.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q7" value="d"> D) GET-BULK.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p8">
+            <div class="pregunta-texto">8. ¿Cuál es la versión de SNMP que es obligatoria en entornos con altos requisitos de seguridad porque añade cifrado y autenticación real?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="a"> A) SNMPv1.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="b"> B) SNMPv2c.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="c"> C) SNMPv3.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q8" value="d"> D) SNMPv4.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p9">
+            <div class="pregunta-texto">9. ¿Qué protocolo se utiliza específicamente para analizar quién, qué y hacia dónde está fluyendo el tráfico en una red?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="a"> A) SNMP.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="b"> B) NetFlow.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="c"> C) OSPF.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q9" value="d"> D) STP.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p10">
+            <div class="pregunta-texto">10. Según la diferencia clave entre SNMP y NetFlow, ¿cuál mide la granularidad de flujos individuales?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="a"> A) SNMP.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="b"> B) NetFlow.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="c"> C) Ambos por igual.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q10" value="d"> D) Ninguno, eso lo hace el protocolo BGP.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p11">
+            <div class="pregunta-texto">11. ¿En qué escenario de red es típico encontrar una arquitectura plana (192.168.1.0/24) sin segmentación ni VLANs?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="a"> A) Red de ISP (Proveedor).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="b"> B) Red Empresarial.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="c"> C) Red Doméstica.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q11" value="d"> D) Centro de Datos (Cloud).</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p12">
+            <div class="pregunta-texto">12. En la metodología de Troubleshooting, ¿cuál consiste en empezar el diagnóstico por la Capa 1 (Física/Cables)?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="a"> A) Top-Down.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="b"> B) Bottom-Up.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="c"> C) Divide y vencerás.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q12" value="d"> D) Análisis forense.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p13">
+            <div class="pregunta-texto">13. Si un usuario tiene conectividad local pero no puede navegar por Internet, y el comando 'nslookup' falla, ¿qué capa o servicio es probable que sea la causa raíz?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="a"> A) Capa 1 (Físico).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="b"> B) Capa 2 (Switching).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="c"> C) Resolución de nombres (DNS).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q13" value="d"> D) Protocolo BGP.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p14">
+            <div class="pregunta-texto">14. ¿Qué comando de red se utiliza para ver cada salto (router) que sigue un paquete y detectar dónde aumenta la latencia?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="a"> A) ping.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="b"> B) ipconfig.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="c"> C) traceroute (o tracert).</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q14" value="d"> D) netstat.</label></li>
+            </ul>
+        </div>
+
+        <div class="pregunta" id="p15">
+            <div class="pregunta-texto">15. ¿Cuándo se considera profesional y necesario "escalar" un problem de red?</div>
+            <ul class="opciones">
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="a"> A) Inmediatamente después de recibir la queja del usuario.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="b"> B) Cuando el problema afecta a servicios críticos y llevas más de 2 horas sin avances.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="c"> C) Sólo si el cable físico está roto.</label></li>
+                <li class="opcion-item"><label class="opcion-label"><input type="radio" name="q15" value="d"> D) Nunca, un buen administrador debe resolverlo todo solo.</label></li>
+            </ul>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Diccionario con las claves de respuesta correctas del usuario
+    const respuestasCorrectas = {
+        q1: 'c', q2: 'b', q3: 'c', q4: 'b', q5: 'c',
+        q6: 'b', q7: 'c', q8: 'c', q9: 'b', q10: 'b',
+        q11: 'c', q12: 'b', q13: 'c', q14: 'c', q15: 'b'
+    };
+
+    let respondidas = 0;
+    let correctas = 0;
+    let incorrectas = 0;
+
+    const inputs = document.querySelectorAll('input[type="radio"]');
+
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const nombrePregunta = this.name;
+            const valorSeleccionado = this.value;
+            const respuestaCorrecta = respuestasCorrectas[nombrePregunta];
+            
+            const numPregunta = nombrePregunta.replace('q', '');
+            const bloquePregunta = document.getElementById('p' + numPregunta);
+            
+            // Deshabilitar la pregunta una vez respondida
+            const opcionesPregunta = bloquePregunta.querySelectorAll('input[type="radio"]');
+            opcionesPregunta.forEach(opt => {
+                opt.disabled = true;
+                opt.parentElement.classList.add('deshabilitada');
+            });
+
+            // Validar acierto o error
+            if (valorSeleccionado === respuestaCorrecta) {
+                correctas++;
+                this.parentElement.classList.add('correcta');
+            } else {
+                incorrectas++;
+                this.parentElement.classList.add('incorrecta');
+                // Revelar la alternativa correcta
+                opcionesPregunta.forEach(opt => {
+                    if (opt.value === respuestaCorrecta) {
+                        opt.parentElement.classList.add('correcta');
+                    }
+                });
+            }
+
+            // Actualizar el panel superior de estadísticas
+            respondidas++;
+            document.getElementById('respondadas').innerText = respondidas;
+            document.getElementById('correctas').innerText = correctas;
+            document.getElementById('incorrectas').innerText = incorrectas;
+        });
+    });
+</script>
+
+</body>
+</html>
