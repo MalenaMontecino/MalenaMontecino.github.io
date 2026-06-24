@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST TEMA 4 — Sistemas de Numeración: Binario, Decimal y Hexadecimal</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 12px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .score-box {
+            padding: 6px 16px;
+            border-radius: 5px;
+        }
+        .score-total { background-color: #34495e; }
+        .score-correct { background-color: #27ae60; }
+        .score-incorrect { background-color: #c0392b; }
+        
+        .main-content {
+            margin-top: 110px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+        .question-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-item:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .question-card.answered .option-item {
+            pointer-events: none; 
+        }
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="scoreboard">
+            <div class="score-box score-total">Respondidas: <span id="total-answered">0</span> / 30</div>
+            <div class="score-box score-correct">Bien: <span id="correct-count">0</span></div>
+            <div class="score-box score-incorrect">Mal: <span id="incorrect-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>TEST TEMA 4 — Sistemas de Numeración: Binario, Decimal y Hexadecimal</h1>
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        const questionsData = [
+            {
+                q: "¿Por qué los computadores utilizan el sistema binario como lenguaje nativo?",
+                options: ["Porque es más fácil de entender para los programadores.", "Porque es físicamente sencillo distinguir entre dos estados de voltaje (alto/bajo).", "Porque consume menos memoria que el sistema decimal.", "Porque permite realizar operaciones matemáticas más complejas."],
+                correct: 1
+            },
+            {
+                q: "¿Qué base utiliza el sistema decimal, de uso humano cotidiano?",
+                options: ["Base 2.", "Base 8.", "Base 10.", "Base 16."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es la función principal del sistema hexadecimal en computación?",
+                options: ["Reemplazar al sistema binario en el hardware.", "Ofrecer una representación compacta y legible del binario.", "Realizar cálculos de punto flotante más rápidos.", "Cifrar datos de forma automática."],
+                correct: 1
+            },
+            {
+                q: "¿Cómo se define la unidad mínima de información?",
+                options: ["Byte.", "Nibble.", "Bit.", "Word."],
+                correct: 2
+            },
+            {
+                q: "¿Qué es un \"nibble\"?",
+                options: ["Un grupo de 8 bits.", "Un grupo de 4 bits, equivalente a un dígito hexadecimal.", "El bit de mayor peso en una cadena.", "Un código de error en la ALU."],
+                correct: 1
+            },
+            {
+                q: "¿Cuántos valores distintos puede representar un Byte (8 bits)?",
+                options: ["128.", "255.", "256 (de 0 a 255).", "512."],
+                correct: 2
+            },
+            {
+                q: "What significan las siglas MSB?",
+                options: ["Medium Significant Bit.", "Most Significant Bit (bit de mayor peso, a la izquierda).", "Memory System Bus.", "Main Serial Bit."],
+                correct: 1
+            },
+            {
+                q: "¿En qué lado de una cadena binaria se sitúa el LSB (Least Significant Bit)?",
+                options: ["En el extremo izquierdo.", "En el centro.", "En el extremo derecho.", "Depende de si el número es par o impar."],
+                correct: 2
+            },
+            {
+                q: "Para convertir un número binario a decimal, ¿qué peso tiene la posición 0 (derecha)?",
+                options: ["2¹", "2⁰ (= 1).", "0.", "10."],
+                correct: 1
+            },
+            {
+                q: "Según el ejemplo de los apuntes, ¿cuál es el valor decimal de 1101₂?",
+                options: ["11.", "12.", "13.", "15."],
+                correct: 2
+            },
+            {
+                q: "¿Qué método se utiliza para convertir un número decimal a binario?",
+                options: ["Multiplicación sucesiva por 2.", "Divisiones sucesivas entre 2, anotando los restos de abajo hacia arriba.", "Agrupación de nibbles.", "Aplicación del código Gray."],
+                correct: 1
+            },
+            {
+                q: "¿A cuántos bits equivale exactamente un dígito hexadecimal?",
+                options: ["1 bit.", "2 bits.", "4 bits.", "8 bits."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el valor decimal del dígito hexadecimal 'A'?",
+                options: ["1.", "9.", "10.", "11."],
+                correct: 2
+            },
+            {
+                q: "¿Qué letra representa el valor decimal 15 en hexadecimal?",
+                options: ["E.", "F.", "G.", "Z."],
+                correct: 1
+            },
+            {
+                q: "Para pasar de binario a hexadecimal, ¿cómo se deben agrupar los bits?",
+                options: ["De 2 en 2 desde la izquierda.", "De 8 en 8 (por bytes).", "De 4 en 4 empezando por la derecha.", "No es necesario agruparlos."],
+                correct: 2
+            },
+            {
+                q: "Según los apuntes, ¿a qué equivale el binario 1011 0011₂ en hexadecimal?",
+                options: ["A3₁₆.", "B3₁₆.", "C3₁₆.", "F3₁₆."],
+                correct: 1
+            },
+            {
+                q: "¿Qué es el código BCD (Binary Coded Decimal)?",
+                options: ["Una conversión binaria pura del número completo.", "Un sistema que representa cada dígito decimal con 4 bits independientes.", "Un código de detección de errores.", "El lenguaje usado en los buses de direcciones."],
+                correct: 1
+            },
+            {
+                q: "¿Cómo se representa el número decimal 25 en código BCD?",
+                options: ["11001.", "0010 0101.", "25h.", "0001 1001."],
+                correct: 1
+            },
+            {
+                q: "¿Dónde es habitual encontrar el uso del código BCD?",
+                options: ["En discos duros de alta capacidad.", "En calculadoras y visualizadores de 7 segmentos.", "En la memoria caché del procesador.", "En protocolos de red inalámbrica."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la característica principal del código Gray?",
+                options: ["Es el más rápido para sumar.", "Dos valores consecutivos solo difieren en un bit.", "Utiliza letras además de números.", "Siempre tiene un número par de unos."],
+                correct: 1
+            },
+            {
+                q: "¿Para qué se utiliza el código Gray en los Mapas de Karnaugh?",
+                options: ["Para reducir el tamaño del mapa.", "Para garantizar la adyacencia de una sola variable entre celdas.", "Para evitar el uso de la compuerta NOT.", "Para convertir directamente a decimal."],
+                correct: 1
+            },
+            {
+                q: "¿Qué operación lógica se usa para convertir entre binario y Gray?",
+                options: ["AND.", "OR.", "XOR.", "NAND."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el valor binario del dígito hexadecimal 'C'?",
+                options: ["1010.", "1100.", "1110.", "1011."],
+                correct: 1
+            },
+            {
+                q: "En el sistema decimal, ¿qué dígitos se utilizan?",
+                options: ["0 y 1.", "0 al 7.", "0 al 9.", "0 al 15."],
+                correct: 2
+            },
+            {
+                q: "¿Qué sistema de numeración es considerado el \"uso humano cotidiano\"?",
+                options: ["Binario.", "Octal.", "Hexadecimal.", "Decimal."],
+                correct: 3
+            },
+            {
+                q: "¿Qué aplicación de ciberseguridad menciona que el binario y el hexadecimal son omnipresentes?",
+                options: ["Cortafuegos analógicos.", "Volcados de memoria, shellcode y hashes criptográficos.", "Solo en el diseño de teclados.", "En la impresión de documentos físicos."],
+                correct: 1
+            },
+            {
+                q: "Si un número hexadecimal es (1AF3)₁₆, ¿cuántos nibbles tiene?",
+                options: ["1.", "2.", "4.", "16."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el peso de la posición 7 en un byte (bit más a la izquierda)?",
+                options: ["64.", "128.", "256.", "1024."],
+                correct: 1
+            },
+            {
+                q: "¿Qué código se utiliza en encoders angulares para evitar errores en las transiciones?",
+                options: ["BCD.", "ASCII.", "Binario puro.", "Código Gray."],
+                correct: 3
+            },
+            {
+                q: "¿A qué valor decimal equivale el binario 1001 0011₂?",
+                options: ["143.", "147.", "179.", "201."],
+                correct: 1
+            }
+        ];
+
+        let totalAnswered = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const container = document.getElementById('quiz-container');
+
+        questionsData.forEach((questionData, qIndex) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-card-${qIndex}`;
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.textContent = `${qIndex + 1}. ${questionData.q}`;
+            card.appendChild(qText);
+
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+
+            questionData.options.forEach((optionText, oIndex) => {
+                const optionItem = document.createElement('li');
+                optionItem.className = 'option-item';
+                optionItem.textContent = optionText;
+                
+                optionItem.addEventListener('click', () => handleAnswer(qIndex, oIndex));
+                optionsList.appendChild(optionItem);
+            });
+
+            card.appendChild(optionsList);
+            container.appendChild(card);
+        });
+
+        function handleAnswer(qIndex, selectedIndex) {
+            const card = document.getElementById(`q-card-${qIndex}`);
+            
+            if (card.classList.contains('answered')) return;
+
+            card.classList.add('answered');
+            totalAnswered++;
+            document.getElementById('total-answered').textContent = totalAnswered;
+
+            const correctIndex = questionsData[qIndex].correct;
+            const items = card.getElementsByClassName('option-item');
+
+            if (selectedIndex === correctIndex) {
+                items[selectedIndex].classList.add('correct');
+                correctCount++;
+                document.getElementById('correct-count').textContent = correctCount;
+            } else {
+                items[selectedIndex].classList.add('incorrect');
+                items[correctIndex].classList.add('correct'); 
+                incorrectCount++;
+                document.getElementById('incorrect-count').textContent = incorrectCount;
+            }
+        }
+    </script>
+</body>
+</html>

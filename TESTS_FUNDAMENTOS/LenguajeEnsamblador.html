@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST INTEGRAL: Lenguaje Ensamblador x86</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 12px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .score-box {
+            padding: 6px 16px;
+            border-radius: 5px;
+        }
+        .score-total { background-color: #34495e; }
+        .score-correct { background-color: #27ae60; }
+        .score-incorrect { background-color: #c0392b; }
+        
+        .main-content {
+            margin-top: 110px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+        .question-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-item:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .question-card.answered .option-item {
+            pointer-events: none; 
+        }
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="scoreboard">
+            <div class="score-box score-total">Respondidas: <span id="total-answered">0</span> / 50</div>
+            <div class="score-box score-correct">Bien: <span id="correct-count">0</span></div>
+            <div class="score-box score-incorrect">Mal: <span id="incorrect-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>TEST INTEGRAL: Lenguaje Ensamblador x86</h1>
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        const questionsData = [
+            {
+                q: "¿Qué define al lenguaje ensamblador?",
+                options: ["Es un lenguaje de alto nivel como C.", "Es el nivel de programación más cercano al hardware que usa nemónicos.", "Es el código binario puro de 1s y 0s.", "Es un lenguaje interpretado por el sistema operativo."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la relación entre una instrucción ensambladora y el código máquina?",
+                options: ["No tienen relación directa.", "Una instrucción genera múltiples operaciones máquina complejas.", "Cada instrucción se corresponde directamente con una instrucción de código máquina.", "El ensamblador es más lento que los lenguajes de alto nivel."],
+                correct: 2
+            },
+            {
+                q: "¿Qué registro de 32 bits es el acumulador principal para operaciones aritméticas?",
+                options: ["EBX", "ECX", "EAX", "EDX"],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es la función convencional del registro ECX?",
+                options: ["Apuntar al tope de la pila.", "Actuar como contador en los bucles (instrucción LOOP).", "Guardar la dirección de la próxima instrucción.", "Almacenar el valor de retorno de funciones."],
+                correct: 1
+            },
+            {
+                q: "¿Qué registro es el más crítico en seguridad porque apunta a la próxima instrucción?",
+                options: ["ESP", "EBP", "EIP", "ESI"],
+                correct: 2
+            },
+            {
+                q: "¿Qué registro apunta al tope de la pila (stack)?",
+                options: ["EBP", "ESP", "EDI", "EAX"],
+                correct: 1
+            },
+            {
+                q: "¿Qué hace la instrucción MOV dest, src?",
+                options: ["Suma el origen al destino.", "Intercambia los valores.", "Copia el origen en el destino sin modificar los flags.", "Mueve físicamente el dato borrando el origen."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el \"truco\" para poner un registro a cero eficientemente?",
+                options: ["MOV reg, 0", "XOR reg, reg", "SUB reg, 0", "AND reg, 0"],
+                correct: 1
+            },
+            {
+                q: "¿Qué diferencia a CMP de SUB?",
+                options: ["CMP no existe en x86.", "SUB no actualiza los flags.", "CMP resta internamente para actualizar flags pero no guarda el resultado.", "CMP siempre produce un salto incondicional."],
+                correct: 2
+            },
+            {
+                q: "¿En qué segmento se guardan las instrucciones del programa?",
+                options: [".data", ".bss", ".text", ".stack"],
+                correct: 2
+            },
+            {
+                q: "¿Hacia dónde crece la pila (stack) en la arquitectura x86?",
+                options: ["Hacia direcciones más altas.", "Hacia direcciones más bajas (decrecientes).", "No crece, es un bloque estático.", "Hacia el segmento .data."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es el flujo correcto de compilación?",
+                options: [".obj → .asm → linker.", ".asm → NASM → .obj → linker → ejecutable.", ".asm → linker → exe.", ".exe → NASM → .asm."],
+                correct: 1
+            },
+            {
+                q: "¿En qué sección se definen variables globales inicializadas?",
+                options: [".bss", ".text", ".data", ".stack"],
+                correct: 2
+            },
+            {
+                q: "¿Con qué carácter comienzan los comentarios en NASM?",
+                options: ["#", "//", "; (punto y coma)", "/*"],
+                correct: 2
+            },
+            {
+                q: "¿Qué directiva define un dato de 1 byte?",
+                options: ["DW", "DD", "DB", "DQ"],
+                correct: 2
+            },
+            {
+                q: "Cuántos bytes ocupa una variable definida con DW?",
+                options: ["1 byte.", "2 bytes.", "4 bytes.", "8 bytes."],
+                correct: 1
+            },
+            {
+                q: "¿Qué diferencia una variable de una constante EQU?",
+                options: ["La variable es más rápida.", "La constante ocupa más memoria.", "La constante no ocupa espacio en memoria en tiempo de ejecución.", "La constante solo puede ser de cadena."],
+                correct: 2
+            },
+            {
+                q: "¿Para qué sirve la directiva TIMES?",
+                options: ["Para medir el tiempo de ejecución.", "Para repetir una declaración de datos n veces.", "Para multiplicar registros.", "Para crear retardos en el reloj."],
+                correct: 1
+            },
+            {
+                q: "¿Qué indican los corchetes [ ] en NASM?",
+                options: ["El inicio de una macro.", "El acceso al contenido de una dirección de memoria.", "Un comentario de bloque.", "Una operación lógica."],
+                correct: 1
+            },
+            {
+                q: "¿Cómo se define una macro en NASM?",
+                options: ["Con la directiva EQU.", "Con %macro y %endmacro.", "Usando la instrucción CALL.", "Definiendo un segmento .macro."],
+                correct: 1
+            },
+            {
+                q: "¿Qué ventaja tiene una macro sobre una función?",
+                options: ["Ocupa menos memoria total.", "Es más rápida al evitar el overhead de CALL/RET.", "Permite recursividad infinita.", "No se sustituye en tiempo de ensamblado."],
+                correct: 1
+            },
+            {
+                q: "¿Qué registros se usan como punteros fuente y destino en cadenas?",
+                options: ["EAX y EBX.", "ESI y EDI.", "ESP y EBP.", "ECX y EDX."],
+                correct: 1
+            },
+            {
+                q: "¿Qué hace el prefijo REP con MOVS?",
+                options: ["Repite la copia del bloque de memoria CX veces.", "Salta a una etiqueta si son iguales.", "Detiene el programa.", "Incrementa el registro EIP."],
+                correct: 0
+            },
+            {
+                q: "¿Qué indica ORG 100h?",
+                options: ["Que el programa tiene 100 líneas.", "Que el código comienza en la dirección 100h (segmento .COM).", "Que se reservan 100h bytes en la pila.", "Es la interrupción de salida."],
+                correct: 1
+            },
+            {
+                q: "¿Qué registro indica la función deseada en INT 21h?",
+                options: ["AL", "DL", "AH", "DX"],
+                correct: 2
+            },
+            {
+                q: "¿Qué hace INT 21h con AH=09h?",
+                options: ["Leer un carácter.", "Terminar el programa.", "Imprimir una cadena de texto.", "Borrar la pantalla."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el delimitador de cadenas para la función 09h?",
+                options: ["\\0", "$", "#", "\\n"],
+                correct: 1
+            },
+            {
+                q: "Si lees el dígito '5', ¿qué valor recibe AL en ASCII?",
+                options: ["05h", "35h", "50h", "15h"],
+                correct: 1
+            },
+            {
+                q: "¿Cómo conviertes un dígito ASCII en su valor real?",
+                options: ["ADD AL, 30h", "SUB AL, 30h", "AND AL, 0DFh", "XOR AL, 20h"],
+                correct: 1
+            },
+            {
+                q: "¿Qué registro recibe el carácter leído en la función 01h?",
+                options: ["AH", "DL", "AL", "DX"],
+                correct: 2
+            },
+            {
+                q: "¿Dónde se pone el carácter que se quiere imprimir con la función 02h?",
+                options: ["AL", "AH", "DL", "BL"],
+                correct: 2
+            },
+            {
+                q: "¿Qué hace la instrucción LOOP?",
+                options: ["Salta siempre al inicio.", "Decrementa CX y salta si CX no es cero.", "Incrementa CX hasta llegar a 10.", "Compara AL con BL."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es el orden de la pila?",
+                options: ["FIFO (Primero en entrar, primero en salir).", "LIFO (Último en entrar, primero en salir).", "Aleatorio.", "Secuencial circular."],
+                correct: 1
+            },
+            {
+                q: "¿Qué máscara convierte minúsculas a mayúsculas con AND?",
+                options: ["20h", "0DFh", "0FFh", "00h"],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la diferencia numérica en ASCII entre 'A' y 'a'?",
+                options: ["10", "32 (20h)", "48", "1"],
+                correct: 1
+            },
+            {
+                q: "¿Qué instrucción guarda el EIP en la pila antes de saltar?",
+                options: ["JMP", "CALL", "RET", "PUSH"],
+                correct: 1
+            },
+            {
+                q: "¿Qué instrucción recupera el EIP de la pila para volver?",
+                options: ["POP", "CALL", "RET", "JMP"],
+                correct: 2
+            },
+            {
+                q: "¿Qué sucede en un PUSH AX con el registro ESP?",
+                options: ["ESP aumenta.", "ESP disminuye (en 2 bytes).", "ESP no cambia.", "ESP se pone a cero."],
+                correct: 1
+            },
+            {
+                q: "¿Qué segmento se usa para variables no inicializadas?",
+                options: [".text", ".data", ".bss", ".stack"],
+                correct: 2
+            },
+            {
+                q: "Qué registro apunta a la base del marco de pila actual?",
+                options: ["ESP", "EBP", "EAX", "EIP"],
+                correct: 1
+            },
+            {
+                q: "¿Qué instrucción realiza AX = AX * src?",
+                options: ["ADD", "MUL", "INC", "MOV"],
+                correct: 1
+            },
+            {
+                q: "¿Qué hace CMP AL, BL seguido de JE etiqueta?",
+                options: ["Salta si AL es mayor que BL.", "Salta si AL es igual a BL.", "Salta si AL es diferente de BL.", "Copia BL in AL."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la función para terminar un programa limpiamente?",
+                options: ["01h", "09h", "4Ch", "02h"],
+                correct: 2
+            },
+            {
+                q: "¿Qué directiva de NASM permite constantes redefinibles?",
+                options: ["EQU", "%assign", "DB", "DW"],
+                correct: 1
+            },
+            {
+                q: "¿Para qué sirve SECTION .bss?",
+                options: ["Guardar el código.", "Guardar constantes.", "Reservar espacio para variables que se inician a cero.", "Guardar la pila."],
+                correct: 2
+            },
+            {
+                q: "¿Qué registro se usa para direcciones de cadenas en la función 09h?",
+                options: ["AX", "DX (Offset)", "CX", "SI"],
+                correct: 1
+            },
+            {
+                q: "¿A qué equivale JNZ?",
+                options: ["Salta si el Zero Flag es 1.", "Salta si el Zero Flag es 0 (No es cero / No iguales).", "Salta siempre.", "No salta nunca."],
+                correct: 1
+            },
+            {
+                q: "¿Qué memoria crece hacia direcciones altas?",
+                options: ["Pila (Stack).", "Heap (Montículo).", ".text.", ".data."],
+                correct: 1
+            },
+            {
+                q: "¿Qué hace INC DL?",
+                options: ["Suma 1 a DL.", "Resta 1 a DL.", "Borra DL.", "Mueve DL a la pila."],
+                correct: 0
+            },
+            {
+                q: "¿Qué ocurre si olvidas el '$' en una cadena de la función 09h?",
+                options: ["El programa da error al ensamblar.", "El programa imprime basura de la memoria hasta hallar un $.", "El programa se apaga.", "No pasa nada, el SO lo añade solo."],
+                correct: 1
+            }
+        ];
+
+        let totalAnswered = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const container = document.getElementById('quiz-container');
+
+        questionsData.forEach((questionData, qIndex) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-card-${qIndex}`;
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.textContent = `${qIndex + 1}. ${questionData.q}`;
+            card.appendChild(qText);
+
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+
+            questionData.options.forEach((optionText, oIndex) => {
+                const optionItem = document.createElement('li');
+                optionItem.className = 'option-item';
+                optionItem.textContent = optionText;
+                
+                optionItem.addEventListener('click', () => handleAnswer(qIndex, oIndex));
+                optionsList.appendChild(optionItem);
+            });
+
+            card.appendChild(optionsList);
+            container.appendChild(card);
+        });
+
+        function handleAnswer(qIndex, selectedIndex) {
+            const card = document.getElementById(`q-card-${qIndex}`);
+            
+            if (card.classList.contains('answered')) return;
+
+            card.classList.add('answered');
+            totalAnswered++;
+            document.getElementById('total-answered').textContent = totalAnswered;
+
+            const correctIndex = questionsData[qIndex].correct;
+            const items = card.getElementsByClassName('option-item');
+
+            if (selectedIndex === correctIndex) {
+                items[selectedIndex].classList.add('correct');
+                correctCount++;
+                document.getElementById('correct-count').textContent = correctCount;
+            } else {
+                items[selectedIndex].classList.add('incorrect');
+                items[correctIndex].classList.add('correct'); 
+                incorrectCount++;
+                document.getElementById('incorrect-count').textContent = incorrectCount;
+            }
+        }
+    </script>
+</body>
+</html>

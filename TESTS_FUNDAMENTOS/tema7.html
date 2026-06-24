@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST TEMA 7 — Lenguaje Ensamblador y Datos en Memoria</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 12px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .score-box {
+            padding: 6px 16px;
+            border-radius: 5px;
+        }
+        .score-total { background-color: #34495e; }
+        .score-correct { background-color: #27ae60; }
+        .score-incorrect { background-color: #c0392b; }
+        
+        .main-content {
+            margin-top: 110px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+        .question-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-item:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .question-card.answered .option-item {
+            pointer-events: none; 
+        }
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="scoreboard">
+            <div class="score-box score-total">Respondidas: <span id="total-answered">0</span> / 30</div>
+            <div class="score-box score-correct">Bien: <span id="correct-count">0</span></div>
+            <div class="score-box score-incorrect">Mal: <span id="incorrect-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>TEST TEMA 7 — Lenguaje Ensamblador y Datos en Memoria</h1>
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        const questionsData = [
+            {
+                q: "¿Qué es el lenguaje ensamblador?",
+                options: ["Un lenguaje de alto nivel como C o Python.", "El nivel de programación más cercano al hardware que usa nemónicos legibles.", "El código binario puro que ejecuta directamente el procesador.", "Un sistema operativo para arquitecturas x86."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la relación entre una instrucción en ensamblador y el código máquina?",
+                options: ["Una instrucción de ensamblador genera siempre cientos de bytes de código máquina.", "No tienen relación directa.", "Cada instrucción ensambladora se corresponde directamente con una instrucción de código máquina.", "El ensamblador es más lento que los lenguajes de alto nivel."],
+                correct: 2
+            },
+            {
+                q: "¿Qué registro de 32 bits se utiliza convencionalmente como acumulador para operaciones aritméticas y valores de retorno?",
+                options: ["EBX", "ECX", "EAX", "EDX"],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es la función principal del registro ECX?",
+                options: ["Apuntar al tope de la pila.", "Actuar como contador en los bucles (instrucción LOOP).", "Guardar la dirección de la próxima instrucción.", "Almacenar el valor de retorno de una función."],
+                correct: 1
+            },
+            {
+                q: "¿Qué registro es el \"Contador de Programa\" que apunta a la dirección de la próxima instrucción?",
+                options: ["ESP", "EBP", "EIP", "ESI"],
+                correct: 2
+            },
+            {
+                q: "¿Por qué el registro EIP es el más crítico en ciberseguridad?",
+                options: ["Porque guarda las contraseñas del sistema.", "Porque controlarlo permite controlar el flujo de ejecución del programa.", "Porque es el único que puede realizar sumas.", "Porque borra la memoria RAM si se sobreescribe."],
+                correct: 1
+            },
+            {
+                q: "¿Qué registro apunta al tope de la pila (stack)?",
+                options: ["ESP", "EBP", "EDI", "EAX"],
+                correct: 0
+            },
+            {
+                q: "¿Qué hace la instrucción MOV dest, src?",
+                options: ["Suma el origen al destino.", "Intercambia los valores de origen y destino.", "Copia el contenido de origen en el destino sin modificar los flags.", "Borra el registro de destino."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el \"truco habitual\" para poner un registro a cero de forma eficiente?",
+                options: ["MOV registro, 0", "XOR registro, registro", "SUB registro, 0", "AND registro, 0"],
+                correct: 1
+            },
+            {
+                q: "¿Qué diferencia hay entre CMP a, b y SUB a, b?",
+                options: ["CMP no existe en x86.", "SUB no modifica los flags.", "CMP realiza la resta pero no guarda el resultado, solo actualiza los flags.", "CMP siempre salta a una etiqueta."],
+                correct: 2
+            },
+            {
+                q: "¿Qué instrucción se usa para llamar a una función guardando el EIP en la pila?",
+                options: ["JMP", "RET", "CALL", "PUSH"],
+                correct: 2
+            },
+            {
+                q: "¿En qué segmento de memoria se guardan las instrucciones del programa (solo lectura)?",
+                options: [".data", ".bss", ".text (o .code)", "Heap"],
+                correct: 2
+            },
+            {
+                q: "¿Hacia dónde crece la pila (stack) en la arquitectura x86?",
+                options: ["Hacia direcciones de memoria más altas.", "No crece, es de tamaño fijo.", "Hacia abajo (direcciones decrecientes).", "Hacia el segmento .text."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el flujo correcto de compilación en ensamblador?",
+                options: [".obj → .asm → linker → exe.", ".asm → NASM → .obj → linker → ejecutable.", ".asm → linker → NASM → exe.", ".exe → NASM → .asm."],
+                correct: 1
+            },
+            {
+                q: "¿Qué sección se utiliza para declarar variables globales inicializadas?",
+                options: ["section .bss", "section .text", "section .data", "section .stack"],
+                correct: 2
+            },
+            {
+                q: "¿Con qué carácter comienzan los comentarios en NASM?",
+                options: ["//", "#", "; (punto y coma)", "/*"],
+                correct: 2
+            },
+            {
+                q: "¿Qué directiva define una variable de 1 byte (8 bits)?",
+                options: ["DW", "DD", "DB", "DQ"],
+                correct: 2
+            },
+            {
+                q: "¿Cuántos bytes ocupa una variable definida con la directiva DD (Doubleword)?",
+                options: ["1 byte.", "2 bytes.", "4 bytes.", "8 bytes."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es la diferencia clave entre una variable y una constante (EQU)?",
+                options: ["La variable es más rápida.", "La constante no ocupa espacio en memoria en tiempo de ejecución.", "La constante puede cambiar su valor en cualquier momento.", "La variable solo puede ser numérica."],
+                correct: 1
+            },
+            {
+                q: "¿Para qué sirve la directiva TIMES?",
+                options: ["Para medir el tiempo de ejecución.", "Para repetir una declaración de datos n veces.", "Para multiplicar dos registros.", "Para crear un bucle infinito."],
+                correct: 1
+            },
+            {
+                q: "¿Qué indican los corchetes [ ] en NASM?",
+                options: ["Una multiplicación.", "El inicio de una macro.", "Acceso al contenido de una dirección de memoria.", "Un comentario de bloque."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es la diferencia entre MOV AX, BX y MOV AX, [BX]?",
+                options: ["No hay diferencia.", "La primera copia el registro BX; la segunda copia el contenido de la memoria apuntada por BX.", "La segunda es más rápida.", "La primera accede a memoria y la segunda no."],
+                correct: 1
+            },
+            {
+                q: "¿Cómo funciona una macro en el momento del ensamblado?",
+                options: ["Se convierte en una llamada CALL.", "El ensamblador sustituye cada llamada por el cuerpo de la macro (copy-paste inteligente).", "Se guarda en el segmento .bss.", "Solo puede usarse una vez en todo el programa."],
+                correct: 1
+            },
+            {
+                q: "¿Cuándo es preferible usar una macro en lugar de una función?",
+                options: ["Para programas muy largos.", "Cuando se quiere ahorrar memoria RAM.", "Para secuencias de código cortas y frecuentes, por ser más rápida al evitar el CALL/RET.", "Nunca, las funciones son siempre mejores."],
+                correct: 2
+            },
+            {
+                q: "¿Qué registros se usan habitualmente como punteros fuente y destino en instrucciones de cadena?",
+                options: ["EAX y EBX.", "ESI y EDI.", "ESP y EBP.", "ECX y EDX."],
+                correct: 1
+            },
+            {
+                q: "¿Qué hace la instrucción MOVS?",
+                options: ["Mueve un registro a la pila.", "Compara dos cadenas de texto.", "Copia un dato de [SI] a [DI] y avanza ambos punteros.", "Salta a una etiqueta si el Zero Flag es 1."],
+                correct: 2
+            },
+            {
+                q: "¿Qué prefijo se usa para repetir una instrucción de cadena CX veces automáticamente?",
+                options: ["LOOP", "REP", "TIMES", "CALL"],
+                correct: 1
+            },
+            {
+                q: "¿En qué sección se guardan las variables no inicializadas que se ponen a 0 al cargar el programa?",
+                options: [".text", ".data", ".bss", ".stack"],
+                correct: 2
+            },
+            {
+                q: "¿Qué directiva define una constante numérica que sí puede ser redefinida más adelante?",
+                options: ["EQU", "%assign", "DB", "%define"],
+                correct: 1
+            },
+            {
+                q: "¿Qué instrucción recupera el EIP de la pila y salta de vuelta tras una función?",
+                options: ["CALL", "POP", "RET", "JMP"],
+                correct: 2
+            }
+        ];
+
+        let totalAnswered = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const container = document.getElementById('quiz-container');
+
+        questionsData.forEach((questionData, qIndex) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-card-${qIndex}`;
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.textContent = `${qIndex + 1}. ${questionData.q}`;
+            card.appendChild(qText);
+
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+
+            questionData.options.forEach((optionText, oIndex) => {
+                const optionItem = document.createElement('li');
+                optionItem.className = 'option-item';
+                optionItem.textContent = optionText;
+                
+                optionItem.addEventListener('click', () => handleAnswer(qIndex, oIndex));
+                optionsList.appendChild(optionItem);
+            });
+
+            card.appendChild(optionsList);
+            container.appendChild(card);
+        });
+
+        function handleAnswer(qIndex, selectedIndex) {
+            const card = document.getElementById(`q-card-${qIndex}`);
+            
+            if (card.classList.contains('answered')) return;
+
+            card.classList.add('answered');
+            totalAnswered++;
+            document.getElementById('total-answered').textContent = totalAnswered;
+
+            const correctIndex = questionsData[qIndex].correct;
+            const items = card.getElementsByClassName('option-item');
+
+            if (selectedIndex === correctIndex) {
+                items[selectedIndex].classList.add('correct');
+                correctCount++;
+                document.getElementById('correct-count').textContent = correctCount;
+            } else {
+                items[selectedIndex].classList.add('incorrect');
+                items[correctIndex].classList.add('correct'); 
+                incorrectCount++;
+                document.getElementById('incorrect-count').textContent = incorrectCount;
+            }
+        }
+    </script>
+</body>
+</html>

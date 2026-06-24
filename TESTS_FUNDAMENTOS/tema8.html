@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST TEMA 8 — Programas Prácticos e Interrupciones (INT 21h)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 12px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .score-box {
+            padding: 6px 16px;
+            border-radius: 5px;
+        }
+        .score-total { background-color: #34495e; }
+        .score-correct { background-color: #27ae60; }
+        .score-incorrect { background-color: #c0392b; }
+        
+        .main-content {
+            margin-top: 110px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+        .question-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-item:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .question-card.answered .option-item {
+            pointer-events: none; 
+        }
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="scoreboard">
+            <div class="score-box score-total">Respondidas: <span id="total-answered">0</span> / 30</div>
+            <div class="score-box score-correct">Bien: <span id="correct-count">0</span></div>
+            <div class="score-box score-incorrect">Mal: <span id="incorrect-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>TEST TEMA 8 — Programas Prácticos e Interrupciones (INT 21h)</h1>
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        const questionsData = [
+            {
+                q: "¿Cuál es la función de la directiva ORG 100h al inicio de los programas prácticos?",
+                options: ["Define que el programa tiene 100 líneas de código.", "Sitúa el programa en un segmento .COM, empezando en la dirección 100h.", "Reserva 100 bytes en la pila.", "Indica que el programa debe ejecutarse 100 veces."],
+                correct: 1
+            },
+            {
+                q: "¿Qué par de instrucciones se utiliza siempre para realizar una salida limpia del programa en MS-DOS?",
+                options: ["MOV AX, 4C00h e INT 21h.", "JMP START e INT 10h.", "RET y POP EAX.", "MOV AH, 09h e INT 21h."],
+                correct: 0
+            },
+            {
+                q: "¿Qué registro debe cargar el programador para indicar qué función de INT 21h desea ejecutar?",
+                options: ["AL.", "DL.", "AH.", "DX."],
+                correct: 2
+            },
+            {
+                q: "Al usar la función 01h (Leer carácter), ¿dónde devuelve el sistema operativo el código ASCII de la tecla pulsada?",
+                options: ["En AH.", "En DL.", "En AL.", "En el segmento .data."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es la diferencia entre la función 01h y la función 08h de la INT 21h?",
+                options: ["La 01h lee una cadena y la 08h un solo carácter.", "La 01h muestra el carácter en pantalla (eco) y la 08h no.", "La 08h es más rápida que la 01h.", "No hay diferencia, son sinónimos."],
+                correct: 1
+            },
+            {
+                q: "Para mostrar un carácter en pantalla con la función 02h, ¿en qué registro debe colocarse dicho carácter?",
+                options: ["AL.", "DX.", "DL.", "AH."],
+                correct: 2
+            },
+            {
+                q: "¿Qué carácter actúa como delimitador obligatorio para imprimir cadenas con la función 09h?",
+                options: ["El carácter nulo (00h).", "El símbolo de exclamación (!).", "El símbolo de dólar ($).", "El carácter de nueva línea (\\n)."],
+                correct: 2
+            },
+            {
+                q: "¿Qué sucede si se olvida incluir el símbolo $ al final de una cadena definida para la función 09h?",
+                options: ["El ensamblador da un error de compilación.", "El programa se detiene inmediatamente.", "El programa sigue leyendo memoria basura y muestra caracteres aleatorios.", "Se imprime un espacio en blanco automáticamente."],
+                correct: 3
+            },
+            {
+                q: "Si lees el dígito \"1\" del teclado, ¿qué valor numérico real recibe el registro AL según la tabla ASCII?",
+                options: ["1h.", "10h.", "31h.", "01b."],
+                correct: 2
+            },
+            {
+                q: "¿Qué operación debe realizarse para convertir un código ASCII de un dígito ('0'-'9') en su valor matemático real?",
+                options: ["ADD AL, 30h.", "SUB AL, 30h.", "XOR AL, 20h.", "AND AL, 0DFh."],
+                correct: 1
+            },
+            {
+                q: "¿Por qué es necesario guardar el valor de AL in otro registro (como BL) tras una lectura antes de imprimir?",
+                options: ["Porque AL se borra automáticamente cada 10 ms.", "Porque al preparar la siguiente función de INT 21h (como la 02h) se sobreescribe el registro AH y el registro AL.", "Porque la pila solo acepta registros que empiecen por B.", "Para aumentar la velocidad del bus de datos."],
+                correct: 1
+            },
+            {
+                q: "¿Qué registro actúa como contador automático en la instrucción LOOP?",
+                options: ["EAX.", "EBX.", "CX (o ECX).", "DX."],
+                correct: 2
+            },
+            {
+                q: "¿A qué instrucciones de alto nivel equivale la combinación de CX y LOOP?",
+                options: ["A un condicional if-else.", "A un bucle for.", "A una declaración de variable.", "A una llamada a función printf."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es el primer código ASCII correspondiente al dígito '0'?",
+                options: ["00h.", "20h.", "30h.", "41h."],
+                correct: 2
+            },
+            {
+                q: "¿Qué hace internamente la instrucción CMP AL, 12h?",
+                options: ["Cambia el valor de AL a 12h.", "Realiza una resta interna (AL - 12h) para actualizar las FLAGS sin guardar el resultado.", "Salta a la etiqueta \"12h\".", "Suma 12h al registro de FLAGS."],
+                correct: 1
+            },
+            {
+                q: "¿Qué salto condicional debe usarse después de un CMP para ejecutar código si el primer valor es \"Mayor o Igual\" que el segundo?",
+                options: ["JE.", "JNE.", "JGE.", "JMP."],
+                correct: 2
+            },
+            {
+                q: "¿Qué significa el acrónimo LIFO en relación con la pila (Stack)?",
+                options: ["Low Input, Fast Output.", "Last In, First Out (El último en entrar es el primero en salir).", "Long Instruction For Operations.", "Logical Internal Flag Object."],
+                correct: 1
+            },
+            {
+                q: "¿Qué efecto tiene la instrucción PUSH AX sobre el puntero de pila (ESP)?",
+                options: ["Lo incrementa en 2 bytes.", "Lo pone a cero.", "Lo decrementa (generalmente en 2 o 4 bytes según la arquitectura).", "No lo modifica, solo afecta al bus de datos."],
+                correct: 2
+            },
+            {
+                q: "¿Cómo se puede usar la pila para intercambiar los valores de AX y BX sin un tercer registro?",
+                options: ["PUSH AX, PUSH BX, luego POP AX, POP BX.", "PUSH AX, POP BX.", "MOV AX, BX.", "XOR AX, BX."],
+                correct: 0
+            },
+            {
+                q: "¿Cuándo ocurre un \"Stack Overflow\" según los apuntes prácticos?",
+                options: ["Cuando se usa demasiado el registro EAX.", "Cuando se realizan demasiados PUSH sin sus correspondientes POP.", "Cuando se borra el segmento .text.", "Cuando el bus de control falla."],
+                correct: 1
+            },
+            {
+                q: "¿En qué sección de un programa NASM se define habitualmente una cadena de texto como MENSAJE DB 'hola$'?",
+                options: ["SECTION .text.", "SECTION .bss.", "SECTION .data.", "SECTION .stack."],
+                correct: 2
+            },
+            {
+                q: "Para imprimir una cadena con la función 09h, ¿qué debe cargarse en el registro DX?",
+                options: ["El primer carácter de la cadena.", "La longitud de la cadena en bits.", "La dirección de memoria (offset) donde comienza la cadena.", "El valor hexadecimal 24h."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es la diferencia numérica constante en ASCII entre una letra mayúscula y su minúscula?",
+                options: ["10 (0Ah).", "32 (20h).", "48 (30h).", "64 (40h)."],
+                correct: 1
+            },
+            {
+                q: "¿Qué operación lógica y máscara se usa para convertir una minúscula en mayúscula \"apagando\" el bit 5?",
+                options: ["OR AL, 20h.", "XOR AL, 20h.", "AND AL, 0DFh.", "NOT AL."],
+                correct: 2
+            },
+            {
+                q: "What hace la operación XOR AL, 20h sobre una letra en AL?",
+                options: ["La borra.", "La convierte siempre en mayúscula.", "Alterna entre mayúscula y minúscula.", "La convierte en un dígito numérico."],
+                correct: 2
+            },
+            {
+                q: "¿A qué rango de la tabla ASCII pertenecen los caracteres no imprimibles como NULL o TAB?",
+                options: ["0 a 31.", "32 a 47.", "48 a 57.", "65 a 90."],
+                correct: 0
+            },
+            {
+                q: "¿Cuál es el código ASCII en hexadecimal del carácter espacio?",
+                options: ["00h.", "09h.", "20h.", "30h."],
+                correct: 2
+            },
+            {
+                q: "¿Qué registro se usa como contador en un bucle LOOP?",
+                options: ["EAX.", "EBX.", "CX.", "DX."],
+                correct: 2
+            },
+            {
+                q: "En la regla mnemotécnica para el examen, si quieres \"mostrar texto\", ¿dónde pones la dirección?",
+                options: ["En AH.", "En AL.", "En DL.", "En DX."],
+                correct: 3
+            },
+            {
+                q: "¿Qué sucede con el registro CX cada vez que se ejecuta la instrucción LOOP?",
+                options: ["Se incrementa en 1.", "Se pone a cero.", "Se decrementa en 1 y se verifica si es cero para saltar.", "Se multiplica por 2."],
+                correct: 2
+            }
+        ];
+
+        let totalAnswered = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const container = document.getElementById('quiz-container');
+
+        questionsData.forEach((questionData, qIndex) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-card-${qIndex}`;
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.textContent = `${qIndex + 1}. ${questionData.q}`;
+            card.appendChild(qText);
+
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+
+            questionData.options.forEach((optionText, oIndex) => {
+                const optionItem = document.createElement('li');
+                optionItem.className = 'option-item';
+                optionItem.textContent = optionText;
+                
+                optionItem.addEventListener('click', () => handleAnswer(qIndex, oIndex));
+                optionsList.appendChild(optionItem);
+            });
+
+            card.appendChild(optionsList);
+            container.appendChild(card);
+        });
+
+        function handleAnswer(qIndex, selectedIndex) {
+            const card = document.getElementById(`q-card-${qIndex}`);
+            
+            if (card.classList.contains('answered')) return;
+
+            card.classList.add('answered');
+            totalAnswered++;
+            document.getElementById('total-answered').textContent = totalAnswered;
+
+            const correctIndex = questionsData[qIndex].correct;
+            const items = card.getElementsByClassName('option-item');
+
+            if (selectedIndex === correctIndex) {
+                items[selectedIndex].classList.add('correct');
+                correctCount++;
+                document.getElementById('correct-count').textContent = correctCount;
+            } else {
+                items[selectedIndex].classList.add('incorrect');
+                items[correctIndex].classList.add('correct'); 
+                incorrectCount++;
+                document.getElementById('incorrect-count').textContent = incorrectCount;
+            }
+        }
+    </script>
+</body>
+</html>

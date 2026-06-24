@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST TEMA 6 — Circuitos Secuenciales</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 12px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .score-box {
+            padding: 6px 16px;
+            border-radius: 5px;
+        }
+        .score-total { background-color: #34495e; }
+        .score-correct { background-color: #27ae60; }
+        .score-incorrect { background-color: #c0392b; }
+        
+        .main-content {
+            margin-top: 110px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+        .question-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-item:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .question-card.answered .option-item {
+            pointer-events: none; 
+        }
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="scoreboard">
+            <div class="score-box score-total">Respondidas: <span id="total-answered">0</span> / 30</div>
+            <div class="score-box score-correct">Bien: <span id="correct-count">0</span></div>
+            <div class="score-box score-incorrect">Mal: <span id="incorrect-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>TEST TEMA 6 — Circuitos Secuenciales</h1>
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        const questionsData = [
+            {
+                q: "¿De qué depende la salida de un circuito secuencial?",
+                options: ["Únicamente de las entradas actuales.", "De las entradas actuales y del estado interno almacenado (memoria).", "Exclusivamente del historial previo.", "Del número de compuertas AND utilizadas."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es el elemento de memoria básico en los circuitos secuenciales?",
+                options: ["La compuerta NAND.", "El biestable (latch o flip-flop).", "El decodificador con habilitación.", "El bus de datos."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la diferencia fundamental entre un latch y un flip-flop?",
+                options: ["El latch tiene más entradas que el flip-flop.", "El latch es asíncrono y el flip-flop es síncrono (funciona con reloj).", "El flip-flop no puede almacenar bits.", "El latch solo se usa en contadores."],
+                correct: 1
+            },
+            {
+                q: "En un Latch SR, ¿qué ocurre cuando la entrada S (Set) es 1 y R (Reset) es 0?",
+                options: ["La salida Q se mantiene igual.", "La salida Q se pone a 0.", "La salida Q se fuerza a 1.", "El circuito entra en estado prohibido."],
+                correct: 2
+            },
+            {
+                q: "¿Qué sucede en un Latch SR si ambas entradas S y R valen 0?",
+                options: ["La salida se pone a 0.", "El circuito mantiene el estado actual.", "La salida se pone a 1.", "Las salidas Q y Q̄ se vuelven iguales."],
+                correct: 1
+            },
+            {
+                q: "¿Por qué se considera que S=R=1 es un \"estado prohibido\" en el Latch SR?",
+                options: ["Porque produce que Q y Q̄ valgan 1 simultáneamente, lo cual es una contradicción lógica.", "Porque quema los transistores del circuito.", "Porque borra la memoria RAM del sistema.", "Porque obliga al procesador a reiniciarse."],
+                correct: 0
+            },
+            {
+                q: "¿Qué mejora introduce el Latch JK respecto al Latch SR?",
+                options: ["Es mucho más rápido.", "Elimina el estado prohibido; la combinación J=K=1 realiza la función Toggle.", "Permite almacenar 2 bits en lugar de uno.", "No requiere alimentación eléctrica."],
+                correct: 1
+            },
+            {
+                q: "¿Qué significa la función \"Toggle\" en un biestable JK?",
+                options: ["Que la salida se pone a 0 permanentemente.", "Que la salida se pone a 1 permanentemente.", "Que el estado actual de la salida Q se invierte.", "Que el biestable ignora las entradas."],
+                correct: 2
+            },
+            {
+                q: "¿En qué momento captura la salida Q el valor de la entrada D en un Flip-flop D?",
+                options: ["En cualquier momento que D cambie.", "Únicamente en el flanco de subida (↑) del reloj.", "Cuando el reloj está en nivel bajo.", "Solo cuando el sistema se apaga."],
+                correct: 1
+            },
+            {
+                q: "Según la analogía de los apuntes, ¿con qué objeto se compara el Flip-flop D?",
+                options: ["Con un interruptor de luz.", "Con una cámara fotográfica (la foto Q solo se toma en el disparo ↑CLK).", "Con un embudo de datos.", "Con un espejo."],
+                correct: 1
+            },
+            {
+                q: "¿Qué sucede con la salida Q de un Flip-flop D entre los flancos de reloj?",
+                options: ["Cambia siguiendo a la entrada D.", "Se borra automáticamente.", "Permanece invariable aunque D cambie.", "Oscila entre 0 y 1."],
+                correct: 2
+            },
+            {
+                q: "¿Qué función del Flip-flop JK síncrono permite que sea la base de los contadores?",
+                options: ["La función Reset.", "La función Toggle (J=K=1), que hace que Q alterne 0→1→0→1.", "La función Set.", "La capacidad de ignorar el reloj."],
+                correct: 1
+            },
+            {
+                q: "¿Qué es un registro?",
+                options: ["Una sola compuerta lógica de alta velocidad.", "Un conjunto de flip-flops conectados al mismo reloj que actúan en paralelo.", "Una parte del disco duro.", "Un cable que conecta la ALU con la UC."],
+                correct: 1
+            },
+            {
+                q: "¿A qué tipo corresponden los registros internos de la CPU (como EAX) para maximizar la velocidad?",
+                options: ["SISO (Entrada Serie - Salida Serie).", "SIPO (Entrada Serie - Salida Paralelo).", "PISO (Entrada Paralelo - Salida Serie).", "PIPO (Entrada Paralelo - Salida Paralelo)."],
+                correct: 3
+            },
+            {
+                q: "¿Qué significa que un registro sea de tipo SISO?",
+                options: ["Que los datos entran y salen simultáneamente en un ciclo.", "Que los datos entran y salen bit a bit, produciendo un retardo de n ciclos.", "Que convierte comunicación serie en paralelo.", "Que no usa señal de reloj."],
+                correct: 1
+            },
+            {
+                q: "¿Qué tipo de registro se usa para convertir datos paralelos en una trama serie para transmisión?",
+                options: ["PIPO.", "PISO.", "SISO.", "SIPO."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la diferencia entre un contador asíncrono (ripple) y uno síncrono?",
+                options: ["El asíncrono no usa biestables.", "En el asíncrono, la salida de un FF se conecta al reloj del siguiente; en el síncrono todos comparten el mismo reloj.", "El síncrono es mucho más lento.", "El asíncrono es el estándar en diseños modernos."],
+                correct: 1
+            },
+            {
+                q: "¿Cuántos estados distintos puede contar un contador de n flip-flops?",
+                options: ["n estados.", "Core estados.", "2ⁿ estados.", "n² estados."],
+                correct: 2
+            },
+            {
+                q: "Cuál es el rango de cuenta de un contador de 3 bits?",
+                options: ["De 0 a 3.", "De 0 a 7.", "De 1 a 8.", "De 0 a 15."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es el primer paso en el diseño formal de un circuito secuencial?",
+                options: ["Hacer el mapa de Karnaugh.", "Obtener la especificación verbal y el diagrama de estados.", "Conectar las compuertas lógicas.", "Escribir el código en ensamblador."],
+                correct: 1
+            },
+            {
+                q: "En la tabla de verdad de un biestable JK, ¿qué ocurre si J=0 y K=1?",
+                options: ["Set (Q=1).", "Reset (Q=0).", "Toggle.", "Mantener estado."],
+                correct: 1
+            },
+            {
+                q: "¿Qué elemento permite \"sincronizar\" los cambios en un circuito secuencial síncrono?",
+                options: ["La memoria RAM.", "La señal de reloj (CLK).", "El bus de direcciones.", "El usuario."],
+                correct: 1
+            },
+            {
+                q: "Qué tipo de registro convierte una comunicación serie (como RS-232) en paralelo?",
+                options: ["SIPO.", "PISO.", "PIPO.", "SISO."],
+                correct: 0
+            },
+            {
+                q: "Si un contador de 4 bits está en el estado 1111, ¿cuál es el siguiente estado tras un pulso de reloj?",
+                options: ["1111 (se bloquea).", "0000 (vuelve a empezar).", "1000.", "Se apaga el circuito."],
+                correct: 1
+            },
+            {
+                q: "¿Qué herramienta se usa para obtener las ecuaciones de excitación de los flip-flops en un diseño?",
+                options: ["Álgebra de Boole manual únicamente.", "Mapas de Karnaugh.", "Un multímetro.", "Un codificador con prioridad."],
+                correct: 1
+            },
+            {
+                q: "En el ejercicio de la \"Caja fuerte\", ¿qué sucede si se introduce una secuencia incorrecta?",
+                options: ["El sistema se bloquea para siempre.", "El sistema se reinicia al estado inicial S0.", "Se activa la alarma sonora.", "El sistema permite un intento más."],
+                correct: 1
+            },
+            {
+                q: "¿Qué significa que el estado final de un Latch SR tras S=R=1 sea \"imprevisible\"?",
+                options: ["Que siempre será 0.", "Que siempre será 1.", "Que depende de las tolerancias físicas del circuito.", "Que el circuito se destruye."],
+                correct: 2
+            },
+            {
+                q: "¿Cuántos flip-flops D se necesitan para construir un registro de 32 bits (como EAX)?",
+                options: ["1.", "8.", "32.", "64."],
+                correct: 2
+            },
+            {
+                q: "¿Cómo se define \"paralelo\" en el contexto de registros?",
+                options: ["Los bits entran uno a uno por ciclo.", "Todos los bits entran o salen simultáneamente en un solo ciclo.", "El reloj es asíncrono.", "El circuito no tiene memoria."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la función principal de los flip-flops JK en los contadores síncronos?",
+                options: ["Evitar el uso de compuertas lógicas.", "Actuar como retardos de señal.", "Alternar su estado (Toggle) para representar el siguiente bit binario.", "Conectarse directamente al bus de direcciones."],
+                correct: 2
+            }
+        ];
+
+        let totalAnswered = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const container = document.getElementById('quiz-container');
+
+        questionsData.forEach((questionData, qIndex) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-card-${qIndex}`;
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.textContent = `${qIndex + 1}. ${questionData.q}`;
+            card.appendChild(qText);
+
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+
+            questionData.options.forEach((optionText, oIndex) => {
+                const optionItem = document.createElement('li');
+                optionItem.className = 'option-item';
+                optionItem.textContent = optionText;
+                
+                optionItem.addEventListener('click', () => handleAnswer(qIndex, oIndex));
+                optionsList.appendChild(optionItem);
+            });
+
+            card.appendChild(optionsList);
+            container.appendChild(card);
+        });
+
+        function handleAnswer(qIndex, selectedIndex) {
+            const card = document.getElementById(`q-card-${qIndex}`);
+            
+            if (card.classList.contains('answered')) return;
+
+            card.classList.add('answered');
+            totalAnswered++;
+            document.getElementById('total-answered').textContent = totalAnswered;
+
+            const correctIndex = questionsData[qIndex].correct;
+            const items = card.getElementsByClassName('option-item');
+
+            if (selectedIndex === correctIndex) {
+                items[selectedIndex].classList.add('correct');
+                correctCount++;
+                document.getElementById('correct-count').textContent = correctCount;
+            } else {
+                items[selectedIndex].classList.add('incorrect');
+                items[correctIndex].classList.add('correct'); 
+                incorrectCount++;
+                document.getElementById('incorrect-count').textContent = incorrectCount;
+            }
+        }
+    </script>
+</body>
+</html>

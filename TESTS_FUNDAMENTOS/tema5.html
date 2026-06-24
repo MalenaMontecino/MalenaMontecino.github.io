@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST TEMA 5 — Circuitos Combinacionales</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 12px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .score-box {
+            padding: 6px 16px;
+            border-radius: 5px;
+        }
+        .score-total { background-color: #34495e; }
+        .score-correct { background-color: #27ae60; }
+        .score-incorrect { background-color: #c0392b; }
+        
+        .main-content {
+            margin-top: 110px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+        .question-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-item:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .question-card.answered .option-item {
+            pointer-events: none; 
+        }
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="scoreboard">
+            <div class="score-box score-total">Respondidas: <span id="total-answered">0</span> / 30</div>
+            <div class="score-box score-correct">Bien: <span id="correct-count">0</span></div>
+            <div class="score-box score-incorrect">Mal: <span id="incorrect-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>TEST TEMA 5 — Circuitos Combinacionales</h1>
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        const questionsData = [
+            {
+                q: "¿Qué define fundamentalmente a un circuito combinacional?",
+                options: ["Su salida depende de las entradas actuales y del estado previo.", "Su salida en cada instante depende exclusivamente de sus entradas actuales.", "Requiere de un biestable para funcionar.", "Utiliza un reloj (CLK) para sincronizar las salidas."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál de las siguientes afirmaciones es cierta sobre los circuitos combinacionales?",
+                options: ["Poseen memoria interna.", "La salida es una función booleana pura de las entradas.", "Son más complejos que los secuenciales porque guardan el historial previo.", "Los registros y contadores son ejemplos típicos de esta familia."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la función de un semisumador?",
+                options: ["Sumar tres bits incluyendo un acarreo de entrada.", "Sumar dos bits y producir una suma y un acarreo de salida.", "Realizar únicamente operaciones lógicas AND y OR.", "Almacenar el resultado de una suma en la memoria RAM."],
+                correct: 1
+            },
+            {
+                q: "En un semisumador, ¿qué operación lógica define la salida de Suma (S)?",
+                options: ["A·B.", "A+B.", "A⊕B (XOR).", "A·B (NAND)."],
+                correct: 2
+            },
+            {
+                q: "¿Qué salida produce un semisumador para el Acarreo de salida (Cout)?",
+                options: ["A⊕B.", "A·B.", "A+B.", "A."],
+                correct: 1
+            },
+            {
+                q: "¿Por qué un semisumador solo sirve para la posición menos significativa de un número?",
+                options: ["Porque es muy lento.", "Porque no acepta acarreo de entrada (Cin).", "Porque solo tiene una salida.", "Porque no puede realizar restas."],
+                correct: 1
+            },
+            {
+                q: "¿Qué componente es considerado la base de la ALU y permite operar con múltiples bits?",
+                options: ["El semisumador.", "El sumador completo.", "El multiplexor.", "El decodificador."],
+                correct: 1
+            },
+            {
+                q: "¿Cuántas entradas tiene un sumador completo?",
+                options: ["Dos: A y B.", "Tres: A, B y el Acarreo de entrada (Cin).", "Dos: Suma y Acarreo.", "Cuatro: A, B, Cin y EN."],
+                correct: 1
+            },
+            {
+                q: "¿A qué se le llama sumador con acarreo en serie (ripple carry adder)?",
+                options: ["A un sumador que solo usa compuertas NAND.", "Al encadenamiento de n sumadores completos donde el Cout de uno pasa como Cin al siguiente.", "A un circuito que suma bits de forma asíncrona sin usar la ALU.", "A un codificador conectado a un decodificador."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la función de un codificador?",
+                options: ["Recibir un código binario y activar una línea de salida.", "Convertir la posición de una entrada activa en su equivalente binario.", "Seleccionar una entrada de datos mediante líneas de selección.", "Sumar dos números binarios de 4 bits."],
+                correct: 1
+            },
+            {
+                q: "Si un codificador tiene 2ⁿ entradas, ¿cuántas salidas tiene?",
+                options: ["1.", "2ⁿ.", "n.", "n+1."],
+                correct: 2
+            },
+            {
+                q: "¿Qué problema presenta el codificador básico si se activan dos entradas a la vez?",
+                options: ["El circuito se quema por sobrevoltaje.", "El resultado binario es incorrecto.", "Se activa la entrada de habilitación (EN).", "El sistema entra en estado de \"Toggle\"."],
+                correct: 1
+            },
+            {
+                q: "¿Cómo se soluciona el conflicto de activación simultánea en los codificadores?",
+                options: ["Usando un demultiplexor.", "Mediante un codificador con prioridad.", "Añadiendo más salidas de datos.", "Reiniciando el bus del sistema."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la función principal de un decodificador?",
+                options: ["Convertir código binario en la activación de exactamente una salida.", "Convertir señales analógicas en digitales.", "Sumar el acarreo de entrada a los datos.", "Enrutar una entrada a muchas salidas."],
+                correct: 0
+            },
+            {
+                q: "¿Para qué se suele usar habitualmente un decodificador?",
+                options: ["Para realizar operaciones AND y OR masivas.", "Para seleccionar chips o posiciones de memoria.", "Como elemento de memoria en los registros de la CPU.", "Para reducir el ruido en señales analógicas."],
+                correct: 1
+            },
+            {
+                q: "En un decodificador 2x4, ¿a qué equivale cada una de sus salidas?",
+                options: ["A un maxtérmino de las entradas.", "A un minitérmino de las entradas.", "A la suma lógica de las entradas.", "Al inverso del código binario de entrada."],
+                correct: 1
+            },
+            {
+                q: "¿Qué sucede en un decodificador si la entrada de habilitación (EN) vale 0?",
+                options: ["Se activa la salida D0.", "Todas las salidas se desactivan independientemente de las entradas.", "El decodificador funciona normalmente pero más lento.", "Se invierten todas las señales de salida."],
+                correct: 1
+            },
+            {
+                q: "¿Qué componente actúa como un conmutador de señal con muchas fuentes y una sola salida?",
+                options: ["El decodificador.", "El codificador.", "El multiplexor (MUX).", "El demultiplexor (DEMUX)."],
+                correct: 2
+            },
+            {
+                q: "¿Cómo elige un multiplexor qué entrada de datos conectar a la salida?",
+                options: ["Mediante la entrada de acarreo.", "Según el valor de sus n líneas de selección.", "Por orden de llegada (prioridad física).", "Invirtiendo el bit más significativo (MSB)."],
+                correct: 1
+            },
+            {
+                q: "Si un multiplexor tiene 8 entradas de datos, ¿cuántas líneas de selección necesita?",
+                options: ["1.", "2.", "3.", "8."],
+                correct: 2
+            },
+            {
+                q: "¿Qué hace un demultiplexor (DEMUX)?",
+                options: ["Selecciona una de muchas entradas y la saca por una salida.", "Toma una única entrada de datos y la enruta hacia una de sus 2ⁿ salidas.", "Convierte código Gray en binario natural.", "Almacena un bit de datos en cada flanco de reloj."],
+                correct: 1
+            },
+            {
+                q: "¿A qué otro circuito es idéntico un demultiplexor desde el punto de vista circuital?",
+                options: ["A un sumador completo.", "A un decodificador con habilitación (EN).", "A un codificador con prioridad.", "A un biestable JK síncrono."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la salida de un sumador completo si sus entradas son A=1, B=1 y Cin=0?",
+                options: ["S=0, Cout=0.", "S=1, Cout=0.", "S=0, Cout=1.", "S=1, Cout=1."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es la salida de un sumador completo si sus entradas son A=1, B=1 y Cin=1?",
+                options: ["S=0, Cout=1.", "S=1, Cout=1.", "S=1, Cout=0.", "S=0, Cout=0."],
+                correct: 1
+            },
+            {
+                q: "En un MUX 4x1 con líneas de selección S1=1 y S0=0, ¿qué entrada pasa a la salida Y?",
+                options: ["I0.", "I1.", "I2.", "I3."],
+                correct: 2
+            },
+            {
+                q: "¿Qué tipo de circuito se usa en calculadoras y visualizadores de 7 segmentos para trabajar con dígitos decimales?",
+                options: ["Semisumador.", "Código BCD.", "Multiplexor 16 a 1.", "Registro de desplazamiento."],
+                correct: 1
+            },
+            {
+                q: "¿Qué ocurre con las salidas no seleccionadas en un demultiplexor?",
+                options: ["Reciben el valor inverso de la entrada.", "Reciben un valor de 0.", "Mantienen su estado previo.", "Entran en estado de alta impedancia."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la unidad mínima de información que puede procesar un circuito combinacional de 1 bit?",
+                options: ["Byte.", "Nibble.", "Bit.", "Word."],
+                correct: 2
+            },
+            {
+                q: "Qué componente de la CPU utiliza sumadores completos de forma masiva para sus cálculos?",
+                options: ["La Unidad de Control (UC).", "Los Registros.", "La Unidad Aritmético-Lógica (ALU).", "El Bus de direcciones."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál de estos NO es un circuito combinacional?",
+                options: ["Sumador.", "Multiplexor.", "Decodificador.", "Registro."],
+                correct: 3
+            }
+        ];
+
+        let totalAnswered = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const container = document.getElementById('quiz-container');
+
+        questionsData.forEach((questionData, qIndex) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-card-${qIndex}`;
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.textContent = `${qIndex + 1}. ${questionData.q}`;
+            card.appendChild(qText);
+
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+
+            questionData.options.forEach((optionText, oIndex) => {
+                const optionItem = document.createElement('li');
+                optionItem.className = 'option-item';
+                optionItem.textContent = optionText;
+                
+                optionItem.addEventListener('click', () => handleAnswer(qIndex, oIndex));
+                optionsList.appendChild(optionItem);
+            });
+
+            card.appendChild(optionsList);
+            container.appendChild(card);
+        });
+
+        function handleAnswer(qIndex, selectedIndex) {
+            const card = document.getElementById(`q-card-${qIndex}`);
+            
+            if (card.classList.contains('answered')) return;
+
+            card.classList.add('answered');
+            totalAnswered++;
+            document.getElementById('total-answered').textContent = totalAnswered;
+
+            const correctIndex = questionsData[qIndex].correct;
+            const items = card.getElementsByClassName('option-item');
+
+            if (selectedIndex === correctIndex) {
+                items[selectedIndex].classList.add('correct');
+                correctCount++;
+                document.getElementById('correct-count').textContent = correctCount;
+            } else {
+                items[selectedIndex].classList.add('incorrect');
+                items[correctIndex].classList.add('correct'); 
+                incorrectCount++;
+                document.getElementById('incorrect-count').textContent = incorrectCount;
+            }
+        }
+    </script>
+</body>
+</html>

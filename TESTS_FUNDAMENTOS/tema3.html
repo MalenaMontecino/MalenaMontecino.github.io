@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST TEMA 3 — Formas Canónicas y Mapas de Karnaugh</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 12px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .score-box {
+            padding: 6px 16px;
+            border-radius: 5px;
+        }
+        .score-total { background-color: #34495e; }
+        .score-correct { background-color: #27ae60; }
+        .score-incorrect { background-color: #c0392b; }
+        
+        .main-content {
+            margin-top: 110px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+        .question-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-item:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .question-card.answered .option-item {
+            pointer-events: none; 
+        }
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="scoreboard">
+            <div class="score-box score-total">Respondidas: <span id="total-answered">0</span> / 30</div>
+            <div class="score-box score-correct">Bien: <span id="correct-count">0</span></div>
+            <div class="score-box score-incorrect">Mal: <span id="incorrect-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>TEST TEMA 3 — Formas Canónicas y Mapas de Karnaugh</h1>
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        const questionsData = [
+            {
+                q: "¿Qué es una forma canónica en lógica digital?",
+                options: ["Una expresión simplificada mediante leyes de Boole.", "Un diagrama físico de transistores.", "Una representación estándar obtenida directamente de la tabla de verdad.", "Un código de error del procesador."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el nombre de la forma canónica SdP?",
+                options: ["Suma de Minitérminos.", "Suma de Maxtérminos.", "Producto de Sumas.", "Sistema de Puntos."],
+                correct: 0
+            },
+            {
+                q: "¿Cómo se define un minitérmino?",
+                options: ["Como la suma de todas las variables de una fila.", "Como el producto (AND) de todas las variables de una fila.", "Como el valor más pequeño de una función.", "Como una variable que siempre vale cero."],
+                correct: 1
+            },
+            {
+                q: "En un minitérmino, ¿cómo aparece una variable si su valor en la fila es 0?",
+                options: ["En forma normal o directa.", "No aparece en la expresión.", "En forma negada.", "Como un número decimal."],
+                correct: 2
+            },
+            {
+                q: "¿Qué representa el índice \"i\" en la notación Σm(i, j, k…)?",
+                options: ["El valor decimal de la combinación binaria de la fila con salida 1.", "El número de variables del sistema.", "La cantidad total de compuertas AND necesarias.", "El número de la columna en el mapa de Karnaugh."],
+                correct: 0
+            },
+            {
+                q: "¿Qué es la forma canónica PdS?",
+                options: ["Producto de Minitérminos.", "Producto de Maxtérminos.", "Suma de Productos.", "Proceso de Simplificación."],
+                correct: 1
+            },
+            {
+                q: "¿Cómo se obtiene un maxtérmino?",
+                options: ["Multiplicando las variables donde la función vale 1.", "Sumando las variables donde la función vale 1.", "Sumando todas las variables donde la función vale 0.", "Invirtiendo el resultado de un mapa de Karnaugh."],
+                correct: 2
+            },
+            {
+                q: "En un maxtérmino, ¿cómo aparece una variable si su valor en la fila es 0?",
+                options: ["Aparece directa (normal).", "Aparece negada.", "Se elimina de la suma.", "Se multiplica por el resto."],
+                correct: 0
+            },
+            {
+                q: "Si la combinación binaria de una fila es 011, ¿cuál es su índice decimal?",
+                options: ["1", "3", "6", "7."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es el minitérmino correspondiente a la fila A=0, B=1, C=1 con salida 1?",
+                options: ["A·B·C", "Ā·B·C", "A+B̄+C̄", "m5"],
+                correct: 1
+            },
+            {
+                q: "¿Qué forma canónica es la más solicitada habitualmente en los exámenes?",
+                options: ["Maxtérminos (PdS).", "Simplificación por leyes de Boole.", "Suma de Minitérminos (SdP).", "Código Gray."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál era el inconveniente de la simplificación algebraica antes de los mapas de Karnaugh?",
+                options: ["No permitía usar variables negadas.", "Solo funcionaba con dos variables.", "No se basaba en el Álgebra de Boole.", "Era un proceso lento y propenso a errores en funciones complejas."],
+                correct: 3
+            },
+            {
+                q: "¿Qué característica fundamental tiene el mapa de Karnaugh?",
+                options: ["Organiza las celdas en orden binario natural.", "Permite simplificar funciones de forma visual y sistemática.", "Solo se puede usar para circuitos secuenciales.", "Requiere el uso obligatorio de maxtérminos."],
+                correct: 1
+            },
+            {
+                q: "¿Cuántas celdas tiene la cuadrícula de un mapa para 4 variables (A, B, C, D)?",
+                options: ["4", "8", "16", "32"],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el orden correcto de las columnas en un mapa de Karnaugh siguiendo el código Gray?",
+                options: ["00 → 01 → 10 → 11", "01 → 10 → 11 → 00", "00 → 01 → 11 → 10", "00 → 10 → 01 → 11"],
+                correct: 2
+            },
+            {
+                q: "¿Por qué se utiliza el código Gray en los mapas de Karnaugh?",
+                options: ["Porque es más rápido de leer por la CPU.", "Porque garantiza que las celdas adyacentes difieren en una sola variable.", "Porque elimina automáticamente los grupos redundantes.", "Porque es compatible con el sistema hexadecimal."],
+                correct: 1
+            },
+            {
+                q: "Al agrupar en un mapa de Karnaugh para obtener una SdP, ¿qué celdas se agrupan?",
+                options: ["Solo celdas con valor 1.", "Solo celdas con valor 0.", "Celdas con 0s y 1s indistintamente.", "Celdas ubicadas en las esquinas únicamente."],
+                correct: 0
+            },
+            {
+                q: "¿Qué forma deben tener los grupos en un mapa de Karnaugh?",
+                options: ["Círculos o triángulos.", "Cualquier forma siempre que las celdas estén juntas.", "Rectángulos o cuadrados.", "Líneas diagonales únicamente."],
+                correct: 2
+            },
+            {
+                q: "¿Qué tamaños de grupo son válidos en un mapa de Karnaugh?",
+                options: ["Cualquier número par.", "Solo potencias de 2 (1, 2, 4, 8...).", "Grupos de 3, 5 o 7 celdas.", "Solo grupos de 4 o 16 celdas."],
+                correct: 1
+            },
+            {
+                q: "¿Cuántas variables se eliminan al formar un grupo de 4 celdas?",
+                options: ["0", "1", "2", "3"],
+                correct: 2
+            },
+            {
+                q: "¿Qué significa que el mapa de Karnaugh sea \"toroidal\"?",
+                options: ["Que los bordes opuestos (primera/última fila y columna) son adyacentes.", "Que tiene forma de pirámide.", "Que las variables se multiplican en círculo.", "Que no puede tener más de 16 celdas."],
+                correct: 0
+            },
+            {
+                q: "¿Es posible que una celda con un \"1\" pertenezca a varios grupos a la vez?",
+                options: ["No, una vez agrupada no puede usarse de nuevo.", "Solo si el mapa es de 2 variables.", "Solo si está en una esquina.", "Sí, una celda puede pertenecer a varios grupos simultáneamente."],
+                correct: 3
+            },
+            {
+                q: "¿Cuándo se considera que un grupo es redundante?",
+                options: ["Cuando tiene un tamaño impar.", "Cuando todos sus \"1\" ya están cubiertos por otros grupos.", "Cuando se encuentra en el centro del mapa.", "Cuando elimina tres variables a la vez."],
+                correct: 1
+            },
+            {
+                q: "¿Qué debe hacerse con los grupos redundantes en la simplificación final?",
+                options: ["Deben sumarse al resultado final.", "Deben eliminarse.", "Deben multiplicarse por el término mayor.", "Deben convertirse en maxtérminos."],
+                correct: 1
+            },
+            {
+                q: "Si una variable cambia de valor dentro de un grupo (vale 0 en unas celdas y 1 en otras):",
+                options: ["Se mantiene en el término final como variable negada.", "Desaparecen del término (se elimina).", "Se convierte en una constante \"1\".", "Se suma al acarreo de la ALU."],
+                correct: 1
+            },
+            {
+                q: "Si dentro de un grupo la variable A vale siempre 0, ¿cómo aparece en el término?",
+                options: ["Como A.", "Se elimina.", "Como Ā (negada).", "Como un minitérmino m0."],
+                correct: 2
+            },
+            {
+                q: "Cuál es el objetivo principal al agrupar en un mapa de Karnaugh?",
+                options: ["Hacer el mayor número de grupos pequeños posible.", "Cubrir solo los 1s de las esquinas.", "Cubrir todos los 1s con el mínimo número de grupos y lo más grandes posible.", "Eliminar todas las variables de la función."],
+                correct: 2
+            },
+            {
+                q: "En el ejemplo F(A,B,C) = Σm(3,4,6,7), ¿qué término genera el grupo de los minitérminos 3 y 7?",
+                options: ["AB", "BC", "AC̄", "ĀB"],
+                correct: 1
+            },
+            {
+                q: "En el mismo ejemplo Σm(3,4,6,7), ¿qué término genera el grupo de los minitérminos 4 y 6?",
+                options: ["BC", "AB", "AC̄", "B̄C̄"],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es un error típico en el examen al usar mapas de Karnaugh?",
+                options: ["Usar potencias de 2 para los grupos.", "Incluir un grupo redundante in el resultado.", "Agrupar celdas adyacentes.", "Eliminar las variables que cambian de valor."],
+                correct: 1
+            }
+        ];
+
+        let totalAnswered = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const container = document.getElementById('quiz-container');
+
+        questionsData.forEach((questionData, qIndex) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-card-${qIndex}`;
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.textContent = `${qIndex + 1}. ${questionData.q}`;
+            card.appendChild(qText);
+
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+
+            questionData.options.forEach((optionText, oIndex) => {
+                const optionItem = document.createElement('li');
+                optionItem.className = 'option-item';
+                optionItem.textContent = optionText;
+                
+                optionItem.addEventListener('click', () => handleAnswer(qIndex, oIndex));
+                optionsList.appendChild(optionItem);
+            });
+
+            card.appendChild(optionsList);
+            container.appendChild(card);
+        });
+
+        function handleAnswer(qIndex, selectedIndex) {
+            const card = document.getElementById(`q-card-${qIndex}`);
+            
+            if (card.classList.contains('answered')) return;
+
+            card.classList.add('answered');
+            totalAnswered++;
+            document.getElementById('total-answered').textContent = totalAnswered;
+
+            const correctIndex = questionsData[qIndex].correct;
+            const items = card.getElementsByClassName('option-item');
+
+            if (selectedIndex === correctIndex) {
+                items[selectedIndex].classList.add('correct');
+                correctCount++;
+                document.getElementById('correct-count').textContent = correctCount;
+            } else {
+                items[selectedIndex].classList.add('incorrect');
+                items[correctIndex].classList.add('correct'); 
+                incorrectCount++;
+                document.getElementById('incorrect-count').textContent = incorrectCount;
+            }
+        }
+    </script>
+</body>
+</html>

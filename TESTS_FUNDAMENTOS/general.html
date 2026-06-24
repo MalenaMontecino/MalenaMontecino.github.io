@@ -214,26 +214,35 @@
         const TESTS_CONFIG = [
             // Pestaña principal fija
             { id: "test_repaso", label: "📘 Test REPASO clase", file: "examenREPASO_PROFE.html", category: "main" },
+             { id: "test_lenguaje", label: "📘 Lenguaje ensamblador", file: "LenguajeEnsamblador.html", category: "main" },
            
+            { id: "test1", label: "🩷 Tema 1", file: "tema1.html", category: "NBook" },
+            { id: "test2", label: "🩷 Tema 2", file: "tema2.html", category: "NBook" },
+            { id: "test3", label: "🩷 Tema 3", file: "tema3.html", category: "NBook" },
+            { id: "test4", label: "🩷 Tema 4", file: "tema4.html", category: "NBook" },
+            { id: "test5", label: "🩷 Tema 5", file: "tema5.html", category: "NBook" },
+            { id: "test6", label: "🩷 Tema 6", file: "tema6.html", category: "NBook" },
+            { id: "test7", label: "🩷 Tema 7", file: "tema7.html", category: "NBook" },
+            { id: "test8", label: "🩷 Tema 8", file: "tema8.html", category: "NBook" },
             // Verdes
-            { id: "test1", label: "🟢 Test suelto 1", file: "preparacion_examen.html", category: "verde" },
-            { id: "test2", label: "🟢 Test suelto 2", file: "TEST-FDC.html", category: "verde" },
-            { id: "test3", label: "🟢 Test suelto 3", file: "test_fundamentos.html", category: "verde" },
+            { id: "test9", label: "🟢 Test suelto 1", file: "preparacion_examen.html", category: "verde" },
+            { id: "test10", label: "🟢 Test suelto 2", file: "TEST-FDC.html", category: "verde" },
+            { id: "test11", label: "🟢 Test suelto 3", file: "test_fundamentos.html", category: "verde" },
             
             // Azules
-            { id: "test4", label: "🔵 Test II", file: "examen_fundamentos_II.html", category: "azul" },
-            { id: "test5", label: "🔵 Test III", file: "examen_fundamentos_III.html", category: "azul" },
-            { id: "test6", label: "🔵 Test IV", file: "examen_fundamentos_IV.html", category: "azul" },
-            { id: "test7", label: "🔵 Test V", file: "examen_fundamentos_V.html", category: "azul" },
-            { id: "test8", label: "🔵 Test VI", file: "examen_fundamentos_VI.html", category: "azul" },
-            { id: "test9", label: "🔵 Test VII", file: "examen_fundamentos_VII.html", category: "azul" },
-            { id: "test10", label: "🔵 Test VIII", file: "examen_fundamentos_VIII.html", category: "azul" },
-            { id: "test11", label: "🔵 Test IX", file: "examen_fundamentos_IX.html", category: "azul" },
+            { id: "test12", label: "🔵 Test II", file: "examen_fundamentos_II.html", category: "azul" },
+            { id: "test13", label: "🔵 Test III", file: "examen_fundamentos_III.html", category: "azul" },
+            { id: "test14", label: "🔵 Test IV", file: "examen_fundamentos_IV.html", category: "azul" },
+            { id: "test15", label: "🔵 Test V", file: "examen_fundamentos_V.html", category: "azul" },
+            { id: "test16", label: "🔵 Test VI", file: "examen_fundamentos_VI.html", category: "azul" },
+            { id: "test17", label: "🔵 Test VII", file: "examen_fundamentos_VII.html", category: "azul" },
+            { id: "test18", label: "🔵 Test VIII", file: "examen_fundamentos_VIII.html", category: "azul" },
+            { id: "test19", label: "🔵 Test IX", file: "examen_fundamentos_IX.html", category: "azul" },
           
             // Amarillos
-            { id: "test12", label: "🟡 Test 1", file: "test_FdC_v1.html", category: "amarillo" },
-            { id: "test13", label: "🟡 Test 2", file: "test_FdC_v2.html", category: "amarillo" },
-            { id: "test14", label: "🟡 Test 3", file: "test_FdC_v3.html", category: "amarillo" }
+            { id: "test20", label: "🟡 Test 1", file: "test_FdC_v1.html", category: "amarillo" },
+            { id: "test21", label: "🟡 Test 2", file: "test_FdC_v2.html", category: "amarillo" },
+            { id: "test22", label: "🟡 Test 3", file: "test_FdC_v3.html", category: "amarillo" }
         ];
 
         const tabsNav = document.getElementById("tabsNav");
@@ -257,6 +266,7 @@
 
         // Definición de los nuevos desplegables configurables
         const dropdownsConfig = [
+            { key: "NBook", title: "📁 Tests Temario" },
             { key: "verde", title: "📁 Tests Verdes" },
             { key: "azul", title: "📁 Tests Azules" },
             { key: "amarillo", title: "📁 Tests Amarillos" }

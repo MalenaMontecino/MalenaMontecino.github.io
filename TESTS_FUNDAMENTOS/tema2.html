@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST TEMA 2 — Lógica Digital y Simplificación</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 12px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .score-box {
+            padding: 6px 16px;
+            border-radius: 5px;
+        }
+        .score-total { background-color: #34495e; }
+        .score-correct { background-color: #27ae60; }
+        .score-incorrect { background-color: #c0392b; }
+        
+        .main-content {
+            margin-top: 110px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+        .question-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .option-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-item:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .question-card.answered .option-item {
+            pointer-events: none; 
+        }
+        .option-item.correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-item.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="scoreboard">
+            <div class="score-box score-total">Respondidas: <span id="total-answered">0</span> / 30</div>
+            <div class="score-box score-correct">Bien: <span id="correct-count">0</span></div>
+            <div class="score-box score-incorrect">Mal: <span id="incorrect-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>TEST TEMA 2 — Lógica Digital y Simplificación</h1>
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        const questionsData = [
+            {
+                q: "¿Qué define fundamentalmente a un circuito combinacional?",
+                options: ["Su salida depende de las entradas actuales y del historial previo.", "Su salida depende únicamente de los valores de las entradas actuales.", "Requiere de un reloj para sincronizar sus operaciones.", "Posee elementos de memoria como biestables."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la base matemática de todos los circuitos digitales?",
+                options: ["Álgebra lineal.", "Cálculo diferencial.", "Álgebra de Boole.", "Geometría euclidiana."],
+                correct: 2
+            },
+            {
+                q: "En el Álgebra de Boole, ¿cuál es el resultado de la operación AND (·)?",
+                options: ["1 si al menos una entrada es 1.", "1 solo si todas las entradas son 1.", "Siempre 0 si hay más de dos entradas.", "El inverso de la suma lógica."],
+                correct: 1
+            },
+            {
+                q: "¿Qué operación lógica devuelve 1 si al menos una de las entradas es 1?",
+                options: ["AND.", "NOT.", "OR (+).", "NAND."],
+                correct: 2
+            },
+            {
+                q: "¿Qué función realiza la compuerta NOT?",
+                options: ["Multiplica dos variables.", "Invierte el valor de entrada (0 → 1 y 1 → 0).", "Compara si dos entradas son iguales.", "Suma dos bits y genera un acarreo."],
+                correct: 1
+            },
+            {
+                q: "¿Por qué las compuertas NAND y NOR se denominan \"universales\"?",
+                options: ["Porque pueden operar con voltajes infinitos.", "Porque se encuentran en todos los procesadores del mundo.", "Porque con solo una de ellas se puede construir cualquier otro circuito digital.", "Porque no requieren transistores para su implementación física."],
+                correct: 2
+            },
+            {
+                q: "¿Qué compuerta lógica devuelve un 1 cuando sus entradas son diferentes?",
+                options: ["AND.", "XOR (⊕).", "XNOR.", "OR."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la característica principal de la compuerta XNOR?",
+                options: ["Da 1 cuando las entradas son diferentes.", "Da 1 cuando las entradas son iguales.", "Es la inversa de la compuerta NOT.", "Solo admite una entrada."],
+                correct: 1
+            },
+            {
+                q: "¿Qué aplicación especial tiene la compuerta XOR en el ámbito de la ciberseguridad?",
+                options: ["Es la base de los cortafuegos de hardware.", "Cifrar un dato con XOR y la misma clave dos veces devuelve el dato original.", "Permite detectar desbordamientos de buffer automáticamente.", "Se usa para generar números aleatorios analógicos."],
+                correct: 1
+            },
+            {
+                q: "Según la Ley de Identidad del Álgebra de Boole, ¿a qué equivale A + 0?",
+                options: ["0.", "1.", "A.", "Ā."],
+                correct: 2
+            },
+            {
+                q: "¿Qué establece la Ley de Nulidad para la operación AND (A · 0)?",
+                options: ["A.", "0.", "1.", "Ā."],
+                correct: 1
+            },
+            {
+                q: "¿A qué equivale la expresión A + 1 según las leyes booleanas?",
+                options: ["A.", "1.", "0.", "2."],
+                correct: 1
+            },
+            {
+                q: "¿Qué establece el Teorema de De Morgan sobre la negación de un producto (NOT(A·B))?",
+                options: ["Equivale a la suma de las variables (A+B).", "Equivale a la suma de las variables negadas (Ā + B̄).", "Equivale al producto de las variables negadas (Ā · B̄).", "No se puede simplificar."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la equivalencia de NOT(A+B) según De Morgan?",
+                options: ["Ā + B̄.", "A · B.", "Ā · B̄.", "NOT(A) + NOT(B)."],
+                correct: 2
+            },
+            {
+                q: "¿Qué es una forma canónica en lógica digital?",
+                options: ["Una simplificación visual del circuito.", "Una representación estándar obtenida directamente de la tabla de verdad.", "Un código secreto para programar la ALU.", "Un tipo de compuerta universal."],
+                correct: 1
+            },
+            {
+                q: "¿Cómo se define un minitérmino?",
+                options: ["Como la suma de todas las variables de una fila.", "Como el producto (AND) de todas las variables de una fila.", "Como una variable que siempre vale 0.", "Como el resultado final de un mapa de Karnaugh."],
+                correct: 1
+            },
+            {
+                q: "En la Suma de Minitérminos (SdP), ¿qué filas se seleccionan de la tabla de verdad?",
+                options: ["Solo las filas donde la función vale 0.", "Solo las filas donde la función vale 1.", "Todas las filas de la tabla.", "Solo las filas con índices pares."],
+                correct: 1
+            },
+            {
+                q: "Si en una fila A=0, B=1 y C=1, ¿cuál es el minitérmino correspondiente (m3)?",
+                options: ["A·B·C.", "Ā·B·C.", "A+B+C.", "Ā+B+C."],
+                correct: 1
+            },
+            {
+                q: "¿Qué caracteriza a la forma canónica Producto de Maxtérminos (PdS)?",
+                options: ["Se obtiene multiplicando los términos de las filas donde la función vale 0.", "Es idéntica a la Suma de Productos.", "Solo usa compuertas XOR.", "Se obtiene sumando las filas donde la función vale 1."],
+                correct: 0
+            },
+            {
+                q: "¿Cuál es la función principal de los Mapas de Karnaugh?",
+                options: ["Diseñar la arquitectura física de los buses.", "Simplificar funciones booleanas de forma visual y sistemática.", "Convertir código binario a hexadecimal.", "Almacenar datos de forma volátil."],
+                correct: 1
+            },
+            {
+                q: "¿Qué sistema de codificación utilizan las filas y columnas de un mapa de Karnaugh?",
+                options: ["Binario natural.", "Decimal.", "Código Gray.", "ASCII."],
+                correct: 2
+            },
+            {
+                q: "¿Por qué se utiliza el código Gray en los mapas de Karnaugh?",
+                options: ["Porque es más fácil de sumar.", "Porque garantiza que entre celdas adyacentes solo cambie una variable.", "Porque permite usar números negativos.", "Porque reduce el consumo de energía del circuito."],
+                correct: 1
+            },
+            {
+                q: "¿Cuál de las siguientes es una regla válida para agrupar celdas en un mapa de Karnaugh?",
+                options: ["Se pueden agrupar 3 celdas si están en línea.", "Los grupos deben ser de tamaño potencia de 2 (1, 2, 4, 8...).", "Solo se pueden agrupar celdas con valor 0.", "Los grupos deben ser siempre circulares."],
+                correct: 1
+            },
+            {
+                q: "¿Qué sucede con las variables que cambian de valor dentro de un grupo de Karnaugh?",
+                options: ["Se mantienen en el término final.", "Se niegan obligatoriamente.", "Desaparecen del término (se eliminan).", "Se convierten en un 1 lógico."],
+                correct: 2
+            },
+            {
+                q: "¿Qué propiedad geométrica tienen los mapas de Karnaugh según las reglas de adyacencia?",
+                options: ["Son planos infinitos.", "Sus bordes son adyacentes (el mapa es toroidal).", "Solo se pueden leer de izquierda a derecha.", "Son estructuras piramidales."],
+                correct: 1
+            },
+            {
+                q: "¿Cuándo se considera que un grupo en un mapa de Karnaugh es \"redundante\"?",
+                options: ["Cuando tiene más de 4 celdas.", "Cuando todos sus \"1\" ya están cubiertos por otros grupos.", "Cuando está ubicado en los bordes del mapa.", "Cuando contiene variables negadas."],
+                correct: 1
+            },
+            {
+                q: "¿Cuántas variables se eliminan en un grupo de 4 celdas en un mapa de Karnaugh?",
+                options: ["1 variable.", "2 variables.", "3 variables.", "Ninguna, solo se simplifican los coeficientes."],
+                correct: 1
+            },
+            {
+                q: "¿Qué tipo de circuito tiene una salida que depende de las entradas actuales y del estado interno?",
+                options: ["Circuito combinacional.", "Circuito secuencial.", "Compuerta NAND pura.", "Bus de direcciones."],
+                correct: 1
+            },
+            {
+                q: "Según la Ley de Absorción, ¿a qué equivale la expresión A + (A · B)?",
+                options: ["B.", "A + B.", "A.", "1."],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el índice decimal del minitérmino correspondiente a la combinación binaria A=1, B=1, C=0?",
+                options: ["3.", "5.", "6.", "7."],
+                correct: 2
+            }
+        ];
+
+        let totalAnswered = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        const container = document.getElementById('quiz-container');
+
+        questionsData.forEach((questionData, qIndex) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-card-${qIndex}`;
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.textContent = `${qIndex + 1}. ${questionData.q}`;
+            card.appendChild(qText);
+
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+
+            questionData.options.forEach((optionText, oIndex) => {
+                const optionItem = document.createElement('li');
+                optionItem.className = 'option-item';
+                optionItem.textContent = optionText;
+                
+                optionItem.addEventListener('click', () => handleAnswer(qIndex, oIndex));
+                optionsList.appendChild(optionItem);
+            });
+
+            card.appendChild(optionsList);
+            container.appendChild(card);
+        });
+
+        function handleAnswer(qIndex, selectedIndex) {
+            const card = document.getElementById(`q-card-${qIndex}`);
+            
+            if (card.classList.contains('answered')) return;
+
+            card.classList.add('answered');
+            totalAnswered++;
+            document.getElementById('total-answered').textContent = totalAnswered;
+
+            const correctIndex = questionsData[qIndex].correct;
+            const items = card.getElementsByClassName('option-item');
+
+            if (selectedIndex === correctIndex) {
+                items[selectedIndex].classList.add('correct');
+                correctCount++;
+                document.getElementById('correct-count').textContent = correctCount;
+            } else {
+                items[selectedIndex].classList.add('incorrect');
+                items[correctIndex].classList.add('correct'); 
+                incorrectCount++;
+                document.getElementById('incorrect-count').textContent = incorrectCount;
+            }
+        }
+    </script>
+</body>
+</html>
