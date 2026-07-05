@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interactivo - Cálculo 1GCIB</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        /* Marcador Fijo Superior */
+        .scoreboard {
+            position: sticky;
+            top: 0;
+            background: #2c3e50;
+            color: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.1em;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .score-box {
+            text-align: center;
+        }
+        .score-val {
+            display: block;
+            font-size: 1.4em;
+            color: #00d2d3;
+        }
+        .score-val.correct { color: #1dd1a1; }
+        .score-val.incorrect { color: #ff6b6b; }
+
+        .question-card {
+            background: #fafafa;
+            border: 1px solid #eef2f3;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .option-item {
+            background: #fff;
+            border: 1px solid #dcdde1;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .option-item:hover {
+            background: #f1f2f6;
+            border-color: #b2bec3;
+        }
+        /* Estados al responder */
+        .option-item.correct-ans {
+            background: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+            font-weight: bold;
+        }
+        .option-item.incorrect-ans {
+            background: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+        .disabled {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Preguntas de Teoría - Cálculo 1GCIB</h1>
+    
+    <div class="scoreboard">
+        <div class="score-box">Llevo <span id="total-answered" class="score-val">0 / 22</span></div>
+        <div class="score-box">Bien <span id="correct-count" class="score-val correct">0</span></div>
+        <div class="score-box">Mal <span id="incorrect-count" class="score-val incorrect">0</span></div>
+    </div>
+
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+    // Banco de datos con todas las preguntas del documento y sus respuestas correctas indicadas (index 0 a 3)
+    const originalQuestions = [
+        {
+            q: "1. ¿Qué es una función real de una variable real?",
+            options: [
+                "a) La información de una salida en la recta numérica para cada punto de la recta numérica.",
+                "b) Una función para la que no existen raíces complejas.",
+                "c) Una expresión formada a partir de la suma, producto, cociente y composición de funciones elementales.",
+                "d) Una función en la que no se divide por 0."
+            ],
+            correct: 0
+        },
+        {
+            q: "2. ¿Cuándo decimos que un número es el límite de una función en un punto?",
+            options: [
+                "a) Cuando la imagen es arbitrariamente cercana a ese número para entradas suficientemente cercanas a ese punto.",
+                "b) Cuando cualquier secuencia de puntos estrictamente menores tiene imágenes estrictamente mayores.",
+                "c) Cuando se aproxima por secuencias estrictas al punto donde queremos calcularlo.",
+                "d) Cuando cualquier secuencia de puntos estrictamente mayores tiene imágenes estrictamente menores."
+            ],
+            correct: 0
+        },
+        {
+            q: "3. ¿Qué es el dominio de una función real de una variable real?",
+            options: [
+                "a) El subconjunto de la recta numérica formado por todas las imágenes originadas por esa función.",
+                "b) El conjunto del plano cartesiano para el que existe una función.",
+                "c) El subconjunto de la recta numérica formado por todos los valores a los que esa función asigna una imagen.",
+                "d) El subconjunto del plano cartesiano que relaciona cada valor a su imagen por esa función."
+            ],
+            correct: 2
+        },
+        {
+            q: "4. ¿Qué es un logaritmo natural?",
+            options: [
+                "a) Es una función diferenciable que manda 1 a 0 y cuya derivada manda cada número no nulo a su inverso multiplicativo. (solo aplica a positivos)",
+                "b) Es la función inversa de la potencia de un número entero positivo llamado constante exponencial.",
+                "c) Es la base de una potencia que tiene que ser positiva y distinta de 1.",
+                "d) Es una función diferenciable que convierte el producto de 2 entradas en la suma de sus salidas."
+            ],
+            correct: 0
+        },
+        {
+            q: "5. ¿Cómo podemos caracterizar la función exponencial real?",
+            options: [
+                "a) Es la función inversa del logaritmo decimal.",
+                "b) Es una función diferenciable que convierte la suma de dos entradas en el producto de sus salidas.",
+                "c) Es la potencia de un número entero positivo llamado constante exponencial.",
+                "d) Es una función diferenciable igual a su propia derivada que manda 0 a 1."
+            ],
+            correct: 3
+        },
+        {
+            q: "6. ¿Qué es una primitiva en el cálculo diferencial?",
+            options: [
+                "a) Es una expresión algebraica con la que formar las demás expresiones en tanto límite.",
+                "b) Es cualquier función cuya función derivada coincide con una función dada.",
+                "c) Es una figura fundamental, como las secciones cónicas, susceptible de diferenciarse.",
+                "d) Es cualquier función usual, como seno o coseno, con la que se construyen las demás funciones."
+            ],
+            correct: 1
+        },
+        {
+            q: "7. ¿Qué es la serie de Taylor?",
+            options: [
+                "a) Un teorema para tomar el límite de un cociente.",
+                "b) Una secuencia de funciones que se aproximan a una función.",
+                "c) La función exponencial.",
+                "d) El límite de unos polinomios cuyos coeficientes son el cociente de la derivada del grado n por n factorial."
+            ],
+            correct: 3
+        },
+        {
+            q: "8. ¿Qué es una función racional?",
+            options: [
+                "a) Una función coherente en la que no se divide por cero.",
+                "b) El cociente de dos polinomios.",
+                "c) La suma de dos polinomios.",
+                "d) El producto de dos polinomios."
+            ],
+            correct: 1
+        },
+        {
+            q: "9. ¿Qué es la función derivada de una función real de una variable real?",
+            options: [
+                "a) Es la mejor aproximación lineal de esta función.",
+                "b) Es, en cada punto, el cociente del límite incremental de la diferencia de imágenes arbitrariamente cercanas de entradas que tienden a ese punto.",
+                "c) Es, en cada punto, el límite del cociente de la imagen incremental de la variable arbitrariamente cercana a cero.",
+                "d) Es, en cada punto, el límite del cociente de la diferencia de sus respectivas imágenes por la diferencia entre entradas arbitrariamente cercanas a ese punto."
+            ],
+            correct: 3
+        },
+        {
+            q: "10. ¿Qué es la gráfica de una función real de una variable real?",
+            options: [
+                "a) Es el conjunto de la recta numérica formado por la imagen de cada punto de su dominio.",
+                "b) El conjunto del dominio con todos sus elementos.",
+                "c) La figura formada por aquellos puntos del plano cartesiano localizados por un punto de su dominio y la correspondiente imagen.",
+                "d) La superficie formada por aquellos puntos del espacio euclidiano de dimensión tres que son la imagen de su primera coordenada."
+            ],
+            correct: 2
+        },
+        {
+            q: "11. ¿En qué consiste la integración por partes?",
+            options: [
+                "a) Cuando el integrante es el producto de una primera función con la derivada de una segunda función, completarlo con la derivada de una función compuesta y aplicar la regla de la cadena.",
+                "b) Cuando el integrante es el producto de una primera función con la derivada de una segunda función, completarlo con la derivada de un producto y aplicar el teorema fundamental del cálculo.",
+                "c) Cuando el integrante es un polinomio, en integrar cada término separadamente por linealidad.",
+                "d) Cuando el integrante es la función derivable reiteradamente, en convertir la integral en el resto de una serie convergente."
+            ],
+            correct: 1
+        },
+        {
+            q: "12. ¿Es f(a+b)-f(a)/b una aproximación de f'(a)?",
+            options: [
+                "a) Si, pero solo si f es una funcion polinomica de grado menor o igual a 2.",
+                "b) Si. Es el cociente incremental estandar (diferencia hacia adelante): para b suficientemente pequeno, [f(a+b)-f(a)]/b tiende a f'(a) por definicion de derivada.",
+                "c) No, porque en el numerador deberia ir f(a)-f(a+b) para que la aproximacion sea valida.",
+                "d) Si, pero siempre sobreestima el valor real de la derivada, independientemente del signo de b."
+            ],
+            correct: 1
+        },
+        {
+            q: "13. ¿Es f(a)-f(a-b)/2b una aproximación de f'(a)?",
+            options: [
+                "a) No. La expresion tiende a (1/2)*f'(a). Para obtener la diferencia hacia atras correcta el denominador debe ser simplemente b, no 2b.",
+                "b) Si, porque el cociente [f(a)-f(a-b)]/b tiende a f'(a), y dividir entre 2 solo escala el resultado, pero sigue siendo una aproximacion valida.",
+                "c) Si, siempre que b sea negativo, ya que entonces el denominador 2b compensa el factor 2 del numerador.",
+                "d) No, porque el numerador deberia ser f(a+b)-f(a) para que sea una diferencia hacia atras."
+            ],
+            correct: 0
+        },
+        {
+            q: "14. ¿Es [f(a+b)-f(a-b)]/b una aproximación de f'(a)?",
+            options: [
+                "a) No. A esta expresion le falta un 2 en el denominador. La formula correcta de diferencia central es [f(a+b)-f(a-b)]/(2b) Tal como esta escrita, la expresion tiende al doble de la derivada: 2f'(a).",
+                "b) Si, porque el termino f(a+b)-f(a-b) aproxima 2bf'(a), y al dividir entre b se obtiene exactamente f'(a) sin necesidad de factor 2.",
+                "c) No, porque el numerador deberia ser f(a-b)-f(a+b) para que el cociente sea positivo y coincida con la derivada.",
+                "d) Si, pero solo si b tiende a infinito, ya que entonces el error relativo se hace despreciable."
+            ],
+            correct: 0
+        },
+        {
+            q: "15. ¿Qué es la integración por sustitución?",
+            options: [
+                "a) Es una tecnica que aplica la regla de la cadena en sentido inverso: se realiza un cambio de variable u=g(x) para transformar la integral de f(g(x))*g'(x) dx en la integral de f(u) du, simplificando la integral original.",
+                "b) Es un metodo que consiste en multiplicar y dividir el integrando por una funcion auxiliar para luego integrar por partes.",
+                "c) Es una tecnica que solo se puede aplicar cuando el integrando es un cociente de polinomios y se utiliza para descomponerlo en fracciones simples.",
+                "d) Es un procedimiento que transforma cualquier integral indefinida en una integral definida evaluada entre 0 y 1."
+            ],
+            correct: 0
+        },
+        {
+            q: "16. ¿En qué consiste la aproximación polinomial de una función?",
+            options: [
+                "a) Consiste en reemplazar una funcion complicada (como senos, cosenos o exponenciales) por un polinomio de Taylor que tenga un comportamiento grafico y matematico casi identico cerca de un punto especifico. Esto facilita muchisimo los calculos.",
+                "b) Consiste en encontrar el polinomio de menor grado que pase exactamente por todos los puntos de la funcion en todo su dominio.",
+                "c) Consiste en aproximar la funcion mediante un polinomio trigonometrico que oscile entre los valores maximos y mínimos de la funcion original.",
+                "d) Consiste en sustituir la funcion por su serie de Fourier truncada, la cual siempre converge uniformemente en cualquier intervalo cerrado."
+            ],
+            correct: 0
+        },
+        {
+            q: "17. ¿Qué es el dominio de una función real de una variable real? (Bis)",
+            options: [
+                "a) El subconjunto de la recta numérica formado por todas las imágenes originadas por esa función",
+                "b) El conjunto del plano cartesiano para el que existe una función",
+                "c) El subconjunto de la recta numérica formado por todos los valores a los que esa función asigna una imagen",
+                "d) El subconjunto del plano cartesiano que relaciona cada valor a su imagen por esa función"
+            ],
+            correct: 2
+        },
+        {
+            q: "18. ¿Cómo podemos caracterizar la función exponencial real? (Bis)",
+            options: [
+                "a) Es la función inversa del logaritmo decimal",
+                "b) Es una función diferenciable que convierte la suma de dos entradas en el producto de sus salidas",
+                "c) Es la potencia de un número entero positivo llamado constante exponencial",
+                "d) Es una función diferenciable igual a su propia derivada que manda 0 a 1"
+            ],
+            correct: 3
+        },
+        {
+            q: "19. ¿Qué es la integración por sustitución? (Bis)",
+            options: [
+                "a) Es una técnica que aplica la regla del producto a la inversa, descomponiendo la integral en partes más simples.",
+                "b) Es una técnica que aplica la regla de la cadena a la inversa. Consiste en hacer un cambio de variable para transformar una integral complicada en una más sencilla y directa de resolver.",
+                "c) Es un método que consiste en derivar la función subintegral y luego ajustar el resultado mediante un factor de corrección constante.",
+                "d) Es un procedimiento algebraico que solo funciona para integrales definidas y que requiere cambiar los límites de integración obligatoriamente."
+            ],
+            correct: 1
+        },
+        {
+            q: "21. ¿Cuál es la regla de la cadena?",
+            options: [
+                "a) La derivada de un producto de dos factores es la suma del producto con cada factor de la derivada del otro.",
+                "b) La derivada de un producto de dos factores es la diferencia del producto con cada factor de la derivada del otro",
+                "c) La derivada de una composición es la composición con la segunda función de la derivada de la primera",
+                "d) La derivada de una composición es el producto de las derivadas"
+            ],
+            correct: 3
+        },
+        {
+            q: "22. Como saber que una función es constante",
+            options: [
+                "a) Si su derivada es igual a cero en todo su dominio y la función está definida en un intervalo conexo.",
+                "b) Si el límite de la función cuando x tiende a infinito es un número real.",
+                "c) Si la integral indefinida de la función es una función lineal.",
+                "d) Si su gráfica es una línea recta con pendiente negativa."
+            ],
+            correct: 0
+        }
+    ];
+
+    let totalAnswered = 0;
+    let correctCount = 0;
+    let incorrectCount = 0;
+
+    // Función algoritmo Fisher-Yates para barajar el array
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // Renderizar el test
+    function initQuiz() {
+        const shuffledQuestions = shuffle([...originalQuestions]);
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = "";
+
+        shuffledQuestions.forEach((item, qIndex) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.innerText = item.q;
+            card.appendChild(qText);
+
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+
+            item.options.forEach((opt, oIndex) => {
+                const li = document.createElement('li');
+                li.className = 'option-item';
+                li.innerText = opt;
+
+                // Evento al hacer clic en una opción
+                li.addEventListener('click', function() {
+                    // Evitar múltiples respuestas a la misma pregunta
+                    if (optionsList.classList.contains('disabled')) return;
+                    optionsList.classList.add('disabled');
+
+                    totalAnswered++;
+                    document.getElementById('total-answered').innerText = `${totalAnswered} / 22`;
+
+                    if (oIndex === item.correct) {
+                        li.classList.add('correct-ans');
+                        correctCount++;
+                        document.getElementById('correct-count').innerText = correctCount;
+                    } else {
+                        li.classList.add('incorrect-ans');
+                        incorrectCount++;
+                        document.getElementById('incorrect-count').innerText = incorrectCount;
+                        
+                        // Mostrar también cuál era la correcta
+                        const allOptions = optionsList.querySelectorAll('.option-item');
+                        allOptions[item.correct].classList.add('correct-ans');
+                    }
+                });
+
+                optionsList.appendChild(li);
+            });
+
+            card.appendChild(optionsList);
+            container.appendChild(card);
+        });
+    }
+
+    // Arrancar el test al cargar la página
+    window.onload = initQuiz;
+</script>
+
+</body>
+</html>
