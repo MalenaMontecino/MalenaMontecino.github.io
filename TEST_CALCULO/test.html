@@ -109,7 +109,7 @@
     <h1>Preguntas de Teoría - Cálculo 1GCIB</h1>
     
     <div class="scoreboard">
-        <div class="score-box">Llevo <span id="total-answered" class="score-val">0 / 22</span></div>
+        <div class="score-box">Llevo <span id="total-answered" class="score-val">0 / 21</span></div>
         <div class="score-box">Bien <span id="correct-count" class="score-val correct">0</span></div>
         <div class="score-box">Mal <span id="incorrect-count" class="score-val incorrect">0</span></div>
     </div>
@@ -311,7 +311,7 @@
             correct: 1
         },
         {
-            q: "21. ¿Cuál es la regla de la cadena?",
+            q: "20. ¿Cuál es la regla de la cadena?",
             options: [
                 "a) La derivada de un producto de dos factores es la suma del producto con cada factor de la derivada del otro.",
                 "b) La derivada de un producto de dos factores es la diferencia del producto con cada factor de la derivada del otro",
@@ -321,7 +321,7 @@
             correct: 3
         },
         {
-            q: "22. Como saber que una función es constante",
+            q: "21. Como saber que una función es constante",
             options: [
                 "a) Si su derivada es igual a cero en todo su dominio y la función está definida en un intervalo conexo.",
                 "b) Si el límite de la función cuando x tiende a infinito es un número real.",
@@ -375,7 +375,7 @@
                     optionsList.classList.add('disabled');
 
                     totalAnswered++;
-                    document.getElementById('total-answered').innerText = `${totalAnswered} / 22`;
+                    document.getElementById('total-answered').innerText = `${totalAnswered} / 21`;
 
                     if (oIndex === item.correct) {
                         li.classList.add('correct-ans');
