@@ -93,6 +93,17 @@
                     <div class="h-6 w-px bg-gray-700 mx-2"></div>
                     <button id="sort-prompts-btn" class="flex items-center gap-2 p-2 mr-2 text-gray-400 hover:text-white transition-colors rounded-md"><i data-lucide="arrow-down-a-z" class="w-5 h-5"></i><span class="hidden sm:inline">Ordenar</span></button>
                     <button id="add-prompt-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Nuevo Prompt</span></button>
+                  
+                    <!-- APARTADO EXPORTACIÓN / IMPORTACIÓN -->
+                    <button id="export-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
+                        <i data-lucide="download" class="w-5 h-5"></i> Exportar
+                    </button>
+                    <button id="import-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
+                        <i data-lucide="upload" class="w-5 h-5"></i> Importar
+                    </button>
+                    <input type="file" id="import-file-input" accept=".json" class="hidden">
+                    <!-- ----------------------------  -->
+
                 </div>
             </header>
 
@@ -322,6 +333,54 @@
                 document.getElementById('view-grid-btn').addEventListener('click', () => setViewMode('grid'));
                 document.getElementById('view-list-btn').addEventListener('click', () => setViewMode('list'));
             }
+
+            //JS EXPORTACIÓN / IMPORTACIÓN
+
+            document.getElementById('export-btn').addEventListener('click', () => {
+                const data = JSON.stringify({
+                    data: state.data,
+                    viewMode: state.viewMode,
+                    expandedFolderIds: state.expandedFolderIds
+                });
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'prompts_backup.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            document.getElementById('import-btn').addEventListener('click', () => {
+                document.getElementById('import-file-input').click();
+            });
+
+            document.getElementById('import-file-input').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const imported = JSON.parse(ev.target.result);
+                        if (imported.data && imported.data.folders && imported.data.prompts) {
+                            state.data = imported.data;
+                            state.viewMode = imported.viewMode || 'grid';
+                            state.expandedFolderIds = imported.expandedFolderIds || [];
+                            saveState();
+                            render();
+                            showToast('Datos importados correctamente');
+                        } else {
+                            showToast('Archivo inválido', true);
+                        }
+                    } catch (err) {
+                        showToast('Error al leer el archivo', true);
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = ''; // permitir re-importar el mismo archivo
+            });
+
+            // -------------------------
 
             function setViewMode(mode) {
                 state.viewMode = mode;
