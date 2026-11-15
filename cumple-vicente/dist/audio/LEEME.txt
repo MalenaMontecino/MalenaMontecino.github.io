@@ -1,0 +1,4 @@
+Añade aquí una pista instrumental con licencia adecuada y renómbrala musica-suave.mp3.
+El proyecto NO incluye música de terceros sin permiso.
+El botón de inicio activará la reproducción si existe el archivo.
+Los efectos de sonido se integrarán en fases posteriores.
